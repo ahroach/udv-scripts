@@ -1515,7 +1515,7 @@ def gen_profile_movie(filename, omega1, omega2, start_time, end_time, channel=2,
 
 def play_raw_profile_animation(filename, channel=2, speed=1.0):
     data = rudv.read_ultrasound(filename, channel)    
-    dt = data['time'][1]-data['time'][0]
+    dt = (data['time'][1]-data['time'][0])/speed
     
     
     fig = figure()
@@ -1535,12 +1535,13 @@ def play_raw_profile_animation(filename, channel=2, speed=1.0):
         time_text.set_text('')
         return line, time_text
     
-    def animate(i):
+    def draw_raw_profile(i):
         line.set_data(data['depth'], data['velocity'][i,:])
         time_text.set_text(time_template%(data['time'][i]))
         return line, time_text
 
-    ani = animation.FuncAnimation(fig, animate, range(0, data['time'].size),
+    ani = animation.FuncAnimation(fig, draw_raw_profile,
+                                  range(0, data['time'].size),
                                   interval = dt*1000, blit=True,
                                   init_func=init)
 
