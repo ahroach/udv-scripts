@@ -7,6 +7,7 @@ import subprocess
 import os
 import shutil
 import glob
+import matplotlib.animation as animation
 from numpy import *
 from pylab import *
 
@@ -1512,6 +1513,35 @@ def gen_profile_movie(filename, omega1, omega2, start_time, end_time, channel=2,
     subprocess.check_call(command)
     shutil.rmtree(basedir)
 
+def play_raw_profile_animation(filename, channel=2, speed=1.0):
+    data = rudv.read_ultrasound(filename, channel)    
+    dt = data['time'][1]-data['time'][0]
+    
+    
+    fig = figure()
+    
+    ax = fig.add_subplot(111, autoscale_on=False, xlim=(0,data['depth'][-1]),
+                         ylim=(-data['maxvelocity'], data['maxvelocity']))
+    ax.grid()
+    
+    line, = ax.plot([], [], '.-', lw=2)
+    time_template = 'time = %.1fs'
+    time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
+    
+    def init():
+        line.set_data([], [])
+        time_text.set_text('')
+        return line, time_text
+    
+    def animate(i):
+        line.set_data(data['depth'], data['velocity'][i,:])
+        time_text.set_text(time_template%(data['time'][i]))
+        return line, time_text
+
+    ani = animation.FuncAnimation(fig, animate, range(0, data['time'].size),
+                                  interval = dt*1000, blit=True,
+                                  init_func=init)
+    plot.show()
 
 def gen_raw_profile_movie(filename, start_time, end_time, channel=2, labelstring='', speed=1.0, basedir='/tmp/abcd000', moviefilename='movie.avi'):
 
