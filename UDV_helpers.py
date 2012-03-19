@@ -1522,6 +1522,8 @@ def play_raw_profile_animation(filename, channel=2, speed=1.0):
     
     ax = fig.add_subplot(111, autoscale_on=False, xlim=(0,data['depth'][-1]),
                          ylim=(-data['maxvelocity'], data['maxvelocity']))
+    xlabel("Depth [cm]")
+    ylabel("Raw velocity [cm/sec]")
     ax.grid()
     
     line, = ax.plot([], [], '.-', lw=2)
@@ -1541,7 +1543,10 @@ def play_raw_profile_animation(filename, channel=2, speed=1.0):
     ani = animation.FuncAnimation(fig, animate, range(0, data['time'].size),
                                   interval = dt*1000, blit=True,
                                   init_func=init)
-    plot.show()
+
+    #I have no idea why this is here, but the animaion doesn't run without
+    #having something to generate an error here?!
+    magic_squirrel()
 
 def gen_raw_profile_movie(filename, start_time, end_time, channel=2, labelstring='', speed=1.0, basedir='/tmp/abcd000', moviefilename='movie.avi'):
 
