@@ -1590,5 +1590,1008 @@ shot_params[904] = {'shot_num': 904, 'shot_length': 145,
                     'ports': [5, 6]}
 
 
+shot_params[909] = {'shot_num': 909, 'shot_length': 185,
+                    'ICspeed': 400, 'IRspeed': 220,
+                    'ORspeed': 53, 'OCspeed': 53,
+                    'current': 700, 'field_delay': 125, 't_field': 55,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
 
 
+shot_params[910] = {'shot_num': 910, 'shot_length': 185,
+                    'ICspeed': 53, 'IRspeed': 53,
+                    'ORspeed': 53, 'OCspeed': 53,
+                    'current': 700, 'field_delay': 125, 't_field': 55,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+
+shot_params[911] = {'shot_num': 911, 'shot_length': 190,
+                    'ICspeed': 200, 'IRspeed': 110,
+                    'ORspeed': 26.5, 'OCspeed': 26.5,
+                    'current': 500, 'field_delay': 125, 't_field': 60,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+shot_params[912] = {'shot_num': 912, 'shot_length': 190,
+                    'ICspeed': 26.5, 'IRspeed': 26.5,
+                    'ORspeed': 26.5, 'OCspeed': 26.5,
+                    'current': 500, 'field_delay': 125, 't_field': 60,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+shot_params[913] = {'shot_num': 913, 'shot_length': 190,
+                    'ICspeed': 200, 'IRspeed': 110,
+                    'ORspeed': 26.5, 'OCspeed': 26.5,
+                    'current': 600, 'field_delay': 125, 't_field': 60,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+shot_params[914] = {'shot_num': 914, 'shot_length': 185,
+                    'ICspeed': 200, 'IRspeed': 110,
+                    'ORspeed': 26.5, 'OCspeed': 26.5,
+                    'current': 700, 'field_delay': 125, 't_field': 55,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+shot_params[915] = {'shot_num': 915, 'shot_length': 145,
+                    'ICspeed': 200, 'IRspeed': 110,
+                    'ORspeed': 26.5, 'OCspeed': 26.5,
+                    'current': 1600, 'field_delay': 125, 't_field': 15,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+shot_params[916] = {'shot_num': 916, 'shot_length': 175,
+                    'ICspeed': 600, 'IRspeed': 330,
+                    'ORspeed': 79.5, 'OCspeed': 79.5,
+                    'current': 900, 'field_delay': 125, 't_field': 45,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+shot_params[917] = {'shot_num': 917, 'shot_length': 170,
+                    'ICspeed': 600, 'IRspeed': 330,
+                    'ORspeed': 79.5, 'OCspeed': 79.5,
+                    'current': 1000, 'field_delay': 125, 't_field': 40,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+shot_params[918] = {'shot_num': 918, 'shot_length': 165,
+                    'ICspeed': 600, 'IRspeed': 330,
+                    'ORspeed': 79.5, 'OCspeed': 79.5,
+                    'current': 1100, 'field_delay': 125, 't_field': 35,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+shot_params[919] = {'shot_num': 919, 'shot_length': 165,
+                    'ICspeed': 800, 'IRspeed': 440,
+                    'ORspeed': 106, 'OCspeed': 106,
+                    'current': 1100, 'field_delay': 125, 't_field': 35,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+shot_params[920] = {'shot_num': 920, 'shot_length': 155,
+                    'ICspeed': 600, 'IRspeed': 330,
+                    'ORspeed': 79.5, 'OCspeed': 79.5,
+                    'current': 1300, 'field_delay': 125, 't_field': 25,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+shot_params[921] = {'shot_num': 921, 'shot_length': 155,
+                    'ICspeed': 1000, 'IRspeed': 550,
+                    'ORspeed': 132.5, 'OCspeed': 132.5,
+                    'current': 1300, 'field_delay': 125, 't_field': 25,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+shot_params[922] = {'shot_num': 922, 'shot_length': 150,
+                    'ICspeed': 1000, 'IRspeed': 550,
+                    'ORspeed': 132.5, 'OCspeed': 132.5,
+                    'current': 1400, 'field_delay': 125, 't_field': 20,
+                    'udv_delay': 105,
+                    'channels': [1, 2],
+                    'alphas': [-0.75, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [1.19, 0.72],
+                    'ports': [5, 6]}
+
+
+shot_params[925] = {'shot_num': 925, 'shot_length': 170, 'trouble_flag': 1,
+                    'ICspeed': 53, 'IRspeed': 53,
+                    'ORspeed': 53, 'OCspeed': 53,
+                    'current': 1000, 'field_delay': 125, 't_field': 40,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[926] = {'shot_num': 926, 'shot_length': 170,
+                    'ICspeed': 400, 'IRspeed': 220,
+                    'ORspeed': 53, 'OCspeed': 53,
+                    'current': 1000, 'field_delay': 125, 't_field': 40,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[927] = {'shot_num': 927, 'shot_length': 160,
+                    'ICspeed': 400, 'IRspeed': 220,
+                    'ORspeed': 53, 'OCspeed': 53,
+                    'current': 1200, 'field_delay': 125, 't_field': 30,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[928] = {'shot_num': 928, 'shot_length': 165,
+                    'ICspeed': 600, 'IRspeed': 330,
+                    'ORspeed': 79.5, 'OCspeed': 79.5,
+                    'current': 1100, 'field_delay': 125, 't_field': 35,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[929] = {'shot_num': 929, 'shot_length': 165,
+                    'ICspeed': 800, 'IRspeed': 440,
+                    'ORspeed': 106, 'OCspeed': 106,
+                    'current': 1100, 'field_delay': 125, 't_field': 35,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[930] = {'shot_num': 930, 'shot_length': 145,
+                    'ICspeed': 200, 'IRspeed': 110,
+                    'ORspeed': 26.5, 'OCspeed': 26.5,
+                    'current': 1600, 'field_delay': 125, 't_field': 15,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[931] = {'shot_num': 931, 'shot_length': 145,
+                    'ICspeed': 100, 'IRspeed': 55,
+                    'ORspeed': 13.25, 'OCspeed': 13.25,
+                    'current': 1600, 'field_delay': 125, 't_field': 15,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[932] = {'shot_num': 932, 'shot_length': 180,
+                    'ICspeed': 100, 'IRspeed': 55,
+                    'ORspeed': 13.25, 'OCspeed': 13.25,
+                    'current': 800, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[933] = {'shot_num': 933, 'shot_length': 190,
+                    'ICspeed': 100, 'IRspeed': 55,
+                    'ORspeed': 13.25, 'OCspeed': 13.25,
+                    'current': 500, 'field_delay': 125, 't_field': 60,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[934] = {'shot_num': 934, 'shot_length': 190,
+                    'ICspeed': 100, 'IRspeed': 55,
+                    'ORspeed': 13.25, 'OCspeed': 13.25,
+                    'current': 400, 'field_delay': 125, 't_field': 60,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[935] = {'shot_num': 935, 'shot_length': 190,
+                    'ICspeed': 100, 'IRspeed': 55,
+                    'ORspeed': 13.25, 'OCspeed': 13.25,
+                    'current': 300, 'field_delay': 125, 't_field': 60,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[936] = {'shot_num': 936, 'shot_length': 160,
+                    'ICspeed': 1600, 'IRspeed': 1080,
+                    'ORspeed': 212, 'OCspeed': 212,
+                    'current': 1200, 'field_delay': 125, 't_field': 30,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[939] = {'shot_num': 939, 'shot_length': 180,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 600, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[941] = {'shot_num': 941, 'shot_length': 180, 'trouble_flag': 1,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 800, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[942] = {'shot_num': 942, 'shot_length': 170, 'trouble_flag': 1,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1000, 'field_delay': 125, 't_field': 40,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[943] = {'shot_num': 943, 'shot_length': 180,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 400, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[944] = {'shot_num': 944, 'shot_length': 180,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 700, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[945] = {'shot_num': 945, 'shot_length': 180,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 900, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[946] = {'shot_num': 946, 'shot_length': 165,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1100, 'field_delay': 125, 't_field': 35,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[947] = {'shot_num': 947, 'shot_length': 160,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1200, 'field_delay': 125, 't_field': 30,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[948] = {'shot_num': 948, 'shot_length': 155,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1300, 'field_delay': 125, 't_field': 25,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[949] = {'shot_num': 949, 'shot_length': 150,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1400, 'field_delay': 125, 't_field': 20,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[950] = {'shot_num': 950, 'shot_length': 145,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1500, 'field_delay': 125, 't_field': 15,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[951] = {'shot_num': 951, 'shot_length': 145,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1600, 'field_delay': 125, 't_field': 15,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[953] = {'shot_num': 953, 'shot_length': 150,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1400, 'field_delay': 125, 't_field': 20,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[954] = {'shot_num': 954, 'shot_length': 150,
+                    'ICspeed': 600, 'IRspeed': 600,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1400, 'field_delay': 125, 't_field': 20,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[955] = {'shot_num': 955, 'shot_length': 160,
+                    'ICspeed': 600, 'IRspeed': 600,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1200, 'field_delay': 125, 't_field': 30,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[956] = {'shot_num': 956, 'shot_length': 170,
+                    'ICspeed': 600, 'IRspeed': 600,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1000, 'field_delay': 125, 't_field': 40,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[957] = {'shot_num': 957, 'shot_length': 170,
+                    'ICspeed': 400, 'IRspeed': 400,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1000, 'field_delay': 125, 't_field': 40,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[958] = {'shot_num': 958, 'shot_length': 165,
+                    'ICspeed': 600, 'IRspeed': 600,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1100, 'field_delay': 125, 't_field': 35,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[959] = {'shot_num': 959, 'shot_length': 165,
+                    'ICspeed': 200, 'IRspeed': 200,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1100, 'field_delay': 125, 't_field': 35,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[960] = {'shot_num': 960, 'shot_length': 170,
+                    'ICspeed': 200, 'IRspeed': 200,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1000, 'field_delay': 125, 't_field': 40,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[961] = {'shot_num': 961, 'shot_length': 175,
+                    'ICspeed': 200, 'IRspeed': 200,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 900, 'field_delay': 125, 't_field': 45,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[962] = {'shot_num': 962, 'shot_length': 180,
+                    'ICspeed': 200, 'IRspeed': 200,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 800, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[963] = {'shot_num': 963, 'shot_length': 180,
+                    'ICspeed': 200, 'IRspeed': 200,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 700, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[964] = {'shot_num': 964, 'shot_length': 180,
+                    'ICspeed': 200, 'IRspeed': 200,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 600, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[965] = {'shot_num': 965, 'shot_length': 180,
+                    'ICspeed': 200, 'IRspeed': 200,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 500, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[966] = {'shot_num': 966, 'shot_length': 180,
+                    'ICspeed': 200, 'IRspeed': 200,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 400, 'field_delay': 125, 't_field': 40,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[967] = {'shot_num': 967, 'shot_length': 180,
+                    'ICspeed': 100, 'IRspeed': 100,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 400, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[968] = {'shot_num': 968, 'shot_length': 180,
+                    'ICspeed': 100, 'IRspeed': 100,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 500, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[969] = {'shot_num': 969, 'shot_length': 180, 'trouble_flag': 1,
+                    'ICspeed': 100, 'IRspeed': 100,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 600, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[970] = {'shot_num': 970, 'shot_length': 180,
+                    'ICspeed': 100, 'IRspeed': 100,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 300, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[971] = {'shot_num': 971, 'shot_length': 180,
+                    'ICspeed': 50, 'IRspeed': 50,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 300, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[972] = {'shot_num': 972, 'shot_length': 180,
+                    'ICspeed': 50, 'IRspeed': 50,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 400, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[973] = {'shot_num': 973, 'shot_length': 180,
+                    'ICspeed': 50, 'IRspeed': 50,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 500, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[974] = {'shot_num': 974, 'shot_length': 180, 'trouble_flag': 1,
+                    'ICspeed': 50, 'IRspeed': 50,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 200, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[975] = {'shot_num': 975, 'shot_length': 145,
+                    'ICspeed': 50, 'IRspeed': 50,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1600, 'field_delay': 125, 't_field': 15,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[976] = {'shot_num': 976, 'shot_length': 160,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1200, 'field_delay': 125, 't_field': 30,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[977] = {'shot_num': 977, 'shot_length': 155,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1300, 'field_delay': 125, 't_field': 25,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[978] = {'shot_num': 978, 'shot_length': 150,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1400, 'field_delay': 125, 't_field': 20,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[979] = {'shot_num': 979, 'shot_length': 145,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1600, 'field_delay': 125, 't_field': 15,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[980] = {'shot_num': 980, 'shot_length': 145,
+                    'ICspeed': 200, 'IRspeed': 200,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1600, 'field_delay': 125, 't_field': 15,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[981] = {'shot_num': 981, 'shot_length': 145,
+                    'ICspeed': 100, 'IRspeed': 100,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1600, 'field_delay': 125, 't_field': 15,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[982] = {'shot_num': 982, 'shot_length': 145,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1500, 'field_delay': 125, 't_field': 15,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[983] = {'shot_num': 983, 'shot_length': 180, 'trouble_flag': 1,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 180, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[984] = {'shot_num': 984, 'shot_length': 180,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 250, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[985] = {'shot_num': 985, 'shot_length': 180, 'trouble_flag': 1,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 300, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[986] = {'shot_num': 986, 'shot_length': 180,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 400, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[987] = {'shot_num': 987, 'shot_length': 180,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 500, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[988] = {'shot_num': 988, 'shot_length': 180,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 600, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[989] = {'shot_num': 989, 'shot_length': 180,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 700, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[990] = {'shot_num': 990, 'shot_length': 180,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 800, 'field_delay': 125, 't_field': 50,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[991] = {'shot_num': 991, 'shot_length': 175,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 900, 'field_delay': 125, 't_field': 45,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[992] = {'shot_num': 992, 'shot_length': 175,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1000, 'field_delay': 125, 't_field': 45,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[993] = {'shot_num': 993, 'shot_length': 165,
+                    'ICspeed': 700, 'IRspeed': 700,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1100, 'field_delay': 125, 't_field': 35,
+                    'udv_delay': 105,
+                    'channels': [2, 3],
+                    'alphas': [20.3, 20.3],
+                    'betas': [0, 0],
+                    'offsets': [0.72, 0.41],
+                    'ports': [6, 7]}
+
+
+shot_params[994] = {'shot_num': 994, 'shot_length': 140,
+                    'ICspeed': 0, 'IRspeed': 0,
+                    'ORspeed': 0, 'OCspeed': 0,
+                    'current': 1200, 'field_delay': 5, 't_field': 30,
+                    'udv_delay': 0,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[995] = {'shot_num': 995, 'shot_length': 160,
+                    'ICspeed': 106, 'IRspeed': 106,
+                    'ORspeed': 106, 'OCspeed': 106,
+                    'current': 0, 'field_delay': nan, 't_field': nan,
+                    'udv_delay': 0,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[996] = {'shot_num': 996, 'shot_length': 160, 'trouble_flag': 1,
+                    'ICspeed': 800, 'IRspeed': 440,
+                    'ORspeed': 106, 'OCspeed': 106,
+                    'current': 1200, 'field_delay': 125, 't_field': 30,
+                    'udv_delay': 120,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[997] = {'shot_num': 997, 'shot_length': 160,
+                    'ICspeed': 159, 'IRspeed': 159,
+                    'ORspeed': 159, 'OCspeed': 159,
+                    'current': 1200, 'field_delay': 125, 't_field': 30,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
+
+
+shot_params[998] = {'shot_num': 998, 'shot_length': 160,
+                    'ICspeed': 1200, 'IRspeed': 660,
+                    'ORspeed': 159, 'OCspeed': 159,
+                    'current': 1200, 'field_delay': 125, 't_field': 30,
+                    'udv_delay': 105,
+                    'channels': [1, 2, 3, 4],
+                    'alphas': [-0.75, 20.3, 20.3, 20.3],
+                    'betas': [0, 0, 0, 0],
+                    'offsets': [1.19, 0.72, 0.41, 0.53],
+                    'ports': [5, 6, 7, 3]}
