@@ -24,9 +24,9 @@ shot_params[676] = {'shot_num': 676, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[677] = {'shot_num': 677, 'shot_length': 190,
@@ -36,9 +36,9 @@ shot_params[677] = {'shot_num': 677, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[678] = {'shot_num': 678, 'shot_length': 65,
@@ -48,9 +48,9 @@ shot_params[678] = {'shot_num': 678, 'shot_length': 65,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[679] = {'shot_num': 679, 'shot_length': 190,
@@ -60,9 +60,9 @@ shot_params[679] = {'shot_num': 679, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[681] = {'shot_num': 681, 'shot_length': 190,
@@ -72,9 +72,9 @@ shot_params[681] = {'shot_num': 681, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[682] = {'shot_num': 682, 'shot_length': 152,
@@ -84,9 +84,9 @@ shot_params[682] = {'shot_num': 682, 'shot_length': 152,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[683] = {'shot_num': 683, 'shot_length': 155,
@@ -96,9 +96,9 @@ shot_params[683] = {'shot_num': 683, 'shot_length': 155,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[684] = {'shot_num': 684, 'shot_length': 165,
@@ -108,9 +108,9 @@ shot_params[684] = {'shot_num': 684, 'shot_length': 165,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[685] = {'shot_num': 685, 'shot_length': 165,
@@ -120,9 +120,9 @@ shot_params[685] = {'shot_num': 685, 'shot_length': 165,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[686] = {'shot_num': 686, 'shot_length': 165,
@@ -132,9 +132,9 @@ shot_params[686] = {'shot_num': 686, 'shot_length': 165,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[687] = {'shot_num': 687, 'shot_length': 165,
@@ -144,9 +144,9 @@ shot_params[687] = {'shot_num': 687, 'shot_length': 165,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[688] = {'shot_num': 687, 'shot_length': 165,
@@ -156,9 +156,9 @@ shot_params[688] = {'shot_num': 687, 'shot_length': 165,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[691] = {'shot_num': 691, 'shot_length': 120,
@@ -168,9 +168,9 @@ shot_params[691] = {'shot_num': 691, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[692] = {'shot_num': 692, 'shot_length': 120,
@@ -180,9 +180,9 @@ shot_params[692] = {'shot_num': 692, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[693] = {'shot_num': 693, 'shot_length': 120,
@@ -192,9 +192,9 @@ shot_params[693] = {'shot_num': 693, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[694] = {'shot_num': 694, 'shot_length': 120,
@@ -204,9 +204,9 @@ shot_params[694] = {'shot_num': 694, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[695] = {'shot_num': 695, 'shot_length': 120,
@@ -216,9 +216,9 @@ shot_params[695] = {'shot_num': 695, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[696] = {'shot_num': 696, 'shot_length': 60,
@@ -228,9 +228,9 @@ shot_params[696] = {'shot_num': 696, 'shot_length': 60,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[697] = {'shot_num': 697, 'shot_length': 120,
@@ -240,9 +240,9 @@ shot_params[697] = {'shot_num': 697, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[698] = {'shot_num': 698, 'shot_length': 120,
@@ -252,9 +252,9 @@ shot_params[698] = {'shot_num': 698, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[699] = {'shot_num': 699, 'shot_length': 120,
@@ -264,9 +264,9 @@ shot_params[699] = {'shot_num': 699, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[700] = {'shot_num': 700, 'shot_length': 120,
@@ -276,9 +276,9 @@ shot_params[700] = {'shot_num': 700, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[701] = {'shot_num': 701, 'shot_length': 190,
@@ -288,9 +288,9 @@ shot_params[701] = {'shot_num': 701, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[702] = {'shot_num': 702, 'shot_length': 190,
@@ -300,9 +300,9 @@ shot_params[702] = {'shot_num': 702, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[703] = {'shot_num': 703, 'shot_length': 165,
@@ -312,9 +312,9 @@ shot_params[703] = {'shot_num': 703, 'shot_length': 165,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[704] = {'shot_num': 704, 'shot_length': 190,
@@ -324,9 +324,9 @@ shot_params[704] = {'shot_num': 704, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[707] = {'shot_num': 707, 'shot_length': 190,
@@ -336,9 +336,9 @@ shot_params[707] = {'shot_num': 707, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[708] = {'shot_num': 708, 'shot_length': 190,
@@ -348,9 +348,9 @@ shot_params[708] = {'shot_num': 708, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[711] = {'shot_num': 711, 'shot_length': 190,
@@ -360,9 +360,9 @@ shot_params[711] = {'shot_num': 711, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[713] = {'shot_num': 713, 'shot_length': 180,
@@ -372,9 +372,9 @@ shot_params[713] = {'shot_num': 713, 'shot_length': 180,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[714] = {'shot_num': 714, 'shot_length': 180,
@@ -444,9 +444,9 @@ shot_params[719] = {'shot_num': 719, 'shot_length': 190,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[720] = {'shot_num': 720, 'shot_length': 180,
@@ -516,9 +516,9 @@ shot_params[725] = {'shot_num': 725, 'shot_length': 170,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[726] = {'shot_num': 726, 'shot_length': 160,
@@ -552,9 +552,9 @@ shot_params[728] = {'shot_num': 728, 'shot_length': 160,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[729] = {'shot_num': 729, 'shot_length': 150,
@@ -588,9 +588,9 @@ shot_params[731] = {'shot_num': 731, 'shot_length': 150,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[732] = {'shot_num': 732, 'shot_length': 145,
@@ -624,9 +624,9 @@ shot_params[734] = {'shot_num': 734, 'shot_length': 145,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[735] = {'shot_num': 735, 'shot_length': 240,
@@ -636,9 +636,9 @@ shot_params[735] = {'shot_num': 735, 'shot_length': 240,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[736] = {'shot_num': 736, 'shot_length': 240,
@@ -648,9 +648,9 @@ shot_params[736] = {'shot_num': 736, 'shot_length': 240,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[737] = {'shot_num': 737, 'shot_length': 240,
@@ -660,9 +660,9 @@ shot_params[737] = {'shot_num': 737, 'shot_length': 240,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[738] = {'shot_num': 738, 'shot_length': 240,
@@ -672,9 +672,9 @@ shot_params[738] = {'shot_num': 738, 'shot_length': 240,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[739] = {'shot_num': 739, 'shot_length': 240,
@@ -684,9 +684,9 @@ shot_params[739] = {'shot_num': 739, 'shot_length': 240,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[740] = {'shot_num': 740, 'shot_length': 240,
@@ -696,9 +696,9 @@ shot_params[740] = {'shot_num': 740, 'shot_length': 240,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[741] = {'shot_num': 741, 'shot_length': 60,
@@ -708,9 +708,9 @@ shot_params[741] = {'shot_num': 741, 'shot_length': 60,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[742] = {'shot_num': 742, 'shot_length': 170,
@@ -720,9 +720,9 @@ shot_params[742] = {'shot_num': 742, 'shot_length': 170,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[743] = {'shot_num': 743, 'shot_length': 170,
@@ -780,9 +780,9 @@ shot_params[774] = {'shot_num': 774, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[775] = {'shot_num': 775, 'shot_length': 120,
@@ -792,9 +792,9 @@ shot_params[775] = {'shot_num': 775, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[785] = {'shot_num': 785, 'shot_length': 70, 'trouble_flag': 1,
@@ -804,9 +804,9 @@ shot_params[785] = {'shot_num': 785, 'shot_length': 70, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[787] = {'shot_num': 787, 'shot_length': 40, 'trouble_flag': 1,
@@ -816,9 +816,9 @@ shot_params[787] = {'shot_num': 787, 'shot_length': 40, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[788] = {'shot_num': 788, 'shot_length': 40, 'trouble_flag': 1,
@@ -828,9 +828,9 @@ shot_params[788] = {'shot_num': 788, 'shot_length': 40, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[813] = {'shot_num': 813, 'shot_length': 120,
@@ -840,9 +840,9 @@ shot_params[813] = {'shot_num': 813, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[814] = {'shot_num': 814, 'shot_length': 40, 'trouble_flag': 1,
@@ -852,9 +852,9 @@ shot_params[814] = {'shot_num': 814, 'shot_length': 40, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[815] = {'shot_num': 815, 'shot_length': 10, 'trouble_flag': 1,
@@ -864,9 +864,9 @@ shot_params[815] = {'shot_num': 815, 'shot_length': 10, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[816] = {'shot_num': 816, 'shot_length': 9, 'trouble_flag': 1,
@@ -876,9 +876,9 @@ shot_params[816] = {'shot_num': 816, 'shot_length': 9, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[818] = {'shot_num': 818, 'shot_length': 40, 'trouble_flag': 1,
@@ -888,9 +888,9 @@ shot_params[818] = {'shot_num': 818, 'shot_length': 40, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[819] = {'shot_num': 819, 'shot_length': 40, 'trouble_flag': 1,
@@ -900,9 +900,9 @@ shot_params[819] = {'shot_num': 819, 'shot_length': 40, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[820] = {'shot_num': 820, 'shot_length': 120, 'trouble_flag': 1,
@@ -912,9 +912,9 @@ shot_params[820] = {'shot_num': 820, 'shot_length': 120, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[821] = {'shot_num': 821, 'shot_length': 120, 'trouble_flag': 1,
@@ -924,9 +924,9 @@ shot_params[821] = {'shot_num': 821, 'shot_length': 120, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[822] = {'shot_num': 822, 'shot_length': 120, 'trouble_flag': 1,
@@ -936,9 +936,9 @@ shot_params[822] = {'shot_num': 822, 'shot_length': 120, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[823] = {'shot_num': 823, 'shot_length': 120, 'trouble_flag': 1,
@@ -948,9 +948,9 @@ shot_params[823] = {'shot_num': 823, 'shot_length': 120, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[824] = {'shot_num': 824, 'shot_length': 120, 'trouble_flag': 1,
@@ -960,9 +960,9 @@ shot_params[824] = {'shot_num': 824, 'shot_length': 120, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[825] = {'shot_num': 825, 'shot_length': 120,
@@ -972,9 +972,9 @@ shot_params[825] = {'shot_num': 825, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[826] = {'shot_num': 826, 'shot_length': 120, 'trouble_flag': 1,
@@ -984,9 +984,9 @@ shot_params[826] = {'shot_num': 826, 'shot_length': 120, 'trouble_flag': 1,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[827] = {'shot_num': 827, 'shot_length': 120,
@@ -996,9 +996,9 @@ shot_params[827] = {'shot_num': 827, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[828] = {'shot_num': 828, 'shot_length': 120,
@@ -1008,9 +1008,9 @@ shot_params[828] = {'shot_num': 828, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[829] = {'shot_num': 829, 'shot_length': 120,
@@ -1020,9 +1020,9 @@ shot_params[829] = {'shot_num': 829, 'shot_length': 120,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[830] = {'shot_num': 830, 'shot_length': 185,
@@ -1032,9 +1032,9 @@ shot_params[830] = {'shot_num': 830, 'shot_length': 185,
                     'udv_delay': 0,
                     'channels': [1, 2],
                     'alphas': [-0.75, 20.3],
-                    'betas': [0,0],
+                    'betas': [0, 0],
                     'offsets': [1.19, 0.72],
-                    'ports': [5,6]}
+                    'ports': [5, 6]}
 
 
 shot_params[831] = {'shot_num': 831, 'shot_length': 180,
