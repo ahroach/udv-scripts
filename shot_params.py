@@ -13,7 +13,24 @@
 #shot_params[num]['channels'].__contains__(4)
 #shot_params[num]['channels'].index(channel_num)
 
+from math import pi
 from numpy import nan
+
+#Port locations
+ports = {}
+ports[1] = {'r': 20.3, 'theta': 0.0, 'z': 3.01625}
+ports[2] = {'r': 20.3, 'theta': pi/2, 'z': 3.01625}
+ports[3] = {'r': 20.3, 'theta': pi, 'z': 3.01625}
+ports[4] = {'r': 20.3, 'theta': 3*pi/2, 'z': 3.01625}
+ports[5] = {'r': 20.3, 'theta': 0.0, 'z': 14.44625}
+ports[6] = {'r': 20.3, 'theta': pi/2, 'z': 14.44625}
+ports[7] = {'r': 20.3, 'theta': pi, 'z': 14.44625}
+ports[8] = {'r': 20.3, 'theta': 3*pi/2, 'z': 14.44625}
+ports[9] = {'r': 20.3, 'theta': 0.0, 'z': 25.87625}
+ports[10] = {'r': 20.3, 'theta': pi/2, 'z': 25.87625}
+ports[11] = {'r': 20.3, 'theta': pi, 'z': 25.87625}
+ports[12] = {'r': 20.3, 'theta': 3*pi/2, 'z': 25.87625}
+
 
 shot_params = {}
 
