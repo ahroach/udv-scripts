@@ -77,6 +77,16 @@ def is_split_unstable(shot):
     return False
 
 
+def is_split_stable(shot):
+    IC = sp.shot_params[shot]['ICspeed']
+    IR = sp.shot_params[shot]['IRspeed']
+    OR = sp.shot_params[shot]['ORspeed']
+    OC = sp.shot_params[shot]['OCspeed']
+    if OC == OR and IR == 0 and IC == 0 and OC != 0:
+        return True
+    return False
+
+
 def is_ekman(shot):
     IC = sp.shot_params[shot]['ICspeed']
     IR = sp.shot_params[shot]['IRspeed']
