@@ -77,7 +77,7 @@ def is_split_unstable(shot):
     return False
 
 
-def is_split_stable(shot):
+def is_split_cyclonic(shot):
     IC = sp.shot_params[shot]['ICspeed']
     IR = sp.shot_params[shot]['IRspeed']
     OR = sp.shot_params[shot]['ORspeed']
