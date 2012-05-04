@@ -10,6 +10,8 @@ import glob
 import matplotlib.animation as animation
 from numpy import *
 from pylab import *
+import shot_params as sp
+import shot_db_ops as sdo
 
 r1 = 7.06 #Position of IC in cm
 r2 = 20.30 #Position of OC in cm
@@ -20,6 +22,37 @@ tan_probe_offset_676 = 0.53
 tan_probe_angle = 20.3 #Angle of tangential probe to radial
 global_beta=0
 radial_probe_angle= -0.75
+
+rpmtorads = lambda x: x*2.0*pi/60.0
+
+def get_channel_data(shot, channel):
+
+    print sp.shot_params[shot]
+    if(not(sp.shot_params[shot]['channels'].__contains__(channel))):
+        print "Error: Shot "+str(shot)+" doesn't use channel "+str(channel)
+        return False
+    
+    if(sp.shot_params[shot].__contains__('trouble_flag')):
+        print "Warning: Shot "+str(shot)+" has trouble_flag set. Check notebook to see why."
+    
+    
+    filename = str(shot) + '.BDD'
+    data = rudv.read_ultrasound(filename, channel)
+
+    #Copy all of the shot parameters to this new dictionary
+    data.update(sp.shot_params[shot])
+
+    #Now eliminate the alphas, betas, offsets, ports, etc., replacing
+    #them just with the one that describes this channel.
+    channel_idx = data.pop('channels').index(channel)
+
+    data['alpha'] = data.pop('alphas')[channel_idx]
+    data['beta'] = data.pop('betas')[channel_idx]
+    data['offset'] = data.pop('offsets')[channel_idx]
+    data['port'] = data.pop('ports')[channel_idx]
+
+    return data
+
 
 def show_logs(start_file, end_file):
     allfiles = glob.glob('*.BDD')
