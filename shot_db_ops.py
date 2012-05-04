@@ -133,6 +133,22 @@ def is_mri_new(shot):
     return False
 
 
+def is_mri(shot):
+    IC = sp.shot_params[shot]['ICspeed']
+    IR = sp.shot_params[shot]['IRspeed']
+    OR = sp.shot_params[shot]['ORspeed']
+    OC = sp.shot_params[shot]['OCspeed']
+
+    IRrat = float(IC)/float(IR)
+    ORrat = float(IC)/float(OR)
+    OCrat = float(IC)/float(OC)
+
+    in_range = lambda x, y: abs(1.0 - x/y) < 0.01
+
+    if (OC != 0 and OR != 0 and IR != 0 and in_range(IRrat, 2.740) and
+        in_range(ORrat, 10.0) and in_range(OCrat, 7.547)):
+        return True
+    return False
 
 
 def is_mri_mango(shot):
