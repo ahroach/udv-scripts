@@ -25,17 +25,15 @@ radial_probe_angle= -0.75
 
 rpmtorads = lambda x: x*2.0*pi/60.0
 
-def get_channel_data(shot, channel):
 
-    print sp.shot_params[shot]
+def get_channel_data(shot, channel):
     if(not(sp.shot_params[shot]['channels'].__contains__(channel))):
         print "Error: Shot "+str(shot)+" doesn't use channel "+str(channel)
         return False
     
     if(sp.shot_params[shot].__contains__('trouble_flag')):
         print "Warning: Shot "+str(shot)+" has trouble_flag set. Check notebook to see why."
-    
-    
+        
     filename = str(shot) + '.BDD'
     data = rudv.read_ultrasound(filename, channel)
 
@@ -51,56 +49,60 @@ def get_channel_data(shot, channel):
     data['offset'] = data.pop('offsets')[channel_idx]
     data['port'] = data.pop('ports')[channel_idx]
 
+    data['time_points'] = data['velocity'].shape[0]
+    data['spatial_points'] = data['velocity'].shape[1]
+
+    unwrap_velocity(data)
+    calculate_radius(data)
+    generate_couette(data)
+
     return data
 
 
-def show_logs(start_file, end_file):
-    allfiles = glob.glob('*.BDD')
-    files=[]
-    for file in allfiles:
-        if (file >= start_file) and (file <= end_file):
-            files.append(file)
-
-    files = sort(files)
-
-    for file in files:
-        print file
-        usound_data = rudv.read_ultrasound(file, 0)
-        print 
-
-def calculate_radius(usound_data, alpha=nan, beta=nan, offset=nan):
-    if isnan(alpha):
-        if usound_data['channel'] == 1:
-            alpha= radial_probe_angle
-        else:
-            alpha = tan_probe_angle
-
-    if isnan(beta):
-        beta = global_beta
-
-    if isnan(offset):
-        if usound_data['channel'] == 1:
-            offset = radial_probe_offset
-        if usound_data['channel'] == 2:
-            offset = tan_probe_offset
-        if usound_data['channel'] == 3:
-            offset = tan_probe_offset_675
-        if usound_data['channel'] == 4:
-            offset = tan_probe_offset_676
-        else:
-            offset = 0
-
-        d = usound_data['depth'] - offset
-        r = zeros(d.size)
-
-        tanalpha = tan(pi*alpha/180)
-        tanbeta = tan(pi*beta/180)
-        anglefactor = 1 + tanalpha**2 + tanbeta**2
-        for i in range(0,d.size):
-            r[i] = sqrt(d[i]**2*(1 + tanalpha**2)/anglefactor
-                        - 2*r2*d[i]/sqrt(anglefactor) + r2**2)
+def calculate_radius(data):
+    d = data['depth'] - data['offset']
+    data['r'] = zeros(data['depth'].size)
     
-    return r
+    tanalpha = tan(pi*data['alpha']/180)
+    tanbeta = tan(pi*data['beta']/180)
+    anglefactor = 1 + tanalpha**2 + tanbeta**2
+    for i in range(0,d.size):
+        data['r'][i] = sqrt(d[i]**2*(1 + tanalpha**2)/anglefactor
+                            - 2*r2*d[i]/sqrt(anglefactor) + r2**2)
+
+
+def generate_couette(data):    
+    v1 = rpmtorads(data['ICspeed'])*r1
+    v2 = rpmtorads(data['OCspeed'])*r2
+    a = (v1*r1 - v2*r2)/(r1**2 - r2**2)
+    b = (v1*r1 - a*r1**2)
+
+    data['couette'] = zeros(data['r'].size)
+    for i in range(0, data['couette'].size):
+        data['couette'][i] = a*data['r'][i] + b/data['r'][i]
+
+
+
+def unwrap_velocity(data, threshold=1.5):
+    #Add the unwrapped_velocity item to the data dictionary
+    data['unwrapped_velocity'] = zeros(data['velocity'].shape)
+    
+    maxvelocity = data['maxvelocity']
+
+    for j in range(0, data['time_points']):
+        wraps = zeros(data['spatial_points'])
+        for i in range(10, data['spatial_points']):
+            if (data['velocity'][j, i] -
+                data['velocity'][j, i-1]) < -threshold*maxvelocity:
+                wraps[i] = wraps[i-1] + 1
+            elif (data['velocity'][j, i] -
+                  data['velocity'][j, i-1]) > threshold*maxvelocity:
+                wraps[i] = wraps[i-1] -1
+            else:
+                wraps[i] = wraps[i-1]
+        v_correction = wraps*2.0*maxvelocity
+        data['unwrapped_velocity'][j,:] = data['velocity'][j,:] + v_correction
+
 
 def correct_vtan(usound_data, profile, omega2):
     omega2 = omega2*2*pi/60 #Convert omega2 in RPM to omega2 in rad/sec
@@ -126,6 +128,22 @@ def correct_vtan(usound_data, profile, omega2):
         
     return v_corrected
 
+
+
+def show_logs(start_file, end_file):
+    allfiles = glob.glob('*.BDD')
+    files=[]
+    for file in allfiles:
+        if (file >= start_file) and (file <= end_file):
+            files.append(file)
+
+    files = sort(files)
+
+    for file in files:
+        print file
+        usound_data = rudv.read_ultrasound(file, 0)
+        print     
+
 def plot_raw_profile(filename, start_num, end_num, channel,
                      labelstring="", time=0):
     usound_data = rudv.read_ultrasound(filename, channel)
@@ -141,16 +159,14 @@ def plot_raw_profile(filename, start_num, end_num, channel,
     plot(usound_data['depth'], profile, '-o', label=labelstring)
     print "Maximum velocity = " + str(usound_data['maxvelocity'])
     print "Time = " + str(usound_data['time'][start_num]) + " to " + str(usound_data['time'][end_num])
-    return axis()
+    return axis()    
 
-def plot_single_profile(filename, profile_num, channel, omega1, omega2):
-    usound_data = rudv.read_ultrasound(filename, channel)
-    unwrapped_profile = unwrap_profile(usound_data,
-                                       usound_data['velocity'][profile_num,:])
-    corrected_profile = correct_vtan(usound_data, unwrapped_profile, omega2)
-    labelstring = usound_data['filename']+": t = "+str(usound_data['time'][profile_num])
-    plot_profile(usound_data, corrected_profile, omega1, omega2, labelstring)
+def plot_single_profile(shot, channel, profile_num):
+    data = get_channel_data(shot, channel)
+    #labelstring = data['filename']+": t = "+str(data['time'][profile_num])
 
+    plot(data['r'], data['unwrapped_velocity'][profile_num,:])
+    plot(data['r'], data['couette'])
 
 def plot_avg_profile(usound_data, start_num, end_num, omega1, omega2, channel=2):
     #Average the profile
@@ -222,6 +238,7 @@ def unwrap_profile(usound_data, profile):
     velocity_correction = wraps*2.0*maxvelocity
     unwrapped_velocity = profile + velocity_correction
     return unwrapped_velocity
+
 
 def plot_all_timeseries_channel(filename, channel):
     data = rudv.read_ultrasound(filename, channel)
