@@ -43,7 +43,7 @@ class Shot:
         self.udv_delay = sp.shot_params[shot_num]['udv_delay']
         self.channels_used = sp.shot_params[shot_num]['channels']
         self.channels = {}
-        self.velocities = {}
+        self.velocities = []
         self.idealcouette = CouetteProfile(self)
 
     def add_all_channels(self):
@@ -73,6 +73,49 @@ class Shot:
                 return self.channels[key]
         #Otherwise add the channel and return that.
         return self.add_channel(channel_num)
+
+    def add_velocity(self, channel_nums):
+        '''Adds and returns a Velocity object produced using channel_nums
+        for this Shot.'''
+        channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
+        
+        #Make sure we actually have all of these channels.
+        for channel_num in channel_nums:
+            if(not(self.channels_used.__contains__(channel_num))):
+                print "Error: Shot "+str(self.number)+" doesn't use channel "+str(channel_num)
+                return False
+
+        
+        self.velocities.append(Velocity(self, channel_nums))
+        return self.velocities[-1]
+    
+    def get_velocity(self, channel_nums):
+        '''Returns a Velocity object produced using the specified
+        channel_nums.'''
+        channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
+
+        #Check to see if we've processed this velocity data before, and, if so,
+        #return it
+        for idx in range(0, self.velocities.__len__()):
+            if self.velocities[idx].progenitors == channel_nums:
+                return self.velocities[idx]
+        #Otherwise add the velocities and return that.
+        return self.add_velocity(channel_nums)
+
+    def sanitize_channel_nums_for_velocities(self, channel_nums):
+        '''Makes sure we have the channel_nums as a sorted list, even if
+        we get weird things on input'''
+        if(type(channel_nums) is int):
+            channel = channel_nums
+            channel_nums = list()
+            channel_nums.append(channel)
+        elif(not(type(channel_nums) is list)):
+            channels = channel_nums
+            channel_nums = list(channels)
+        
+        channel_nums.sort()
+        return channel_nums
+
 
     def list_params(self):
         '''Lists information about the shot'''
@@ -236,8 +279,9 @@ class Velocity():
             return None
 
     def generate_velocity_one_transducer(self, channel_num):
-        self.progenitors = self.shot.get_channel(channel_num)
-        channel = self.progenitors
+        self.progenitors = []
+        self.progenitors.append(self.shot.get_channel(channel_num[0]))
+        channel = self.progenitors[0]
         if (((channel.beta == 90) or (channel.beta == -90)) and
             (channel.alpha == 0)):
             
