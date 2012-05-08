@@ -332,8 +332,16 @@ class Velocity():
                 self.vtheta[i,:] = ((channel.unwrapped_velocity[i,:]*
                                      anglefactor) +
                                     r2*rpmtorads(self.shot.OCspeed))
-
-        
+    
+    def list_progenitors(self):
+        num_progenitors = size(self.progenitors)
+        print "Derived from %d progenitor(s)" % num_progenitors
+        for i in range(0, num_progenitors):
+            progenitor = self.progenitors[i]
+            print "%d: alpha=%g, beta=%g, port=%d" % (i,
+                                                      progenitor.alpha,
+                                                      progenitor.beta,
+                                                      progenitor.port)
 
 class CouetteProfile():
     def __init__(self, shot):
