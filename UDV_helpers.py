@@ -26,6 +26,199 @@ radial_probe_angle= -0.75
 rpmtorads = lambda x: x*2.0*pi/60.0
 
 
+class Shot:
+    def __init__(self, shot_num):
+        '''Creates a new Shot object, looks up and adds shot parameters
+        to the object, and runs add_channel_data() for all channels'''
+        self.number = shot_num
+        self.filename = str(shot_num) + '.BDD'
+        self.shot_length = sp.shot_params[shot_num]['shot_length']
+        self.ICspeed = sp.shot_params[shot_num]['ICspeed']
+        self.IRspeed = sp.shot_params[shot_num]['IRspeed']
+        self.ORspeed = sp.shot_params[shot_num]['ORspeed']
+        self.OCspeed = sp.shot_params[shot_num]['OCspeed']
+        self.current = sp.shot_params[shot_num]['current']
+        self.field_delay = sp.shot_params[shot_num]['field_delay']
+        self.field_length = sp.shot_params[shot_num]['t_field']
+        self.udv_delay = sp.shot_params[shot_num]['udv_delay']
+        self.channels_used = sp.shot_params[shot_num]['channels']
+        self.channels = {}
+        for channel in self.channels_used:
+            self.add_channel_data(channel)
+        self.velocities = {}
+    
+    def add_channel_data(self, channel_num):
+        '''Adds and returns a ChannelData object corresponding to channel_num
+        for this Shot.'''
+        if(not(self.channels_used.__contains__(channel_num))):
+            print "Error: Shot "+str(self.number)+" doesn't use channel "+str(channel_num)
+            return False
+        
+        self.channels[channel_num] = ChannelData(self, channel_num)
+        return self.channels[channel_num]
+    
+    def get_channel_data(self, channel_num):
+        '''Returns a ChannelData object corresponding to channel_num. Should
+        be equivalent to Shot.channels[channel_num], with the only difference
+        being that this routine will add the channel data if it has not
+        already been added to the shot.'''
+        #Check to see if we've added this channel data before, and, if so,
+        #return it
+        for key in self.channels.keys():
+            if self.channels[key]['channel'] == channel_num:
+                return self.channels['key']
+        #Otherwise add the channel and return that.
+        return add_channel_data(self, channel_num)
+
+    def list_params(self):
+        '''Lists information about the shot'''
+        print "Shot number: %d" % self.number
+        print "Component speeds: {%d, %d, %d, %d RPM}" % (self.ICspeed,
+                                                                  self.IRspeed,
+                                                                  self.ORspeed,
+                                                                  self.OCspeed)
+        print "Shot length: %ds, UDV Delay: %ds" % (self.shot_length,
+                                                        self.udv_delay)
+        print "Field delay: %ds, Field length: %ds" % (self.field_delay,
+                                                           self.field_length)
+        field = self.current*2.8669
+        print "%dA applied current -> %dG" % (self.current,
+                                                  field)
+        
+    
+class ChannelData:
+    def __init__(self, shot, channel_num):
+        '''Initialize a ChannelData object. Note that shot is a Shot object,
+        which must be created before. Ideally, this function is only run
+        from Shot.add_channel_data(), and was most likely already run
+        from Shot.__init__().'''
+        if(not(shot.channels_used.__contains__(channel_num))):
+            print "Error: Shot "+str(shot_num)+" doesn't use channel "+str(channel_num)
+            return False
+
+        self.shot = shot
+        params = sp.shot_params[shot.number]
+        
+        if(params.__contains__('trouble_flag')):
+            print "Warning: Shot "+str(shot_num)+" has trouble_flag set. Check notebook to see why."
+
+
+        
+        data = rudv.read_ultrasound(shot.filename, channel_num)
+
+        self.velocity = data['velocity']
+        self.echo = data['echo']
+        self.energy = data['energy']
+        self.depth = data['depth']
+        self.time = data['time']
+        self.channel = data['channel']
+        self.maxvelocity = data['maxvelocity']
+        
+        
+        channel_idx = params['channels'].index(channel_num)
+        
+        self.alpha = params['alphas'][channel_idx]
+        self.beta = params['betas'][channel_idx]
+        self.offset = params['offsets'][channel_idx]
+        self.port = params['ports'][channel_idx]
+        
+        self.time_points = self.time.size
+        self.spatial_points = self.depth.size
+        self.unwrap_velocity()
+        self.calculate_radius()
+        self.calculate_azimuth()
+        self.calculate_height()
+
+    def unwrap_velocity(self, threshold=1.5):
+        '''Adds the unwrapped velocity to the channel information, done using
+        the specified threshold.'''
+        #Add the unwrapped velocity to the channel information
+        self.unwrapped_velocity = zeros(self.velocity.shape)
+        self.unwrap_threshold = threshold
+    
+        maxvelocity = self.maxvelocity
+    
+        for j in range(0, self.time_points):
+            wraps = zeros(self.spatial_points)
+            for i in range(10, self.spatial_points):
+                if (self.velocity[j, i] -
+                    self.velocity[j, i-1]) < -threshold*maxvelocity:
+                    wraps[i] = wraps[i-1] + 1
+                elif (self.velocity[j, i] -
+                      self.velocity[j, i-1]) > threshold*maxvelocity:
+                    wraps[i] = wraps[i-1] -1
+                else:
+                    wraps[i] = wraps[i-1]
+        v_correction = wraps*2.0*maxvelocity
+        self.unwrapped_velocity[j,:] = self.velocity[j,:] + v_correction
+        
+    def calculate_radius(self):
+        '''Calculate the radial location of the measured points'''
+        d = self.depth - self.offset
+        self.r = zeros(self.depth.size)
+        
+        tanalpha = tan(pi*self.alpha/180.0)
+        tanbeta = tan(pi*self.beta/180.0)
+        anglefactor = 1 + tanalpha**2 + tanbeta**2
+        for i in range(0,d.size):
+            self.r[i] = sqrt(d[i]**2*(1 + tanalpha**2)/anglefactor
+                             - 2*r2*d[i]/sqrt(anglefactor) + r2**2)
+        
+    
+    def calculate_azimuth(self):
+        '''Calculate the azimuthal location of the measured points'''
+        d = self.depth - self.offset
+        self.azimuth = zeros(self.depth.size)
+        azimuthoffset = sp.ports[self.port]['theta']
+        
+        tanalpha = tan(pi*self.alpha/180.0)
+        tanbeta = tan(pi*self.beta/180.0)
+        anglefactor = 1 + tanalpha**2 + tanbeta**2
+        for i in range(0,d.size):
+            self.azimuth[i] = arcsin(d[i]*tanalpha/
+                                     sqrt(d[i]**2*(1 + tanalpha**2) +
+                                          r2**2*anglefactor -
+                                          2*r2*d[i]*sqrt(anglefactor)))
+            self.azimuth[i] = wrap_phase(self.azimuth[i] - azimuthoffset)
+    
+    
+    def calculate_height(self):
+        '''Calculate the height of the measured points'''
+        d = self.depth - self.offset
+        self.z = zeros(self.depth.size)
+        zoffset = sp.ports[self.port]['z']
+        
+        tanalpha = tan(pi*self.alpha/180.0)
+        tanbeta = tan(pi*self.beta/180.0)
+        anglefactor = 1 + tanalpha**2 + tanbeta**2
+        for i in range(0,d.size):
+            self.z[i] = d[i]*tanbeta/sqrt(anglefactor) + zoffset
+
+    def get_index_after_time(self, time):
+        '''Find the index in the time_array of the first element after
+        the specified time'''
+        idx = nan
+        temp_idx = self.time_points - 1
+        while(temp_idx >=0):
+            if self.time[temp_idx] > time:
+                idx = temp_idx
+            temp_idx = temp_idx - 1
+        return idx
+
+    def list_params(self):
+        '''Lists information about the channel'''
+        print "Shot: %d, Channel: %d, Port: %d" % (self.shot.number,
+                                                   self.channel,
+                                                   self.port)
+        print "alpha = %g, beta = %g, offset = %gmm" % (self.alpha,
+                                                        self.beta,
+                                                        self.offset)
+        print "UDV delay: %ds, Data-taking time: %gs" % (self.shot.udv_delay,
+                                                         self.time[-1])
+
+
+        
+
 def get_channel_data(shot, channel):
     if(not(sp.shot_params[shot]['channels'].__contains__(channel))):
         print "Error: Shot "+str(shot)+" doesn't use channel "+str(channel)
@@ -51,24 +244,20 @@ def get_channel_data(shot, channel):
 
     data['time_points'] = data['velocity'].shape[0]
     data['spatial_points'] = data['velocity'].shape[1]
-
+    
     unwrap_velocity(data)
     calculate_radius(data)
     generate_couette(data)
-
+    
     return data
 
 
-def calculate_radius(data):
-    d = data['depth'] - data['offset']
-    data['r'] = zeros(data['depth'].size)
-    
-    tanalpha = tan(pi*data['alpha']/180)
-    tanbeta = tan(pi*data['beta']/180)
-    anglefactor = 1 + tanalpha**2 + tanbeta**2
-    for i in range(0,d.size):
-        data['r'][i] = sqrt(d[i]**2*(1 + tanalpha**2)/anglefactor
-                            - 2*r2*d[i]/sqrt(anglefactor) + r2**2)
+def wrap_phase(angle):
+    while (angle > pi):
+        angle = angle - 2.0*pi
+    while (angle < pi):
+        angle = angle + 2.0*pi
+    return angle
 
 
 def generate_couette(data):    
@@ -80,28 +269,6 @@ def generate_couette(data):
     data['couette'] = zeros(data['r'].size)
     for i in range(0, data['couette'].size):
         data['couette'][i] = a*data['r'][i] + b/data['r'][i]
-
-
-
-def unwrap_velocity(data, threshold=1.5):
-    #Add the unwrapped_velocity item to the data dictionary
-    data['unwrapped_velocity'] = zeros(data['velocity'].shape)
-    
-    maxvelocity = data['maxvelocity']
-
-    for j in range(0, data['time_points']):
-        wraps = zeros(data['spatial_points'])
-        for i in range(10, data['spatial_points']):
-            if (data['velocity'][j, i] -
-                data['velocity'][j, i-1]) < -threshold*maxvelocity:
-                wraps[i] = wraps[i-1] + 1
-            elif (data['velocity'][j, i] -
-                  data['velocity'][j, i-1]) > threshold*maxvelocity:
-                wraps[i] = wraps[i-1] -1
-            else:
-                wraps[i] = wraps[i-1]
-        v_correction = wraps*2.0*maxvelocity
-        data['unwrapped_velocity'][j,:] = data['velocity'][j,:] + v_correction
 
 
 def correct_vtan(usound_data, profile, omega2):
