@@ -91,7 +91,7 @@ class Shot:
     
     def get_velocity(self, channel_nums):
         '''Returns a Velocity object produced using the specified
-        channel_nums.'''
+        channel_nums for this Shot.'''
         channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
 
         #Check to see if we've processed this velocity data before, and, if so,
