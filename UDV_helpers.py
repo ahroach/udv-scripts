@@ -1171,28 +1171,6 @@ def save_avg_profile(filename, start_num, end_num, omega1, omega2,
         print("Saving Ideal Couette profile")
         savetxt(savefilename, c_[newr, couette], fmt="%12.6G")
 
-def print_profile_time(filename, profile):
-    data = rudv.read_ultrasound(filename, 2)
-    print data['time'][profile]
-
-def find_profile_after_time(filename, channel, time):
-    data = rudv.read_ultrasound(filename, channel)
-    profilenum = 0
-    for i in range(0, data['time'].size):
-        if (data['time'][i] > time) & (data['time'][i-1] < time):
-            profilenum = i
-
-    return profilenum
-
-def find_number_of_profiles(filename, channel):
-    data = rudv.read_ultrasound(filename, channel)
-    profilenum = data['time'].size
-    return profilenum
-
-def find_time_of_profile(filename, channel, profile_num):
-    data = rudv.read_ultrasound(filename, channel)
-    t = data['time'][profile_num]
-    return t
 
 def find_element_r(r, desired_radius):
     element = 0
