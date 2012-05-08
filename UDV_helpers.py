@@ -43,11 +43,14 @@ class Shot:
         self.udv_delay = sp.shot_params[shot_num]['udv_delay']
         self.channels_used = sp.shot_params[shot_num]['channels']
         self.channels = {}
-        for channel in self.channels_used:
-            self.add_channel_data(channel)
         self.velocities = {}
+
+    def add_all_channels(self):
+        '''Adds all available channels to the Shot object'''
+        for channel in self.channels_used:
+            add_channel(channel)
     
-    def add_channel_data(self, channel_num):
+    def add_channel(self, channel_num):
         '''Adds and returns a ChannelData object corresponding to channel_num
         for this Shot.'''
         if(not(self.channels_used.__contains__(channel_num))):
@@ -57,7 +60,7 @@ class Shot:
         self.channels[channel_num] = ChannelData(self, channel_num)
         return self.channels[channel_num]
     
-    def get_channel_data(self, channel_num):
+    def get_channel(self, channel_num):
         '''Returns a ChannelData object corresponding to channel_num. Should
         be equivalent to Shot.channels[channel_num], with the only difference
         being that this routine will add the channel data if it has not
@@ -65,10 +68,10 @@ class Shot:
         #Check to see if we've added this channel data before, and, if so,
         #return it
         for key in self.channels.keys():
-            if self.channels[key]['channel'] == channel_num:
-                return self.channels['key']
+            if self.channels[key].channel == channel_num:
+                return self.channels[key]
         #Otherwise add the channel and return that.
-        return add_channel_data(self, channel_num)
+        return self.add_channel(channel_num)
 
     def list_params(self):
         '''Lists information about the shot'''
@@ -149,9 +152,9 @@ class ChannelData:
                     wraps[i] = wraps[i-1] -1
                 else:
                     wraps[i] = wraps[i-1]
-        v_correction = wraps*2.0*maxvelocity
-        self.unwrapped_velocity[j,:] = self.velocity[j,:] + v_correction
-        
+            v_correction = wraps*2.0*maxvelocity
+            self.unwrapped_velocity[j,:] = self.velocity[j,:] + v_correction
+    
     def calculate_radius(self):
         '''Calculate the radial location of the measured points'''
         d = self.depth - self.offset
@@ -163,7 +166,6 @@ class ChannelData:
         for i in range(0,d.size):
             self.r[i] = sqrt(d[i]**2*(1 + tanalpha**2)/anglefactor
                              - 2*r2*d[i]/sqrt(anglefactor) + r2**2)
-        
     
     def calculate_azimuth(self):
         '''Calculate the azimuthal location of the measured points'''
@@ -179,8 +181,7 @@ class ChannelData:
                                      sqrt(d[i]**2*(1 + tanalpha**2) +
                                           r2**2*anglefactor -
                                           2*r2*d[i]*sqrt(anglefactor)))
-            self.azimuth[i] = wrap_phase(self.azimuth[i] - azimuthoffset)
-    
+            self.azimuth[i] = wrap_phase(self.azimuth[i] - azimuthoffset)    
     
     def calculate_height(self):
         '''Calculate the height of the measured points'''
@@ -215,43 +216,7 @@ class ChannelData:
                                                         self.offset)
         print "UDV delay: %ds, Data-taking time: %gs" % (self.shot.udv_delay,
                                                          self.time[-1])
-
-
-        
-
-def get_channel_data(shot, channel):
-    if(not(sp.shot_params[shot]['channels'].__contains__(channel))):
-        print "Error: Shot "+str(shot)+" doesn't use channel "+str(channel)
-        return False
     
-    if(sp.shot_params[shot].__contains__('trouble_flag')):
-        print "Warning: Shot "+str(shot)+" has trouble_flag set. Check notebook to see why."
-        
-    filename = str(shot) + '.BDD'
-    data = rudv.read_ultrasound(filename, channel)
-
-    #Copy all of the shot parameters to this new dictionary
-    data.update(sp.shot_params[shot])
-
-    #Now eliminate the alphas, betas, offsets, ports, etc., replacing
-    #them just with the one that describes this channel.
-    channel_idx = data.pop('channels').index(channel)
-
-    data['alpha'] = data.pop('alphas')[channel_idx]
-    data['beta'] = data.pop('betas')[channel_idx]
-    data['offset'] = data.pop('offsets')[channel_idx]
-    data['port'] = data.pop('ports')[channel_idx]
-
-    data['time_points'] = data['velocity'].shape[0]
-    data['spatial_points'] = data['velocity'].shape[1]
-    
-    unwrap_velocity(data)
-    calculate_radius(data)
-    generate_couette(data)
-    
-    return data
-
-
 def wrap_phase(angle):
     while (angle > pi):
         angle = angle - 2.0*pi
@@ -311,22 +276,24 @@ def show_logs(start_file, end_file):
         usound_data = rudv.read_ultrasound(file, 0)
         print     
 
-def plot_raw_profile(filename, start_num, end_num, channel,
-                     labelstring="", time=0):
-    usound_data = rudv.read_ultrasound(filename, channel)
+def plot_channel_velocity(channel, start_num, end_num, unwrapped=0,
+                          labelstring="", time=0):
+    '''Plots the velocity measured by a specified channel. start_num
+    and end_num are the indices to average between, unless time != 0, in
+    which case those are time points to average between. Unwrapped velocity
+    is plotted instead of raw velocity if unwrapped != 0'''
+    if(time != 0):
+        start_num = channel.find_index_after_time(start_num)
+        end_num = channel.find_index_after_time(end_num)
 
-    if(time == 1):
-        start_num = find_profile_after_time(filename, channel, start_num)
-        end_num = find_profile_after_time(filename, channel, end_num)
-
-
-    profile = mean(usound_data['velocity']
-                   [start_num:end_num,:], axis=0)
-    
-    plot(usound_data['depth'], profile, '-o', label=labelstring)
-    print "Maximum velocity = " + str(usound_data['maxvelocity'])
-    print "Time = " + str(usound_data['time'][start_num]) + " to " + str(usound_data['time'][end_num])
-    return axis()    
+    if (unwrapped == 0):
+        profile = mean(channel.velocity[start_num:end_num,:], axis=0)
+    else:
+        profile = mean(channel.unwrapped_velocity[start_num:end_num,:], axis=0)
+        
+    plot(channel.depth, profile, '-o', label=labelstring)
+    print "Maximum velocity = " + str(channel.maxvelocity)
+    print "Time = " + str(channel.time[start_num]) + " to " + str(channel.time[end_num])  
 
 def plot_single_profile(shot, channel, profile_num):
     data = get_channel_data(shot, channel)
