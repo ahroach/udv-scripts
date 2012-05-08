@@ -44,6 +44,7 @@ class Shot:
         self.channels_used = sp.shot_params[shot_num]['channels']
         self.channels = {}
         self.velocities = {}
+        self.idealcouette = CouetteProfile(self)
 
     def add_all_channels(self):
         '''Adds all available channels to the Shot object'''
@@ -216,6 +217,22 @@ class ChannelData:
                                                         self.offset)
         print "UDV delay: %ds, Data-taking time: %gs" % (self.shot.udv_delay,
                                                          self.time[-1])
+
+
+
+class CouetteProfile():
+    def __init__(self, shot):
+        self.shot = shot
+        self.r = linspace(r1, r2, 200)
+        self.vtheta = zeros(self.r.size)
+        v1 = rpmtorads(shot.ICspeed)*r1
+        v2 = rpmtorads(shot.OCspeed)*r2
+        a = (v1*r1 - v2*r2)/(r1**2 - r2**2)
+        b = (v1*r1 - a*r1**2)
+
+        for i in range(0, self.vtheta.size):
+            self.vtheta[i] = a*self.r[i] + b/self.r[i]
+
     
 def wrap_phase(angle):
     while (angle > pi):
@@ -223,18 +240,6 @@ def wrap_phase(angle):
     while (angle < pi):
         angle = angle + 2.0*pi
     return angle
-
-
-def generate_couette(data):    
-    v1 = rpmtorads(data['ICspeed'])*r1
-    v2 = rpmtorads(data['OCspeed'])*r2
-    a = (v1*r1 - v2*r2)/(r1**2 - r2**2)
-    b = (v1*r1 - a*r1**2)
-
-    data['couette'] = zeros(data['r'].size)
-    for i in range(0, data['couette'].size):
-        data['couette'][i] = a*data['r'][i] + b/data['r'][i]
-
 
 def correct_vtan(usound_data, profile, omega2):
     omega2 = omega2*2*pi/60 #Convert omega2 in RPM to omega2 in rad/sec
@@ -1677,12 +1682,12 @@ def play_channel_velocity_animation(channel, speed=1.0):
         line.set_data(channel.depth, channel.velocity[i,:])
         time_text.set_text(time_template%(channel.time[i]))
         return line, time_text
-
+    
     ani = animation.FuncAnimation(fig, draw_raw_profile,
                                   range(0, channel.time.size),
                                   interval = dt*1000, blit=True,
                                   init_func=init)
-
+    
     #I have no idea why this is here, but the animaion doesn't run without
     #having something to generate an error here?!
     magic_squirrel()
