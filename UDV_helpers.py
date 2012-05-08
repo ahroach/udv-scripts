@@ -96,10 +96,21 @@ class Shot:
 
         #Check to see if we've processed this velocity data before, and, if so,
         #return it
+
         for idx in range(0, self.velocities.__len__()):
-            if self.velocities[idx].progenitors == channel_nums:
+            #First make a list of the channel numbers from all of the
+            #progenitor ChannelData objects for this Velocity object
+            progenitor_list = list()
+            for progenitor in self.velocities[idx].progenitors:
+                progenitor_list.append(progenitor.channel)
+
+            #Now check to see if these channels match the channel_nums, and,
+            #if so, return that.
+            progenitor_list.sort()
+            if progenitor_list == channel_nums:
                 return self.velocities[idx]
-        #Otherwise add the velocities and return that.
+
+        #Otherwise add this new velocity set and return that.
         return self.add_velocity(channel_nums)
 
     def sanitize_channel_nums_for_velocities(self, channel_nums):
