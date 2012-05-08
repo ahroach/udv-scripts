@@ -24,7 +24,7 @@ global_beta=0
 radial_probe_angle= -0.75
 
 rpmtorads = lambda x: x*2.0*pi/60.0
-
+degstorads = lambda x: x*pi/180.0
 
 class Shot:
     def __init__(self, shot_num):
@@ -161,8 +161,8 @@ class ChannelData:
         d = self.depth - self.offset
         self.r = zeros(self.depth.size)
         
-        tanalpha = tan(pi*self.alpha/180.0)
-        tanbeta = tan(pi*self.beta/180.0)
+        tanalpha = tan(degstorads(self.alpha))
+        tanbeta = tan(degstorads(self.beta))
         anglefactor = 1 + tanalpha**2 + tanbeta**2
         for i in range(0,d.size):
             self.r[i] = sqrt(d[i]**2*(1 + tanalpha**2)/anglefactor
@@ -174,8 +174,8 @@ class ChannelData:
         self.azimuth = zeros(self.depth.size)
         azimuthoffset = sp.ports[self.port]['theta']
         
-        tanalpha = tan(pi*self.alpha/180.0)
-        tanbeta = tan(pi*self.beta/180.0)
+        tanalpha = tan(degstorads(self.alpha))
+        tanbeta = tan(degstorads(self.beta))
         anglefactor = 1 + tanalpha**2 + tanbeta**2
         for i in range(0,d.size):
             self.azimuth[i] = arcsin(d[i]*tanalpha/
@@ -190,8 +190,8 @@ class ChannelData:
         self.z = zeros(self.depth.size)
         zoffset = sp.ports[self.port]['z']
         
-        tanalpha = tan(pi*self.alpha/180.0)
-        tanbeta = tan(pi*self.beta/180.0)
+        tanalpha = tan(degstorads(self.alpha))
+        tanbeta = tan(degstorads(self.beta))
         anglefactor = 1 + tanalpha**2 + tanbeta**2
         for i in range(0,d.size):
             self.z[i] = d[i]*tanbeta/sqrt(anglefactor) + zoffset
@@ -219,6 +219,66 @@ class ChannelData:
                                                          self.time[-1])
 
 
+class Velocity():
+    def __init__(self, shot, channel_nums):
+        self.shot = shot
+        if size(channel_nums) == 0:
+            print "Error: 0 channels presented to Velocity.__init__()."
+            return None
+        elif size(channel_nums) == 1:
+            self.generate_velocity_one_transducer(channel_nums)
+        elif size(channel_nums) == 2:
+            self.generate_velocity_two_transducers(channel_nums)
+        elif size(channel_nums) == 3:
+            self.generate_velocity_three_transducers(channel_nums)
+        else:
+            print "Error: Don't know how to generate velocity from %d measurements" % size(channel_nums)
+            return None
+
+    def generate_velocity_one_transducer(self, channel_num):
+        self.progenitors = self.shot.get_channel(channel_num)
+        channel = self.progenitors
+        if (((channel.beta == 90) or (channel.beta == -90)) and
+            (channel.alpha == 0)):
+            
+            #This thing is just pointed vertically, so just use the unwrapped
+            #velocity and the the position from the original channel
+            self.time = channel.time
+            self.r = channel.r
+            self.z = channel.z
+            self.vr = ones(channel.unwrapped_velocity.shape)*nan
+            self.vtheta = ones(channel.unwrapped_velocity.shape)*nan
+            self.vz = (channel.unwrapped_velocity/
+                       (-1.0*sin(degstorads(channel.beta))))
+        elif ((channel.alpha == 0) and  (channel.beta == 0)):
+            #In the unlikely event that we got this dead on in the radial
+            #direction
+            self.time = channel.time
+            self.r = channel.r
+            self.z = channel.z
+            self.vr = -1.0*channel.unwrapped_velocity
+            self.vtheta = ones(channel.unwrapped_velocity.shape)*nan
+            self.vz = ones(channel.unwrapped_velocity.shape)*nan
+        else:
+            #Otherwise, just assume the velocity is in the azimuthal direction
+            self.time = channel.time
+            self.r = channel.r
+            self.z = channel.z
+            self.vr = ones(channel.unwrapped_velocity.shape)*nan
+            self.vtheta = zeros(channel.unwrapped_velocity.shape)
+            self.vz = ones(channel.unwrapped_velocity.shape)*nan
+            anglefactor = zeros(self.r.size)
+            
+            for i in range(0, self.r.size):
+                anglefactor[i] = (r2/self.r[i])*sin(degstorads(channel.alpha))
+
+            #Now iterate over the entire dataset
+            for i in range(0, self.time.size):
+                self.vtheta[i,:] = ((channel.unwrapped_velocity[i,:]*
+                                     anglefactor) +
+                                    r2*rpmtorads(self.shot.OCspeed))
+
+        
 
 class CouetteProfile():
     def __init__(self, shot):
