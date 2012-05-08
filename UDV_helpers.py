@@ -352,28 +352,6 @@ def average_profile(usound_data, start_num, end_num, omega2, channel=2):
     std_profile = std(profiles,1)
     return avg_profile, std_profile
 
-
-def unwrap_profile(usound_data, profile):
-    numpoints = usound_data['depth'].shape[0]
-    wraps = zeros(numpoints)
-    maxvelocity = usound_data['maxvelocity']
-
-    last_point = 0
-    for i in range(20, numpoints):
-        if (profile[i] -
-            profile[i-1]) < -1.5*maxvelocity:
-            wraps[i] = wraps[i-1] + 1
-        elif (profile[i] -
-              profile[i-1]) > 1.5*maxvelocity:
-            wraps[i] = wraps[i-1] -1
-        else:
-            wraps[i] = wraps[i-1]
-
-    velocity_correction = wraps*2.0*maxvelocity
-    unwrapped_velocity = profile + velocity_correction
-    return unwrapped_velocity
-
-
 def plot_all_timeseries_channel(filename, channel):
     data = rudv.read_ultrasound(filename, channel)
     r = calculate_radius(data)
