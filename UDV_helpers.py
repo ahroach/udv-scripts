@@ -1653,15 +1653,13 @@ def gen_profile_movie(filename, omega1, omega2, start_time, end_time, channel=2,
     subprocess.check_call(command)
     shutil.rmtree(basedir)
 
-def play_raw_profile_animation(filename, channel=2, speed=1.0):
-    data = rudv.read_ultrasound(filename, channel)    
-    dt = (data['time'][1]-data['time'][0])/speed
-    
+def play_channel_velocity_animation(channel, speed=1.0):
+    dt = (channel.time[1]-channel.time[0])/speed
     
     fig = figure()
     
-    ax = fig.add_subplot(111, autoscale_on=False, xlim=(0,data['depth'][-1]),
-                         ylim=(-data['maxvelocity'], data['maxvelocity']))
+    ax = fig.add_subplot(111, autoscale_on=False, xlim=(0,channel.depth[-1]),
+                         ylim=(-channel.maxvelocity, channel.maxvelocity))
     xlabel("Depth [cm]")
     ylabel("Raw velocity [cm/sec]")
     ax.grid()
@@ -1676,18 +1674,19 @@ def play_raw_profile_animation(filename, channel=2, speed=1.0):
         return line, time_text
     
     def draw_raw_profile(i):
-        line.set_data(data['depth'], data['velocity'][i,:])
-        time_text.set_text(time_template%(data['time'][i]))
+        line.set_data(channel.depth, channel.velocity[i,:])
+        time_text.set_text(time_template%(channel.time[i]))
         return line, time_text
 
     ani = animation.FuncAnimation(fig, draw_raw_profile,
-                                  range(0, data['time'].size),
+                                  range(0, channel.time.size),
                                   interval = dt*1000, blit=True,
                                   init_func=init)
 
     #I have no idea why this is here, but the animaion doesn't run without
     #having something to generate an error here?!
     magic_squirrel()
+
 
 def gen_raw_profile_movie(filename, start_time, end_time, channel=2, labelstring='', speed=1.0, basedir='/tmp/abcd000', moviefilename='movie.avi'):
 
