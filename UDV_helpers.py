@@ -589,14 +589,15 @@ def plot_profile(usound_data, profile, omega1, omega2, labelstring):
     legend()
     grid(b=1)
 
-def plot_all_timeseries_channel(filename, channel):
-    data = rudv.read_ultrasound(filename, channel)
-    r = calculate_radius(data)
-
-    contourf(data['time'], r, data['velocity'].T)
+def plot_channel_velocity_contour(channel, unwrapped=0, n=30):
+    '''Makes a contour plot of the raw velocity as a function of depth for a
+    channel'''
+    if (unwrapped == 0):
+        contourf(channel.time, channel.depth, channel.velocity.T, n)
+    else:
+        contourf(channel.time, channel.depth, channel.unwrapped_velocity.T, n)
     xlabel("Time [sec]")
-    ylabel("r [cm]")
-    title(filename)
+    ylabel("depth [cm]")
     colorbar()
 
 def plot_all_timeseries_velocity(filename, start_time, end_time, omega1, omega2):
