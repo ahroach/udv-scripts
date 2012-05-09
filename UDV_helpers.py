@@ -1578,7 +1578,13 @@ def gen_profile_movie(filename, omega1, omega2, start_time, end_time, channel=2,
     subprocess.check_call(command)
     shutil.rmtree(basedir)
 
-def play_channel_velocity_animation(channel, speed=1.0):
+def play_channel_velocity_animation(channel, speed=1.0,
+                                    saveoutput=0, savefilename=''):
+    '''Plays an animation of the raw data from the specified Channel object.
+    If saveoutput=1 is specified and a filename is given, an mpeg4 movie
+    will be written. Note that this requires having ffmpeg in the path
+    somewhere. Consider adding a symlink to avconv if appropriate for your
+    system.'''
     dt = (channel.time[1]-channel.time[0])/speed
     
     fig = figure()
@@ -1602,12 +1608,22 @@ def play_channel_velocity_animation(channel, speed=1.0):
         line.set_data(channel.depth, channel.velocity[i,:])
         time_text.set_text(time_template%(channel.time[i]))
         return line, time_text
-    
-    ani = animation.FuncAnimation(fig, draw_raw_profile,
-                                  range(0, channel.time.size),
-                                  interval = dt*1000, blit=True,
-                                  init_func=init)
-    
+
+    if(saveoutput):
+        ani = animation.FuncAnimation(fig, draw_raw_profile,
+                                      range(0, channel.time.size),
+                                      interval = 1, blit=True,
+                                      init_func=init)
+        ani.save(savefilename, fps=int(1.0/dt))
+        #If this fails, keep in mind that the routine expects ffmpeg
+        #to be in the path somewhere, but Debian has libav-tools.
+        #Consider ln -s /usr/bin/avconv /usr/bin/ffmpeg
+    else:
+        ani = animation.FuncAnimation(fig, draw_raw_profile,
+                                      range(0, channel.time.size),
+                                      interval = dt*1000, blit=True,
+                                      init_func=init)
+        
     #I have no idea why this is here, but the animaion doesn't run without
     #having something to generate an error here?!
     magic_squirrel()
@@ -1615,6 +1631,11 @@ def play_channel_velocity_animation(channel, speed=1.0):
 
 def play_two_component_velocity_animation(velocity, speed=1.0, rlim=0.0,
                                           saveoutput=0, savefilename=''):
+    '''Plays an animation of the v_r and v_theta velocity components from
+    the specified Velocity object. If saveoutput=1 is specified and a
+    filename is given, an mpeg4 movie will be written. Note that this
+    requires having ffmpeg in the path somewhere. Consider adding a symlink
+    to avconv if appropriate for your system.'''
     dt = (velocity.time[1]-velocity.time[0])/speed
 
     rlim_idx = velocity.get_index_near_radius(rlim)
