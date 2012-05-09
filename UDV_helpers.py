@@ -292,34 +292,33 @@ class Velocity():
             return None
 
     def generate_velocity_one_transducer(self, channel_num):
+        '''Generate velocity from a single transducer. If it is purely radial
+        or purely vertical, a purely radial or vertical velocity is created.
+        Otherwise, the velocity is assumed to be in the azimuthal direction,
+        and the appropriate angle corrections are applied to the velocity.'''
         self.progenitors = []
         self.progenitors.append(self.shot.get_channel(channel_num[0]))
+
         channel = self.progenitors[0]
+        self.time = channel.time
+        self.r = channel.r
+        self.z = channel.z
+
         if (((channel.B == 0) or (channel.B == -180) or (channel.B == 180)) and
             (channel.A == 90)):
-            
             #This thing is just pointed vertically, so just use the unwrapped
             #velocity and the the position from the original channel
-            self.time = channel.time
-            self.r = channel.r
-            self.z = channel.z
             self.vr = ones(channel.unwrapped_velocity.shape)*nan
             self.vtheta = ones(channel.unwrapped_velocity.shape)*nan
             self.vz = channel.unwrapped_velocity/cos(degstorads(channel.B))
         elif (channel.A == 0):
             #In the unlikely event that we got this dead on in the radial
             #direction
-            self.time = channel.time
-            self.r = channel.r
-            self.z = channel.z
             self.vr = -1.0*channel.unwrapped_velocity
             self.vtheta = ones(channel.unwrapped_velocity.shape)*nan
             self.vz = ones(channel.unwrapped_velocity.shape)*nan
         else:
             #Otherwise, just assume the velocity is in the azimuthal direction
-            self.time = channel.time
-            self.r = channel.r
-            self.z = channel.z
             self.vr = ones(channel.unwrapped_velocity.shape)*nan
             self.vtheta = zeros(channel.unwrapped_velocity.shape)
             self.vz = ones(channel.unwrapped_velocity.shape)*nan
