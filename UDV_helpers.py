@@ -636,32 +636,22 @@ def plot_two_component_velocity_contours(velocity, start_time, end_time, n=30):
     colorbar()
 
     
-def plot_timeseries(filename, channel, element, labelstring='', nopoints=0,
-                    color="", depth=0):
-    data = rudv.read_ultrasound(filename, channel)
-    r = calculate_radius(data)
-    
+def plot_timeseries(channel, idx, labelstring='', withpts=0):
+    '''Plot timeseries of the velocity at a particular point, specified by
+    idx, of a channel.'''
     if(len(labelstring) == 0):
-        if (depth==0):
-            labelstring = filename+": r="+str(round(r[element],2))+" cm"
-        else:
-            labelstring = filename+": depth="+str(round(data['depth'][element],2))+" cm"
-
-    if(nopoints):
-        line=plot(data['time'], data['velocity'][:,element], '-', label=labelstring)
+        labelstring = "Shot %d, Ch. %d:\n d=%.3gcm, r=%.3gcm" % (channel.shot.number,
+                                                         channel.channel,
+                                                         channel.depth[idx],
+                                                         channel.r[idx])
+        
+    if(withpts):
+        plot(channel.time, channel.velocity[:,idx], '.-', label=labelstring)
     else:
-        line=plot(data['time'], data['velocity'][:,element], '.-', label=labelstring)
+        plot(channel.time, channel.velocity[:,idx], '-', label=labelstring)
 
-    if(color):
-        setp(line, color=color)
-    
     xlabel("Time [sec]")
-    if channel == 1:
-        ylabel("Radial transducer [cm/sec]")
-    if channel == 2:
-        ylabel("Tangential transducer [cm/sec]")
-    legend()
-    grid(b=1)
+    ylabel("Velocity [cm/sec]")
 
 def plot_timeseries_velocity(filename, radius, omega1, omega2, scaleshift=0, timeshift=0):
     r_data = rudv.read_ultrasound(filename, 1)
