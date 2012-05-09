@@ -55,7 +55,8 @@ class Shot:
         '''Adds and returns a ChannelData object corresponding to channel_num
         for this Shot.'''
         if(not(self.channels_used.__contains__(channel_num))):
-            print "Error: Shot "+str(self.number)+" doesn't use channel "+str(channel_num)
+            print "Error: Shot %d doesn't use channel %d." % (self.number,
+                                                              channel_num)
             return False
         
         self.channels[channel_num] = ChannelData(self, channel_num)
@@ -82,7 +83,8 @@ class Shot:
         #Make sure we actually have all of these channels.
         for channel_num in channel_nums:
             if(not(self.channels_used.__contains__(channel_num))):
-                print "Error: Shot "+str(self.number)+" doesn't use channel "+str(channel_num)
+                print "Error: Shot %d doesn't use channel %d." % (self.number,
+                                                                  channel_num)
                 return False
 
         
@@ -132,16 +134,16 @@ class Shot:
         '''Lists information about the shot'''
         print "Shot number: %d" % self.number
         print "Component speeds: {%d, %d, %d, %d RPM}" % (self.ICspeed,
-                                                                  self.IRspeed,
-                                                                  self.ORspeed,
-                                                                  self.OCspeed)
+                                                          self.IRspeed,
+                                                          self.ORspeed,
+                                                          self.OCspeed)
         print "Shot length: %ds, UDV Delay: %ds" % (self.shot_length,
-                                                        self.udv_delay)
+                                                    self.udv_delay)
         print "Field delay: %ds, Field length: %ds" % (self.field_delay,
-                                                           self.field_length)
+                                                       self.field_length)
         field = self.current*2.8669
         print "%dA applied current -> %dG" % (self.current,
-                                                  field)
+                                              field)
         
     
 class ChannelData:
@@ -151,16 +153,15 @@ class ChannelData:
         from Shot.add_channel_data(), and was most likely already run
         from Shot.__init__().'''
         if(not(shot.channels_used.__contains__(channel_num))):
-            print "Error: Shot "+str(shot_num)+" doesn't use channel "+str(channel_num)
+            print "Error: Shot %d doesn't use channel %d" % (shot_num,
+                                                             channel_num)
             return False
 
         self.shot = shot
         params = sp.shot_params[shot.number]
         
         if(params.__contains__('trouble_flag')):
-            print "Warning: Shot "+str(shot_num)+" has trouble_flag set. Check notebook to see why."
-
-
+            print "Shot %d has trouble_flag set. Check notebook." % shot_num
         
         data = rudv.read_ultrasound(shot.filename, channel_num)
 
@@ -288,7 +289,7 @@ class Velocity():
         elif size(channel_nums) == 3:
             self.generate_velocity_three_transducers(channel_nums)
         else:
-            print "Error: Don't know how to generate velocity from %d measurements" % size(channel_nums)
+            print "Error: Can't generate velocity from %d measurements" % size(channel_nums)
             return None
 
     def generate_velocity_one_transducer(self, channel_num):
@@ -544,8 +545,9 @@ def plot_channel_velocity(channel, start_num, end_num, unwrapped=0,
         profile = mean(channel.unwrapped_velocity[start_num:end_num,:], axis=0)
         
     plot(channel.depth, profile, '-o', label=labelstring)
-    print "Maximum velocity = " + str(channel.maxvelocity)
-    print "Time = " + str(channel.time[start_num]) + " to " + str(channel.time[end_num])  
+    print "Maximum velocity = %.3g" % channel.maxvelocity
+    print "Time = %.3g to %.3g" % (channel.time[start_num],
+                                   channel.time[end_num])  
 
 
 def plot_single_vtheta_profile(vel_obj, profile_num):
