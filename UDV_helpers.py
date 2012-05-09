@@ -548,12 +548,13 @@ def plot_channel_velocity(channel, start_num, end_num, unwrapped=0,
     print "Maximum velocity = " + str(channel.maxvelocity)
     print "Time = " + str(channel.time[start_num]) + " to " + str(channel.time[end_num])  
 
-def plot_single_profile(shot, channel, profile_num):
-    data = get_channel_data(shot, channel)
-    #labelstring = data['filename']+": t = "+str(data['time'][profile_num])
 
-    plot(data['r'], data['unwrapped_velocity'][profile_num,:])
-    plot(data['r'], data['couette'])
+def plot_single_vtheta_profile(vel_obj, profile_num):
+    title_str = str(vel_obj.shot.number) +": t="+str(vel_obj.time[profile_num])
+
+    plot(vel_obj.r, vel_obj.vtheta[profile_num,:])
+    plot(vel_obj.shot.idealcouette.r, vel_obj.shot.idealcouette.vtheta)
+    title(title_str)
 
 def plot_avg_profile(usound_data, start_num, end_num, omega1, omega2, channel=2):
     #Average the profile
