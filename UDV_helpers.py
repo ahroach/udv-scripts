@@ -589,24 +589,6 @@ def plot_profile(usound_data, profile, omega1, omega2, labelstring):
     legend()
     grid(b=1)
 
-def average_profile(usound_data, start_num, end_num, omega2, channel=2):
-    #Sum up the profiles
-    profiles = zeros([usound_data['depth'].shape[0],
-                      end_num - start_num + 1])
-    for i in range(start_num, end_num+1):
-        unwrapped_profile = unwrap_profile(usound_data,
-                                           usound_data['velocity'][i,:])
-        if(channel==2):
-            corrected_profile = correct_vtan(usound_data, unwrapped_profile,
-                                             omega2)
-        else:
-            corrected_profile=unwrapped_profile
-        profiles[:,(i-start_num)] = corrected_profile
-
-    avg_profile = mean(profiles,1)
-    std_profile = std(profiles,1)
-    return avg_profile, std_profile
-
 def plot_all_timeseries_channel(filename, channel):
     data = rudv.read_ultrasound(filename, channel)
     r = calculate_radius(data)
