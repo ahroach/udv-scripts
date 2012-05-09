@@ -930,32 +930,24 @@ def plot_avg_velocities(filename, start_num, end_num, omega1, omega2, labelstrin
     axvline(x=r2, color='black')
     grid(b=1)
 
-def find_avg_velocity_at_r(filename, start_num, end_num, omega1, omega2, r_avg, channel=2, time=0, labelstring=''):
-    r_data = rudv.read_ultrasound(filename, 1)
-    t_data = rudv.read_ultrasound(filename, channel)
-
+def find_avg_velocity_at_r(velocity, start, end, radius, time=0):
+    '''Finds the mean and stddev of v_r and v_theta at the specified radius.
+    If time = 1, start and end and starting and ending times. Otherwise, they
+    directly refer to indices in the time array. Returns vr_mean, vr_stddev,
+    vt_mean, vt_stddev.'''
     if(time == 1):
-        start_num = find_profile_after_time(filename, channel, start_num)
-        end_num = find_profile_after_time(filename, channel, end_num)
+        start = velocity.get_index_after_time(start)
+        end = velocity.get_index_after_time(end)
+        if(isnan(start) or isnan(end)):
+            print "Valid times are from %g to %g secs." % (velocity.time[0],
+                                                           velocity.time[-1])
+            return False
 
-    samples = end_num - start_num
-    vrs = zeros(samples)
-    vts = zeros(samples)
-    
-    for i in range(start_num, end_num):
-        r, vr, vt = reconstruct_avg_velocities(r_data, t_data, i,
-                                           i, omega2)
-        r_avg_elem = find_element_r(r, r_avg)
-        vrs[i-start_num] = vr[r_avg_elem]
-        vts[i-start_num] = vt[r_avg_elem]
+    r_idx = velocity.get_index_near_radius(radius)
+    vr = velocity.vr[start:end, r_idx]
+    vt = velocity.vtheta[start:end, r_idx]
 
-    #hist(vts, label=labelstring)
-    vr_average = mean(vrs)
-    vr_std = std(vrs)
-    vt_average = mean(vts)
-    vt_std = std(vts)
-
-    return vr_average, vr_std, vt_average, vt_std
+    return vr.mean(), vr.std(), vt.mean(), vt.std()
 
 
 def find_shear(filename, start_time, end_time, omega1, omega2, rlimin, rlimout, channel=2):
