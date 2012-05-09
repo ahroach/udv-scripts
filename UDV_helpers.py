@@ -175,8 +175,8 @@ class ChannelData:
         
         channel_idx = params['channels'].index(channel_num)
         
-        self.alpha = params['alphas'][channel_idx]
-        self.beta = params['betas'][channel_idx]
+        self.A = params['As'][channel_idx]
+        self.B = params['Bs'][channel_idx]
         self.offset = params['offsets'][channel_idx]
         self.port = params['ports'][channel_idx]
         
@@ -214,41 +214,43 @@ class ChannelData:
         '''Calculate the radial location of the measured points'''
         d = self.depth - self.offset
         self.r = zeros(self.depth.size)
-        
-        tanalpha = tan(degstorads(self.alpha))
-        tanbeta = tan(degstorads(self.beta))
-        anglefactor = 1 + tanalpha**2 + tanbeta**2
+
+        sinA = sin(degstorads(self.A))
+        cosA = cos(degstorads(self.A))
+        sinB = sin(degstorads(self.B))
         for i in range(0,d.size):
-            self.r[i] = sqrt(d[i]**2*(1 + tanalpha**2)/anglefactor
-                             - 2*r2*d[i]/sqrt(anglefactor) + r2**2)
+            self.r[i] = sqrt((d[i]*sinA*sinB)**2 + (r2 - d[i]*cosA)**2)
     
     def calculate_azimuth(self):
         '''Calculate the azimuthal location of the measured points'''
         d = self.depth - self.offset
         self.azimuth = zeros(self.depth.size)
         azimuthoffset = sp.ports[self.port]['theta']
+
+        sinA = sin(degstorads(self.A))
+        cosA = cos(degstorads(self.A))
+        sinB = sin(degstorads(self.B))
         
-        tanalpha = tan(degstorads(self.alpha))
-        tanbeta = tan(degstorads(self.beta))
-        anglefactor = 1 + tanalpha**2 + tanbeta**2
         for i in range(0,d.size):
-            self.azimuth[i] = arcsin(d[i]*tanalpha/
-                                     sqrt(d[i]**2*(1 + tanalpha**2) +
-                                          r2**2*anglefactor -
-                                          2*r2*d[i]*sqrt(anglefactor)))
-            self.azimuth[i] = wrap_phase(self.azimuth[i] - azimuthoffset)    
+            self.azimuth[i] = arcsin(d[i]*sinA*sinB/
+                                     sqrt((d[i]*sinA*sinB)**2 +
+                                          (r2 - d[i]*cosA)**2))
+            self.azimuth[i] = wrap_phase(self.azimuth[i] + azimuthoffset)    
     
     def calculate_height(self):
         '''Calculate the height of the measured points'''
         d = self.depth - self.offset
         self.z = zeros(self.depth.size)
+        
         zoffset = sp.ports[self.port]['z']
         
-        tanalpha = tan(degstorads(self.alpha))
-        tanbeta = tan(degstorads(self.beta))
-        anglefactor = 1 + tanalpha**2 + tanbeta**2
+        sinA = sin(degstorads(self.A))
+        cosA = cos(degstorads(self.A))
+        sinB = sin(degstorads(self.B))
+        cosB = cos(degstorads(self.B))
+        
         for i in range(0,d.size):
-            self.z[i] = d[i]*tanbeta/sqrt(anglefactor) + zoffset
+            self.z[i] = d[i]*sinA*cosB + zoffset
 
     def get_index_after_time(self, time):
         '''Find the index in the time_array of the first element after
@@ -266,9 +268,9 @@ class ChannelData:
         print "Shot: %d, Channel: %d, Port: %d" % (self.shot.number,
                                                    self.channel,
                                                    self.port)
-        print "alpha = %g, beta = %g, offset = %gmm" % (self.alpha,
-                                                        self.beta,
-                                                        self.offset)
+        print "A = %g, B = %g, offset = %gmm" % (self.A,
+                                                 self.B,
+                                                 self.offset)
         print "UDV delay: %ds, Data-taking time: %gs" % (self.shot.udv_delay,
                                                          self.time[-1])
 
@@ -293,8 +295,8 @@ class Velocity():
         self.progenitors = []
         self.progenitors.append(self.shot.get_channel(channel_num[0]))
         channel = self.progenitors[0]
-        if (((channel.beta == 90) or (channel.beta == -90)) and
-            (channel.alpha == 0)):
+        if (((channel.B == 0) or (channel.B == -180) or (channel.B == 180)) and
+            (channel.A == 90)):
             
             #This thing is just pointed vertically, so just use the unwrapped
             #velocity and the the position from the original channel
@@ -303,9 +305,8 @@ class Velocity():
             self.z = channel.z
             self.vr = ones(channel.unwrapped_velocity.shape)*nan
             self.vtheta = ones(channel.unwrapped_velocity.shape)*nan
-            self.vz = (channel.unwrapped_velocity/
-                       (-1.0*sin(degstorads(channel.beta))))
-        elif ((channel.alpha == 0) and  (channel.beta == 0)):
+            self.vz = channel.unwrapped_velocity/cos(degstorads(channel.B))
+        elif (channel.A == 0):
             #In the unlikely event that we got this dead on in the radial
             #direction
             self.time = channel.time
@@ -322,14 +323,23 @@ class Velocity():
             self.vr = ones(channel.unwrapped_velocity.shape)*nan
             self.vtheta = zeros(channel.unwrapped_velocity.shape)
             self.vz = ones(channel.unwrapped_velocity.shape)*nan
+
+            sinA = sin(degstorads(channel.A))
+            cosA = cos(degstorads(channel.A))
+            sinB = sin(degstorads(channel.B))
+            cosB = cos(degstorads(channel.B))
+            d = channel.depth
+        
             anglefactor = zeros(self.r.size)
             
             for i in range(0, self.r.size):
-                anglefactor[i] = (r2/self.r[i])*sin(degstorads(channel.alpha))
-
+                anglefactor[i] = (sqrt(1-sinA**2*cosB**2)*
+                                  sin(math.atan(sinA*sinB/cosA) +
+                                      math.asin(d[i]*sinA*sinB/self.r[i])))
+            
             #Now iterate over the entire dataset
             for i in range(0, self.time.size):
-                self.vtheta[i,:] = ((channel.unwrapped_velocity[i,:]*
+                self.vtheta[i,:] = ((channel.unwrapped_velocity[i,:]/
                                      anglefactor) +
                                     r2*rpmtorads(self.shot.OCspeed))
     
@@ -338,10 +348,10 @@ class Velocity():
         print "Derived from %d progenitor(s)" % num_progenitors
         for i in range(0, num_progenitors):
             progenitor = self.progenitors[i]
-            print "%d: alpha=%g, beta=%g, port=%d" % (i,
-                                                      progenitor.alpha,
-                                                      progenitor.beta,
-                                                      progenitor.port)
+            print "%d: A=%g, B=%g, port=%d" % (i,
+                                               progenitor.A,
+                                               progenitor.B,
+                                               progenitor.port)
 
 class CouetteProfile():
     def __init__(self, shot):
@@ -360,8 +370,10 @@ class CouetteProfile():
 def wrap_phase(angle):
     while (angle > pi):
         angle = angle - 2.0*pi
-    while (angle < pi):
+
+    while (angle < -pi):
         angle = angle + 2.0*pi
+
     return angle
 
 def correct_vtan(usound_data, profile, omega2):
