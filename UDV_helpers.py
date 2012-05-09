@@ -546,6 +546,7 @@ def plot_single_vtheta_profile(vel_obj, profile_num):
     plot(vel_obj.r, vel_obj.vtheta[profile_num,:], label=label_str)
     plot(vel_obj.shot.idealcouette.r, vel_obj.shot.idealcouette.vtheta)
 
+
 def plot_avg_vtheta_profile(vel_obj, start_num, end_num):
     label_str = "%d: Avg from t=%.3g to t=%.3g" % (vel_obj.shot.number,
                                                    vel_obj.time[start_num],
@@ -555,6 +556,7 @@ def plot_avg_vtheta_profile(vel_obj, start_num, end_num):
          mean(vel_obj.vtheta[start_num:end_num, :], axis=0),
          label = label_str)
     plot(vel_obj.shot.idealcouette.r, vel_obj.shot.idealcouette.vtheta)
+
 
 def plot_profile(usound_data, profile, omega1, omega2, labelstring):
     v1 = 2*pi*omega1*r1/60.0
@@ -580,6 +582,7 @@ def plot_profile(usound_data, profile, omega1, omega2, labelstring):
     legend()
     grid(b=1)
 
+
 def plot_channel_velocity_contour(channel, unwrapped=0, n=30):
     '''Makes a contour plot of the raw velocity as a function of depth for a
     channel'''
@@ -590,6 +593,7 @@ def plot_channel_velocity_contour(channel, unwrapped=0, n=30):
     xlabel("Time [sec]")
     ylabel("depth [cm]")
     colorbar()
+
 
 def plot_two_component_velocity_contours(velocity, start_time, end_time, n=30):
     start_idx = velocity.get_index_after_time(start_time)
@@ -853,35 +857,28 @@ def fit_frequency(filename, channel, element, start_time, end_time, start_amplit
     ylabel("Velocity [cm/sec]")
     
 
-
-
-def plot_spectrogram(filename, channel, element, start_time=0, end_time=1000, timechunk=3):
-    data = rudv.read_ultrasound(filename, channel)
-    r = calculate_radius(data)
-    time = data['time']
-
-    start_pos = 0
-    end_pos = time.size-1
-    for i in range(0, time.size):
-        if (time[i] > start_time) & (time[i-1] < start_time):
-            start_pos = i
-        elif (time[i] > end_time) & (time[i-1] < end_time):
-            end_pos = i-1
-
-    x = data['velocity'][start_pos:end_pos,element]
-    t = time[start_pos:end_pos]
+def plot_spectrogram(channel, idx, start_time=0, end_time=1000, timechunk=3):
+    '''Plots a spectrogram of the velocity measured on the specified channel
+    object at the location specified by the index idx.'''
+    start = channel.get_index_after_time(start_time)
+    end = channel.get_index_after_time(end_time)
+    if(isnan(end)):
+        end = size(channel.time)-1
 
     subplot(2,1,1)
-    plot(t, x)
+    plot(channel.time[start:end], channel.velocity[start:end, idx])
     ylabel("Velocity [cm/sec]")
-    titlestring = filename+": r="+str(r[element])
+    titlestring = "Shot %d, Ch. %d: r=%.3gcm" % (channel.shot.number,
+                                                 channel.channel,
+                                                 channel.r[idx])
     title(titlestring)
 
     subplot(2,1,2)
-    fs = 1.0/(data['time'][2]-data['time'][1])
-    nfft = round(timechunk/(data['time'][2]-data['time'][1]))
+    fs = 1.0/(channel.time[2]-channel.time[1])
+    nfft = int(round(fs*timechunk))
     noverlap=nfft-1
-    Pxx, freqs, bins, im = specgram(x, NFFT=nfft, Fs=fs, noverlap=noverlap)
+    Pxx, freqs, bins, im = specgram(channel.velocity[start:end, idx],
+                                    NFFT=nfft, Fs=fs, noverlap=noverlap)
     xlabel("Time [sec]")
     ylabel("Frequency [Hz]")
     
