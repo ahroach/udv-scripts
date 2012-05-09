@@ -1613,7 +1613,8 @@ def play_channel_velocity_animation(channel, speed=1.0):
     magic_squirrel()
 
 
-def play_two_component_velocity_animation(velocity, speed=1.0, rlim=0.0):
+def play_two_component_velocity_animation(velocity, speed=1.0, rlim=0.0,
+                                          saveoutput=0, savefilename=''):
     dt = (velocity.time[1]-velocity.time[0])/speed
 
     rlim_idx = velocity.get_index_near_radius(rlim)
@@ -1654,11 +1655,23 @@ def play_two_component_velocity_animation(velocity, speed=1.0, rlim=0.0):
         line2.set_data(velocity.r[rlim_idx:], velocity.vr[i,rlim_idx:])
         time_text.set_text(time_template%(velocity.time[i]))
         return line1, line2, time_text
-    
-    ani = animation.FuncAnimation(fig, draw_velocities,
-                                  range(0, velocity.time.size),
-                                  interval = dt*1000, blit=True,
-                                  init_func=init)
+
+    if (saveoutput):
+        ani = animation.FuncAnimation(fig, draw_velocities,
+                                      range(0, velocity.time.size),
+                                      interval = 1, blit=True,
+                                      init_func=init)
+        
+        ani.save(savefilename, fps=int(1.0/dt))
+        #If this fails, keep in mind that the routine expects ffmpeg
+        #to be in the path somewhere, but Debian has libav-tools.
+        #Consider ln -s /usr/bin/avconv /usr/bin/ffmpeg
+    else:
+        ani = animation.FuncAnimation(fig, draw_velocities,
+                                      range(0, velocity.time.size),
+                                      interval = dt*1000, blit=True,
+                                      init_func=init)
+        
     
     #I have no idea why this is here, but the animaion doesn't run without
     #having something to generate an error here?!
