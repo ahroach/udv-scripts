@@ -635,57 +635,6 @@ def plot_two_component_velocity_contours(velocity, start_time, end_time, n=30):
     title('vt')
     colorbar()
 
-
-def plot_all_timeseries_velocity(filename, start_time, end_time, omega1, omega2):
-    r_data = rudv.read_ultrasound(filename, 1)
-    t_data = rudv.read_ultrasound(filename, 2)
-
-    time = r_data['time']
-    #Run once just to get the r vector
-    r, vr, vt = reconstruct_avg_velocities(r_data, t_data, 0, 0, omega2)
-
-    v1 = 2*pi*omega1*r1/60.0
-    v2 = 2*pi*omega2*r2/60.0
-    a = (v1*r1 - v2*r2)/(r1**2-r2**2)
-    b = (v1*r1 - a*r1**2)
-
-    couette = zeros(r.size)
-    for i in range(0, couette.size):
-        couette[i] = a*r[i] + b/r[i]
-
-    start_pos = 0
-    end_pos = time.size-1
-    for i in range(0, time.size):
-        if (time[i] > start_time) & (time[i-1] < start_time):
-            start_pos = i
-        elif (time[i] > end_time) & (time[i-1] < end_time):
-            end_pos = i-1
-
-    clipped_time = time[start_pos:end_pos]
-
-    vr_time = zeros([clipped_time.size, vr.size])
-    vt_time = zeros([clipped_time.size, vr.size])
-    for i in range(start_pos, end_pos):
-        r, vr, vt = reconstruct_avg_velocities(r_data, t_data, i, i, omega2)
-        vr_time[i-start_pos,:] = vr
-        vt_time[i-start_pos,:] = vt - couette
-
-    v = arange(-14, 8, 2)
-    z = arange(-88, 32, 12)
-
-    subplot(2,1,1)
-    contourf(clipped_time, r, vr_time.T, v, extend='both')
-    xlabel("Time [s]")
-    ylabel("r [cm]")
-    title(filename + ' vr')
-    colorbar()
-
-    subplot(2,1,2)
-    contourf(clipped_time, r, vt_time.T, z, extend='both')
-    xlabel("Time [s]")
-    ylabel("r [cm]")
-    title('vt - ideal couette')
-    colorbar()
     
 def plot_timeseries(filename, channel, element, labelstring='', nopoints=0,
                     color="", depth=0):
