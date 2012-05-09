@@ -454,6 +454,18 @@ class Velocity():
                 #Now add the azimuthal velocity offset.
                 self.vtheta[j,i] = (self.vtheta[j,i] +
                                     rpmtorads(self.shot.OCspeed)*r)
+
+
+    def get_index_after_time(self, time):
+        '''Find the index in the time_array of the first element after
+        the specified time'''
+        idx = nan
+        temp_idx = size(self.time) - 1
+        while(temp_idx >=0):
+            if self.time[temp_idx] > time:
+                idx = temp_idx
+            temp_idx = temp_idx - 1
+        return idx
                   
     
     def list_progenitors(self):
