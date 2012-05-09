@@ -505,31 +505,6 @@ def wrap_phase(angle):
 
     return angle
 
-def correct_vtan(usound_data, profile, omega2):
-    omega2 = omega2*2*pi/60 #Convert omega2 in RPM to omega2 in rad/sec
-
-    if usound_data['channel'] != 2:
-        print "Not a tangential measurement.  Not correcting."
-        return profile
-
-    cosangle = cos(pi*tan_probe_angle/180)
-    alpha = zeros(usound_data['depth'].size)
-
-    for i in range(0, alpha.size):
-        d = usound_data['depth'][i] - tan_probe_offset
-        alpha[i] = arccos((d - r2*cosangle)/(sqrt(d**2 - 2*r2*d*cosangle + r2**2)))
-
-    v_corrected = zeros(usound_data['depth'].shape)
-    r = calculate_radius(usound_data)
-
-    for i in range(0,alpha.size):
-        scalefactor = 1.0/sin(alpha[i])
-        offset = omega2*r[i]
-        v_corrected[i] = scalefactor*profile[i]  + offset
-        
-    return v_corrected
-
-
 
 def show_logs(start_file, end_file):
     allfiles = glob.glob('*.BDD')
