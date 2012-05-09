@@ -1288,14 +1288,6 @@ def save_avg_profile(filename, start_num, end_num, omega1, omega2,
         print("Saving Ideal Couette profile")
         savetxt(savefilename, c_[newr, couette], fmt="%12.6G")
 
-
-def find_element_r(r, desired_radius):
-    element = 0
-    for i in range(0, r.size):
-        if (r[i] > desired_radius) & (r[i-1] < desired_radius):
-            element = i
-    return element
-
 def calculate_fft_timeseries(time, data, start_time, end_time, filter_threshold=1000):
     start_pos = 0
     end_pos = time.size
