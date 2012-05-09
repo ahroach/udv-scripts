@@ -54,11 +54,13 @@ class Shot:
     def add_channel(self, channel_num):
         '''Adds and returns a ChannelData object corresponding to channel_num
         for this Shot.'''
+        #Make sure this channel exists
         if(not(self.channels_used.__contains__(channel_num))):
             print "Error: Shot %d doesn't use channel %d." % (self.number,
                                                               channel_num)
             return False
-        
+
+        #And create it, adding the object to the channels dictionary
         self.channels[channel_num] = ChannelData(self, channel_num)
         return self.channels[channel_num]
     
@@ -152,17 +154,16 @@ class ChannelData:
         which must be created before. Ideally, this function is only run
         from Shot.add_channel_data(), and was most likely already run
         from Shot.__init__().'''
+
         if(not(shot.channels_used.__contains__(channel_num))):
             print "Error: Shot %d doesn't use channel %d" % (shot_num,
                                                              channel_num)
             return False
 
+        #Get a pointer back to our parent Shot.
         self.shot = shot
-        params = sp.shot_params[shot.number]
         
-        if(params.__contains__('trouble_flag')):
-            print "Shot %d has trouble_flag set. Check notebook." % shot_num
-        
+        #Read in the data from the UDV file
         data = rudv.read_ultrasound(shot.filename, channel_num)
 
         self.velocity = data['velocity']
@@ -173,23 +174,35 @@ class ChannelData:
         self.channel = data['channel']
         self.maxvelocity = data['maxvelocity']
         
+
+        #Now grab the shot parameters from the database.
+        params = sp.shot_params[shot.number]
         
+        if(params.__contains__('trouble_flag')):
+            print "Shot %d has trouble_flag set. Check notebook." % shot_num
+
+        #Pick out the transducer mounting parameters to correspond to this
+        #channel
         channel_idx = params['channels'].index(channel_num)
         
         self.A = params['As'][channel_idx]
         self.B = params['Bs'][channel_idx]
         self.offset = params['offsets'][channel_idx]
         self.port = params['ports'][channel_idx]
+
         
         self.time_points = self.time.size
         self.spatial_points = self.depth.size
+
+        #Now run some routines to unwrap the aliased velocity, and to find
+        #the location of each measurement.        
         self.unwrap_velocity()
         self.calculate_radius()
         self.calculate_azimuth()
         self.calculate_height()
 
     def unwrap_velocity(self, threshold=1.5):
-        '''Adds the unwrapped velocity to the channel information, done using
+        '''Adds the unwrapped velocity to the channel information using
         the specified threshold.'''
         #Add the unwrapped velocity to the channel information
         self.unwrapped_velocity = zeros(self.velocity.shape)
@@ -198,6 +211,10 @@ class ChannelData:
         maxvelocity = self.maxvelocity
     
         for j in range(0, self.time_points):
+            #Define an array describing the number of cumulative phase shifts
+            #from the face of the transducer to the current radius. Iterate
+            #along, adding one when we jump 2\pi, and subtracting one when
+            #we go back the other way.
             wraps = zeros(self.spatial_points)
             for i in range(10, self.spatial_points):
                 if (self.velocity[j, i] -
@@ -208,6 +225,10 @@ class ChannelData:
                     wraps[i] = wraps[i-1] -1
                 else:
                     wraps[i] = wraps[i-1]
+            #Every 2\pi phase shift corresponds to a shift in the velocity
+            #of 2*maxvelocity. So calculate and apply the appropriate
+            #velocity correction based on the number of 2\pi phase shifts
+            #at each radius.
             v_correction = wraps*2.0*maxvelocity
             self.unwrapped_velocity[j,:] = self.velocity[j,:] + v_correction
     
@@ -277,6 +298,11 @@ class ChannelData:
 
 
 class Velocity():
+    '''A class for processed velocity measurements. These are distinct from
+    the velocities in the Channel class because the velocities here are
+    processed and presented in the v_r, v_theta, and v_z components.
+    __init__() tries to be smart about which generation routine to call based
+    on the number of channels presented.'''
     def __init__(self, shot, channel_nums):
         self.shot = shot
         if size(channel_nums) == 0:
@@ -331,7 +357,8 @@ class Velocity():
             sinB = sin(degstorads(channel.B))
             cosB = cos(degstorads(channel.B))
             d = channel.depth
-        
+
+            #Calculate the the correction factor needed at each radius
             anglefactor = zeros(self.r.size)
             
             for i in range(0, self.r.size):
@@ -339,7 +366,9 @@ class Velocity():
                                   sin(math.atan(sinA*sinB/cosA) +
                                       math.asin(d[i]*sinA*sinB/self.r[i])))
             
-            #Now iterate over the entire dataset
+            #Now iterate over every time, applying the correction factor
+            #and also adding offset due to the transducer motion to find
+            #the velocity in the lab frame.
             for i in range(0, self.time.size):
                 self.vtheta[i,:] = ((channel.unwrapped_velocity[i,:]/
                                      anglefactor) +
@@ -357,17 +386,21 @@ class Velocity():
     def generate_velocity_two_transducers(self, channel_num):
         '''Generate velocity from two transducers. Currently assumes we are
            just getting contributions from v_r and v_theta'''
+        
         self.progenitors = []
         self.progenitors.append(self.shot.get_channel(channel_num[0]))
         self.progenitors.append(self.shot.get_channel(channel_num[1]))
-
+        
         ch1 = self.progenitors[0]
         ch2 = self.progenitors[1]
-
+        
+        #Find the index of the deepest point (smallest radius)
         ch1_last_idx = ch1.r.argmin()
         ch2_last_idx = ch2.r.argmin()
-
-        #First find out has the least radial penetration, and use that 
+        
+        #First find out which has the least radial penetration, and use that
+        #as the definitive radial coordinate. This avoids radii where only
+        #one channel has information
         #Also reverse the array, so smaller radii are first.
         if (ch1.r.min() > ch2.r.min()):
             use_ch1_r = True
@@ -375,8 +408,9 @@ class Velocity():
         else:
             use_ch1_r = False
             self.r = ch2.r[0:ch2_last_idx][::-1]
-
+        
         self.time = ch1.time
+        
         #With two transducers, it's less clear what the z and azimuth
         #coordinates should be. Just make them nans.
         self.z = ones(self.r.size)*nan
@@ -391,8 +425,8 @@ class Velocity():
         ch1_v = zeros((self.time.size, self.r.size))
         ch2_v = zeros((self.time.size, self.r.size))
 
-        #Now interpolate and resample the velocity onto the same radial grid
-        #Again keeping in mind that we need to reverse these arrays as inputs
+        #Now interpolate and resample the velocity onto the same radial grid,
+        #again keeping in mind that we need to reverse these arrays as inputs
         #into the interpolation routines, so that smaller measured radii
         #are first. Now everything in ch1_v, ch2_v and self.r will
         #be stored from smaller radii to larger.
@@ -440,6 +474,7 @@ class Velocity():
 
         for i in range(0, self.r.size):
             r = self.r[i]
+            #Set up the transformation matrix
             d1 = ((r2*cosA1 - sqrt(r**2*(sinA1**2*sinB1**2 + cosA1**2) -
                                    r2**2*sinA1**2*sinB1**2)) /
                   (sinA1**2*sinB1**2 + cosA1**2))
@@ -455,12 +490,20 @@ class Velocity():
             T[0,1] = sqrt(1 - sinA1**2*cosB1**2)*sin(xi1)
             T[1,0] = -sqrt(1 - sinA2**2*cosB2**2)*cos(xi2)
             T[1,1] = sqrt(1 - sinA2**2*cosB2**2)*sin(xi2)
+
+            #Now invert the matrix so we can apply it to the measured
+            #velocities
             Tinv = linalg.inv(T)
+
+            #Now cycle through every time point at this radius,
+            #and dot the inverted transformation matrix into the
+            #measurements to find v_r and v_theta
             for j in range(0, self.time.size):
                 [self.vr[j,i], self.vtheta[j,i]] = dot(Tinv,
                                                        [ch1_v[j,i],
                                                        ch2_v[j,i]])
-                #Now add the azimuthal velocity offset.
+                #Add the azimuthal velocity offset due to the transducer
+                #motion to find the velocity in the lab frame.
                 self.vtheta[j,i] = (self.vtheta[j,i] +
                                     rpmtorads(self.shot.OCspeed)*r)
 
@@ -482,6 +525,8 @@ class Velocity():
         return abs(self.r - radius).argmin()
     
     def list_progenitors(self):
+        '''List information about the channels that were combined to
+        create a Velocity object.'''
         num_progenitors = size(self.progenitors)
         print "Derived from %d progenitor(s)" % num_progenitors
         for i in range(0, num_progenitors):
