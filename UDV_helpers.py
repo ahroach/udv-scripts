@@ -1535,49 +1535,6 @@ def plot_vtheta_mode(filename, channel, omega2, start_time, end_time, desiredcel
         
     return C.levels
 
-
-def gen_profile_movie(filename, omega1, omega2, start_time, end_time, channel=2, labelstring='', rlim=0, speed=1.0, basedir='/tmp/abcd000', moviefilename='movie.avi'):
-
-    dt = find_time_of_profile(filename, channel, 3) - find_time_of_profile(filename, channel, 2)
-    fps = speed*1.0/dt
-
-    #First find the acqusition rate of this channel
-    initial_profile = find_profile_after_time(filename, channel, start_time)
-    final_profile = find_profile_after_time(filename, channel, end_time)
-    if(final_profile == 0):
-        final_profile = find_number_of_profiles(filename, channel)    
-
-    os.mkdir(basedir)
-
-    axes = plot_avg_velocities_novr(filename, initial_profile, initial_profile, omega1, omega2, rlim=rlim, channel=channel)
-    
-    for i in range(initial_profile, final_profile):
-        clf()
-        t = find_time_of_profile(filename, channel, i)
-        finallabel = labelstring + ": t=" + str(t)
-        plot_avg_velocities_novr(filename, i, i, omega1, omega2, labelstring=finallabel, rlim=rlim, channel=channel)
-        axis(axes)
-        outputfile = basedir + '/' + str("%04d" % i) + '.png'
-        savefig(outputfile)
-        print 'Wrote file', outputfile
-
-    #Now compile into a movie
-    command = ('mencoder',
-               'mf://' + basedir + '/????.png',
-               '-mf',
-               'type=png:fps=' + str(fps),
-               '-ovc',
-               'lavc',
-               '-lavcopts',
-               'vcodec=mpeg4',
-               '-oac',
-               'copy',
-               '-o',
-               moviefilename)
-
-    subprocess.check_call(command)
-    shutil.rmtree(basedir)
-
 def play_channel_velocity_animation(channel, speed=1.0,
                                     saveoutput=0, savefilename=''):
     '''Plays an animation of the raw data from the specified Channel object.
