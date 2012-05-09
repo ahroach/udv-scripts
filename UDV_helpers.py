@@ -550,19 +550,20 @@ def plot_channel_velocity(channel, start_num, end_num, unwrapped=0,
 
 
 def plot_single_vtheta_profile(vel_obj, profile_num):
-    title_str = str(vel_obj.shot.number) +": t="+str(vel_obj.time[profile_num])
+    label_str = str(vel_obj.shot.number) +": t="+str(vel_obj.time[profile_num])
 
-    plot(vel_obj.r, vel_obj.vtheta[profile_num,:])
+    plot(vel_obj.r, vel_obj.vtheta[profile_num,:], label=label_str)
     plot(vel_obj.shot.idealcouette.r, vel_obj.shot.idealcouette.vtheta)
-    title(title_str)
 
-def plot_avg_profile(usound_data, start_num, end_num, omega1, omega2, channel=2):
-    #Average the profile
-    avg_profile, std_profile = average_profile(usound_data,
-                                               start_num, end_num, omega2, channel)
-    #And plot.
-    labelstring = usound_data['filename']+": Average from t = "+str(usound_data['time'][start_num])+" to t = "+str(usound_data['time'][end_num])
-    plot_profile(usound_data, avg_profile, omega1, omega2, labelstring)
+def plot_avg_vtheta_profile(vel_obj, start_num, end_num):
+    label_str = "%d: Avg from t=%.3g to t=%.3g" % (vel_obj.shot.number,
+                                                   vel_obj.time[start_num],
+                                                   vel_obj.time[end_num])
+
+    plot(vel_obj.r,
+         mean(vel_obj.vtheta[start_num:end_num, :], axis=0),
+         label = label_str)
+    plot(vel_obj.shot.idealcouette.r, vel_obj.shot.idealcouette.vtheta)
 
 def plot_profile(usound_data, profile, omega1, omega2, labelstring):
     v1 = 2*pi*omega1*r1/60.0
