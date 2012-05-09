@@ -302,7 +302,9 @@ class Velocity():
         channel = self.progenitors[0]
         self.time = channel.time
         self.r = channel.r
+        self.azimuth = channel.azimuth
         self.z = channel.z
+        
 
         if (((channel.B == 0) or (channel.B == -180) or (channel.B == 180)) and
             (channel.A == 90)):
@@ -340,7 +342,118 @@ class Velocity():
             for i in range(0, self.time.size):
                 self.vtheta[i,:] = ((channel.unwrapped_velocity[i,:]/
                                      anglefactor) +
-                                    r2*rpmtorads(self.shot.OCspeed))
+                                    self.r*rpmtorads(self.shot.OCspeed))
+
+
+    def generate_velocity_two_transducers(self, channel_num):
+        '''Generate velocity from two transducers.'''
+        self.progenitors = []
+        self.progenitors.append(self.shot.get_channel(channel_num[0]))
+        self.progenitors.append(self.shot.get_channel(channel_num[1]))
+
+        ch1 = self.progenitors[0]
+        ch2 = self.progenitors[1]
+
+        ch1_last_idx = ch1.r.argmin()
+        ch2_last_idx = ch2.r.argmin()
+
+        #First find out has the least radial penetration, and use that 
+        #Also reverse the array, so smaller radii are first.
+        if (ch1.r.min() > ch2.r.min()):
+            use_ch1_r = True
+            self.r = ch1.r[0:ch1_last_idx][::-1]
+        else:
+            use_ch1_r = False
+            self.r = ch2.r[0:ch2_last_idx][::-1]
+
+        self.time = ch1.time
+        #With two transducers, it's less clear what the z and azimuth
+        #coordinates should be. Just make them nans..
+        self.z = ones(self.r.size)*nan
+        self.azimuth = ones(self.r.size)*nan
+
+        
+        self.vr = zeros((self.time.size, self.r.size))
+        self.vtheta = zeros((self.time.size, self.r.size))
+        self.vz = ones((self.time.size, self.r.size))*nan
+
+        #Set up some temporary arrays to store the velocities
+        ch1_v = zeros((self.time.size, self.r.size))
+        ch2_v = zeros((self.time.size, self.r.size))
+
+        #Now interpolate and resample the velocity onto the same radial grid
+        #Again keeping in mind that we need to reverse these arrays as inputs
+        #into the interpolation routines, so that smaller measured radii
+        #are first. Now everything in ch1_v, ch2_v and self.r will
+        #be stored from smaller radii to larger.
+        for i in range (0, self.time.size):
+            if(use_ch1_r):
+                ch1_v[i,:] = ch1.unwrapped_velocity[i,0:ch1_last_idx][::-1]
+                tck = scipy.interpolate.splrep(ch2.r[0:ch2_last_idx][::-1],
+                                               ch2.unwrapped_velocity[i,0:ch2_last_idx][::-1],
+                                               s=0)
+                ch2_v[i,:] = scipy.interpolate.splev(self.r, tck, der=0)
+            else:
+                ch2_v[i,:] = ch2.unwrapped_velocity[i,0:ch2_last_idx][::-1]
+                tck = scipy.interpolate.splrep(ch1.r[0:ch1_last_idx][::-1],
+                                               ch1.unwrapped_velocity[i,0:ch1_last_idx][::-1],
+                                               s=0)
+                ch1_v[i,:] = scipy.interpolate.splev(self.r, tck, der=0)
+
+        #Now define a matrix for doing the transformations.
+        #v = T \cdot v_measured
+        #[ v1 ] = [A11 A12][ v_r ]
+        #[ v2 ]   [A21 A22][ v_t ]
+        #where T_{0,0} = -\sqrt{1 - \sin^2 A_1 \cos^2 B_1}\cos\xi_1
+        #  and T_{0,1} = \sqrt{1 - \sin^2 A_1 \cos^2 B_1}\sin\xi_1
+        #  and T_{1,0} = -\sqrt{1 - \sin^2 A_2 \cos^2 B_2}\cos\xi_2
+        #  and T_{1,1} = \sqrt{1 - \sin^2 A_2 \cos^2 B_2}\sin\xi_2
+        #  \xi = \theta + \alpha, where \alpha = \arctan(\tan A \sin B)
+        #  \theta = \arcsin\left[\frac{d\sin A \sin B}{r} \right]
+        #  and d = \frac{r_2 cos \A - sqrt{r^2(\sin^2 A \sin ^2 B + \cos ^2 A)
+        #  - r_2^2 \sin^2 A \sin^2 B}}{\sin^2 A \sin ^2 B + \cos^2 A}
+
+        #Define some trigonometric quantities that I need
+        sinA1 = sin(degstorads(ch1.A))
+        cosA1 = cos(degstorads(ch1.A))
+        sinB1 = sin(degstorads(ch1.B))
+        cosB1 = cos(degstorads(ch1.B))
+        sinA2 = sin(degstorads(ch2.A))
+        cosA2 = cos(degstorads(ch2.A))
+        sinB2 = sin(degstorads(ch2.B))
+        cosB2 = cos(degstorads(ch2.B))
+
+        alpha1 = arctan(sinA1*sinB1/cosA1)
+        alpha2 = arctan(sinA2*sinB2/cosA2)
+
+        T = zeros([2,2])
+
+        for i in range(0, self.r.size):
+            r = self.r[i]
+            d1 = ((r2*cosA1 - sqrt(r**2*(sinA1**2*sinB1**2 + cosA1**2) -
+                                   r2**2*sinA1**2*sinB1**2)) /
+                  (sinA1**2*sinB1**2 + cosA1**2))
+            d2 = ((r2*cosA2 - sqrt(r**2*(sinA2**2*sinB2**2 + cosA2**2) -
+                                   r2**2*sinA2**2*sinB2**2)) /
+                  (sinA2**2*sinB2**2 + cosA2**2))
+            theta1 = arcsin(d1*sinA1*sinB1/r)
+            theta2 = arcsin(d2*sinA2*sinB2/r)
+            xi1 = alpha1 + theta1
+            xi2 = alpha2 + theta2
+
+            T[0,0] = -sqrt(1 - sinA1**2*cosB1**2)*cos(xi1)
+            T[0,1] = sqrt(1 - sinA1**2*cosB1**2)*sin(xi1)
+            T[1,0] = -sqrt(1 - sinA2**2*cosB2**2)*cos(xi2)
+            T[1,1] = sqrt(1 - sinA2**2*cosB2**2)*sin(xi2)
+            Tinv = linalg.inv(T)
+            for j in range(0, self.time.size):
+                [self.vr[j,i], self.vtheta[j,i]] = dot(Tinv,
+                                                       [ch1_v[j,i],
+                                                       ch2_v[j,i]])
+                #Now add the azimuthal velocity offset.
+                self.vtheta[j,i] = (self.vtheta[j,i] +
+                                    rpmtorads(self.shot.OCspeed)*r)
+                  
     
     def list_progenitors(self):
         num_progenitors = size(self.progenitors)
