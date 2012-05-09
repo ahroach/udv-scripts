@@ -883,45 +883,44 @@ def plot_spectrogram(channel, idx, start_time=0, end_time=1000, timechunk=3):
     ylabel("Frequency [Hz]")
     
 
-def plot_avg_velocities(filename, start_num, end_num, omega1, omega2, labelstring='', scale=1, rlim=0, channel=2, time=0):
-    r_data = rudv.read_ultrasound(filename, 1)
-    t_data = rudv.read_ultrasound(filename, channel)
-
+def plot_two_component_avg_velocities(velocity, start_num, end_num, labelstring='', scale=1, rlim=0, time=0):
+    '''Plots the average v_r and v_theta for the specified Velocity object.
+    start_num and end_num are the indices to average between, unless time=1,
+    in which case they are times in seconds.'''
     if(time == 1):
-        start_num = find_profile_after_time(filename, channel, start_num)
-        end_num = find_profile_after_time(filename, channel, end_num)
-
-    r, vr, vt = reconstruct_avg_velocities(r_data, t_data, start_num,
-                                           end_num, omega2)
-    v1 = 2*pi*omega1*r1/60.0
-    v2 = 2*pi*omega2*r2/60.0
-    a = (v1*r1 - v2*r2)/(r1**2-r2**2)
-    b = (v1*r1 - a*r1**2)
-    couette = zeros(r.shape)
-    for i in range(0, couette.size):
-        couette[i] = a*r[i] + b/r[i]
-    rcouette = r
-
-    rlim = find_element_r(r, rlim)
-    r = r[rlim:]
-    vr = vr[rlim:]
-    vt = vt[rlim:]
+        start_num = velocity.get_index_after_time(start_num)
+        end_num = velocity.get_index_after_time(end_num)
+        if(isnan(start_num) or isnan(end_num)):
+            print "Valid times are from %g to %g secs." % (velocity.time[0],
+                                                           velocity.time[-1])
+            return False
+    if (start_num < 0) or (end_num > size(velocity.time)):
+        print "Invalid start or end time indices."
+        return False
+    
+    rlim = velocity.get_index_near_radius(rlim)
 
     subplot(2,1,1)
-    xlabel("r [cm]")
     ylabel(r"$v_\theta$ [cm/sec]")
     if(len(labelstring) == 0):
-        labelstring=filename + ": "+str(start_num)+"-"+str(end_num)
-    plot(r, vt*scale, label=labelstring)     
+        labelstring= "Shot %d: %d to %d" % (velocity.shot.number,
+                                            start_num,
+                                            end_num)
+    plot(velocity.r[rlim:],
+         scale*mean(velocity.vtheta[start_num:end_num, rlim:], axis=0),
+         label=labelstring)     
     axvline(x=r1, color='black')
     axvline(x=r2, color='black')
-    plot(rcouette, couette*scale, 'k-')
+    plot(velocity.shot.idealcouette.r,
+         velocity.shot.idealcouette.vtheta*scale, 'k-')
     grid(b=1)
     legend()
 
     subplot(2,1,2)
+    xlabel("r [cm]")
     ylabel(r"$v_r$ [cm/sec]")
-    plot(r, vr*scale)
+    plot(velocity.r[rlim:],
+         scale*mean(velocity.vr[start_num:end_num, rlim:], axis=0))
     axhline(y=0, color='black')
     axvline(x=r1, color='black')
     axvline(x=r2, color='black')
