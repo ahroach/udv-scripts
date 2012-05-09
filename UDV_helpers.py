@@ -1398,61 +1398,6 @@ def reconstruct_avg_velocities_nonaxisymmetric(r_data, t_data, profile_num, omeg
     return r, v_r, v_t
 
 
-def reconstruct_avg_velocities_novr(r_data, t_data, start_num, end_num, omega2, unwrap=1):
-    #Get an average, unwrapped tangential profile
-
-    t_profiles = zeros([t_data['depth'].shape[0],
-                        end_num - start_num + 1])
-    for i in range(start_num, end_num+1):
-        if(unwrap==1):
-            unwrapped_profile = unwrap_profile(t_data,
-                                               t_data['velocity'][i,:])
-            t_profiles[:,(i-start_num)] = unwrapped_profile
-        else:
-            t_profiles[:,(i-start_num)] = t_data['velocity'][i,:]
-    
-
-    t_avg_profile = mean(t_profiles,1)
-    t_std_profile = std(t_profiles,1)
-
-    #Generate the radiuses for both sets of data
-    r_t = calculate_radius(t_data)
-
-    #Find the last good radius
-    for i in range(0, r_t.size):
-        if r_t[i] < r_t[i-1]:
-            t_good_index = i-1
-
-    #Trim the arrays
-    r_t = r_t[0:t_good_index]
-    t_avg_profile = t_avg_profile[0:t_good_index]
-
-    #Now reverse all the arrays
-    r_t = r_t[::-1]
-    t_avg_profile = t_avg_profile[::-1]
-
-
-    r_avg_resampled = zeros(r_t.size)
-
-    #r_t is now the definitive radial coordinate
-    r = r_t
-
-    v_r = zeros(r.shape)
-    v_t = zeros(r.shape)
-
-    #Now do the transformation.
-    for i in range(0, r.size):
-        sinalpha_t = (r2/r[i])*sin(tan_probe_angle*pi/180)
-        v_t[i] = t_avg_profile[i]/sinalpha_t
-
-    #Now fix the vt offset
-    if(unwrap == 1):
-        omega2 = omega2*2*pi/60
-        offset = omega2*r
-        v_t = v_t + offset
-
-    return r, v_r, v_t
-
 def get_statistics(filename, channel, element, start_time, end_time):
     data = rudv.read_ultrasound(filename, channel)
     time = data['time']
