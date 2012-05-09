@@ -346,7 +346,8 @@ class Velocity():
 
 
     def generate_velocity_two_transducers(self, channel_num):
-        '''Generate velocity from two transducers.'''
+        '''Generate velocity from two transducers. Currently assumes we are
+           just getting contributions from v_r and v_theta'''
         self.progenitors = []
         self.progenitors.append(self.shot.get_channel(channel_num[0]))
         self.progenitors.append(self.shot.get_channel(channel_num[1]))
@@ -368,7 +369,7 @@ class Velocity():
 
         self.time = ch1.time
         #With two transducers, it's less clear what the z and azimuth
-        #coordinates should be. Just make them nans..
+        #coordinates should be. Just make them nans.
         self.z = ones(self.r.size)*nan
         self.azimuth = ones(self.r.size)*nan
 
