@@ -612,6 +612,30 @@ def plot_channel_velocity_contour(channel, unwrapped=0, n=30):
     ylabel("depth [cm]")
     colorbar()
 
+def plot_two_component_velocity_contours(velocity, start_time, end_time, n=30):
+    start_idx = velocity.get_index_after_time(start_time)
+    end_idx = velocity.get_index_after_time(end_time)
+    if(isnan(start_idx) or isnan(end_idx)):
+        print "Valid times are from %g to %g secs." % (velocity.time[0],
+                                                       velocity.time[-1])
+        return False
+
+    subplot(2,1,1)
+    contourf(velocity.time[start_idx:end_idx],
+             velocity.r, velocity.vr[start_idx:end_idx,:].T, n)
+    ylabel("r [cm]")
+    title('vr')
+    colorbar()
+
+    subplot(2,1,2)
+    contourf(velocity.time[start_idx:end_idx],
+             velocity.r, velocity.vtheta[start_idx:end_idx,:].T, n)
+    xlabel("Time [s]")
+    ylabel("r [cm]")
+    title('vt')
+    colorbar()
+
+
 def plot_all_timeseries_velocity(filename, start_time, end_time, omega1, omega2):
     r_data = rudv.read_ultrasound(filename, 1)
     t_data = rudv.read_ultrasound(filename, 2)
