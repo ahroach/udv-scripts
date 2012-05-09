@@ -1613,6 +1613,58 @@ def play_channel_velocity_animation(channel, speed=1.0):
     magic_squirrel()
 
 
+def play_two_component_velocity_animation(velocity, speed=1.0, rlim=0.0):
+    dt = (velocity.time[1]-velocity.time[0])/speed
+
+    rlim_idx = velocity.get_index_near_radius(rlim)
+    
+    fig = figure()
+    
+    ax1 = fig.add_subplot(211, autoscale_on=False, xlim=(r1,r2),
+                         ylim=(velocity.vtheta[:,rlim_idx:].min(),
+                               velocity.vtheta[:,rlim_idx:].max()))
+    ylabel(r"$v_\theta$ [cm/sec]")
+    ax2 = fig.add_subplot(212, autoscale_on=False, xlim=(r1,r2),
+                          ylim=(velocity.vr[:,rlim_idx:].min(),
+                                velocity.vr[:,rlim_idx:].max()))
+
+    ylabel(r"$v_r$ [cm/sec]")
+    xlabel("Depth [cm]")
+
+    ax1.grid()
+    ax2.grid()
+                          
+    
+    line1, = ax1.plot([], [], '.-', lw=2)
+    line2, = ax2.plot([], [], '.-', lw=2)
+    couetteline = ax1.plot(velocity.shot.idealcouette.r,
+                           velocity.shot.idealcouette.vtheta,
+                           'k-', lw=1)
+    time_template = 'time = %.1fs'
+    time_text = ax1.text(0.05, 0.9, '', transform=ax1.transAxes)
+    
+    def init():
+        line1.set_data([], [])
+        line2.set_data([], [])
+        time_text.set_text('')
+        return line1, line2, time_text
+    
+    def draw_velocities(i):
+        line1.set_data(velocity.r[rlim_idx:], velocity.vtheta[i,rlim_idx:])
+        line2.set_data(velocity.r[rlim_idx:], velocity.vr[i,rlim_idx:])
+        time_text.set_text(time_template%(velocity.time[i]))
+        return line1, line2, time_text
+    
+    ani = animation.FuncAnimation(fig, draw_velocities,
+                                  range(0, velocity.time.size),
+                                  interval = dt*1000, blit=True,
+                                  init_func=init)
+    
+    #I have no idea why this is here, but the animaion doesn't run without
+    #having something to generate an error here?!
+    magic_squirrel()
+
+
 def gen_raw_profile_movie(filename, start_time, end_time, channel=2, labelstring='', speed=1.0, basedir='/tmp/abcd000', moviefilename='movie.avi'):
 
     dt = find_time_of_profile(filename, channel, 3) - find_time_of_profile(filename, channel, 2)
