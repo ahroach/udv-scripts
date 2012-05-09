@@ -619,10 +619,10 @@ def plot_timeseries(channel, idx, labelstring='', withpts=0):
     '''Plot timeseries of the velocity at a particular point, specified by
     idx, of a channel.'''
     if(len(labelstring) == 0):
-        labelstring = "Shot %d, Ch. %d:\n d=%.3gcm, r=%.3gcm" % (channel.shot.number,
-                                                         channel.channel,
-                                                         channel.depth[idx],
-                                                         channel.r[idx])
+        labelstring="Shot %d, Ch. %d:\nd=%.3gcm, r=%.3gcm"%(channel.shot.number,
+                                                            channel.channel,
+                                                            channel.depth[idx],
+                                                            channel.r[idx])
         
     if(withpts):
         plot(channel.time, channel.velocity[:,idx], '.-', label=labelstring)
@@ -645,40 +645,6 @@ def plot_two_component_velocity_timeseries(velocity, radius):
     ylabel("Velocity [cm/sec]")
     title(titlestring)
 
-def generate_profiles_alltime(filename, channel, omega2):
-    r_data = rudv.read_ultrasound(filename, 1)
-    t_data = rudv.read_ultrasound(filename, channel)
-    time = t_data['time']
-
-    r, vr, vt = reconstruct_avg_velocities(r_data, t_data, 0, 0, 53, unwrap=0)
-    
-    vt_profiles = zeros([time.size, r.size])
-    vr_profiles = zeros([time.size, r.size])
-    
-    for i in range(0, time.size):
-        r, vr, vt = reconstruct_avg_velocities(r_data, t_data, i, i, 53)
-        vt_profiles[i,:] = vt
-        vr_profiles[i,:] = vr
-        
-    data = {'r': r, 'time': time, 'vr': vr_profiles, 'vt': vt_profiles}
-    return data
-
-def generate_profiles_alltime_novr(filename, channel, omega2):
-    r_data = rudv.read_ultrasound(filename, 1)
-    t_data = rudv.read_ultrasound(filename, channel)
-    time = t_data['time']
-
-    r, vr, vt = reconstruct_avg_velocities_novr(r_data, t_data, 0, 0, 53, unwrap=0)
-    
-    profiles = zeros([time.size, r.size])
-    
-    for i in range(0, time.size):
-        r, vr, vt = reconstruct_avg_velocities_novr(r_data, t_data, i, i, 53)
-        profiles[i,:] = vt
-
-    vr = zeros(profiles.shape)
-    data = {'r': r, 'time': time, 'vt': profiles, 'vr': vr}
-    return data
 
 def plot_wave_amplitude_profile(filename, channel, omega2, start_time, end_time, freqband_min = 0, freqband_max = 0, filter_threshold=1000):
     data = generate_profiles_alltime_novr(filename, channel, omega2)
