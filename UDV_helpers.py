@@ -343,7 +343,15 @@ class Velocity():
                 self.vtheta[i,:] = ((channel.unwrapped_velocity[i,:]/
                                      anglefactor) +
                                     self.r*rpmtorads(self.shot.OCspeed))
-
+        #Now before we leave, reverse these arrays so that they're in
+        #smallest-radius-first order, since this matches better with what
+        #we do everywhere else.
+        self.r = self.r[::-1]
+        self.azimuth = self.azimuth[::-1]
+        self.z = self.z[::-1]
+        self.vr = self.vr[:,::-1]
+        self.vtheta = self.vtheta[:,::-1]
+        self.vz = self.vz[:,::-1]
 
     def generate_velocity_two_transducers(self, channel_num):
         '''Generate velocity from two transducers. Currently assumes we are
