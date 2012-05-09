@@ -467,6 +467,10 @@ class Velocity():
             temp_idx = temp_idx - 1
         return idx
                   
+    def get_index_near_radius(self, radius):
+        '''Find the index in the radius array of the element with r
+        closest to the specified radius'''
+        return abs(self.r - radius).argmin()
     
     def list_progenitors(self):
         num_progenitors = size(self.progenitors)
@@ -653,51 +657,18 @@ def plot_timeseries(channel, idx, labelstring='', withpts=0):
     xlabel("Time [sec]")
     ylabel("Velocity [cm/sec]")
 
-def plot_timeseries_velocity(filename, radius, omega1, omega2, scaleshift=0, timeshift=0):
-    r_data = rudv.read_ultrasound(filename, 1)
-    t_data = rudv.read_ultrasound(filename, 2)
-    #Resample r time onto t grid, with timeshift if needed.
-    if(timeshift == 0):
-        time = r_data['time']
-    else:        
-        r_time = r_data['time'] + timeshift
-        t_time = t_data['time']
-        time = t_time
-        for i in range(0, r_data['depth'].shape[0]):
-            tck = scipy.interpolate.splrep(r_time, r_data['velocity'][:,i], s=0)
-            r_data['velocity'][:,i] = scipy.interpolate.splev(t_time, tck, der=0)
-    
-        
-    vr_series = zeros(time.size)
-    vt_series = zeros(time.size)
 
-    r, vr, vt = reconstruct_avg_velocities(r_data, t_data, 0, 0, omega2)
-    element = find_element_r(r, radius)
-    print element
+def plot_two_component_velocity_timeseries(velocity, radius):
+    '''Plot timeseries of a velocity object at a point specified by idx.'''
+    idx = velocity.get_index_near_radius(radius)
 
-    for i in range(0, time.size):
-        r, vr, vt = reconstruct_avg_velocities(r_data, t_data, i, i, omega2)
-        vr_series[i] = vr[element]
-        vt_series[i] = vt[element]
-
-    if (scaleshift != 0):
-        vt_series = vt_series - scaleshift
-
-    #Some goofiness to get rid of spurious measurements
-#    for i in range(0, time.size):
-#        if vt_series[i] > 400:
-#            vt_series[i] = vt_series[i-1]
-#        if vt_series[i] < 0:
-#            vt_series[i] = vt_series[i-1]
-    
-
-    titlestring = filename+": r="+str(r[element])
-    plot(time, vr_series, '.-', label=r"$v_r$")
-    plot(time, vt_series, '.-', label=r"$v_\theta$")
+    titlestring = "Shot %d, r=%.3gcm" % (velocity.shot.number,
+                                         velocity.r[idx])
+    plot(velocity.time, velocity.vr[:,idx], '.-', label=r"$v_r$")
+    plot(velocity.time, velocity.vtheta[:,idx], '.-', label=r"$v_\theta$")
     xlabel("Time [sec]")
     ylabel("Velocity [cm/sec]")
     title(titlestring)
-    legend()
 
 def generate_profiles_alltime(filename, channel, omega2):
     r_data = rudv.read_ultrasound(filename, 1)
