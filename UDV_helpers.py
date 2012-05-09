@@ -1183,54 +1183,6 @@ def eval_shear_layer_2(r_data, t_data, profile_num, omega1, omega2, channel=2,
     return a, avg_ampl
 
 
-
-def plot_avg_velocities_novr(filename, start_num, end_num, omega1, omega2, labelstring='', scale=1, rlim=0, channel=2, time=0, omega=0, unwrap=1):
-    r_data = rudv.read_ultrasound(filename, 1)
-    t_data = rudv.read_ultrasound(filename, channel)
-
-    if(time == 1):
-        start_num = find_profile_after_time(filename, channel, start_num)
-        end_num = find_profile_after_time(filename, channel, end_num)
-
-    r, vr, vt = reconstruct_avg_velocities_novr(r_data, t_data, start_num,
-                                                end_num, omega2, unwrap=unwrap)
-    v1 = 2*pi*omega1*r1/60.0
-    v2 = 2*pi*omega2*r2/60.0
-    a = (v1*r1 - v2*r2)/(r1**2-r2**2)
-    b = (v1*r1 - a*r1**2)
-    couette = zeros(r.shape)
-    for i in range(0, couette.size):
-        couette[i] = a*r[i] + b/r[i]
-    rcouette = r
-
-    rlim = find_element_r(r, rlim)
-    r = r[rlim:]
-    vr = vr[rlim:]
-    vt = vt[rlim:]
-
-    xlabel("r [cm]")
-    if(omega==1):
-        ylabel(r"$\Omega$ [1/sec]")
-    else:
-        ylabel(r"$v_\theta$ [cm/sec]")
-
-    if(len(labelstring) == 0):
-        labelstring=filename + ": "+str(start_num)+"-"+str(end_num)
-
-    if(omega==1):
-        plot(r, vt*scale/r, label=labelstring)
-    else:
-        plot(r, vt*scale, label=labelstring)
-        
-    axvline(x=r1, color='black')
-    axvline(x=r2, color='black')
-    if(omega==0):
-        plot(rcouette, couette*scale, 'k-')
-    
-    grid(b=1)
-    legend()
-    return axis()
-
 def save_avg_profile(filename, start_num, end_num, omega1, omega2,
                      savefilename, scale=1, saveideal=0):
     r_data = rudv.read_ultrasound(filename, 1)
