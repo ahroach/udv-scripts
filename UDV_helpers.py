@@ -701,7 +701,9 @@ def plot_two_component_velocity_timeseries(velocity, radius):
 def plot_wave_amplitude_profile(velocity, component, start_time, end_time,
                                 freqband_min = 0, freqband_max = 0,
                                 filter_threshold=1000):
-
+    '''Plots the amplitude of velocity fluctuations in a given frequency
+    band as a function of radius. Note that the peak-to-peak velocity
+    is twice the amplitude.'''
     if(component == 'vr'):
         data = velocity.vr
     elif(component == 'vtheta'):
@@ -744,20 +746,12 @@ def plot_power_spectrum_velocity(velocity, component, radius, start_time,
     start_num = velocity.get_index_near_time(start_time)
     end_num = velocity.get_index_near_time(end_time)
     idx = velocity.get_index_near_radius(radius)
-    
-    freq,fourier,n=calculate_fft(velocity.time[start_num:end_num],
-                                 filter_velocity(data[start_num:end_num, idx],
-                                                 filter_threshold))
 
-    #Note that we needed to normalize by 1/N^2
-    #Factor of 2 is to account for negative frequencies, since we'll
-    #just deal with the positive part of the spectrum.
-    power = 2*fourier*fourier.conjugate()/(n*n)
-    phase = zeros(fourier.size)
-    for i in range(0,fourier.size):
-        phase[i] = cmath.phase(fourier[i])
-    
-    subplot(3,1,1)
+    freq,power=calculate_power_from_fft(*calculate_fft(velocity.time[start_num:end_num],
+                                                       filter_velocity(data[start_num:end_num, idx],
+                                                                       filter_threshold)))
+
+    subplot(2,1,1)
     semilogy(freq, power)
     xlabel("Freq [Hz]")
     ylabel("Power Spectrum")
@@ -765,10 +759,7 @@ def plot_power_spectrum_velocity(velocity, component, radius, start_time,
     xlim(xmin=0.0)
     grid(b=1)
     
-    subplot(3,1,2)
-    plot(freq, phase)
-    
-    subplot(3,1,3)
+    subplot(2,1,2)
     plot(velocity.time[start_num:end_num], data[start_num:end_num, idx])
     xlabel("Time [sec]")
     ylabel("Velocity [cm/sec]")
@@ -780,27 +771,44 @@ def plot_power_spectrum_velocity(velocity, component, radius, start_time,
                                 freqband_max)
     output1 = "Power in band = %0.5g at r = %0.3gcm, " % (pinband,
                                                           velocity.r[idx])
-    output2 = "amplitude = %0.5gcm/sec" % sqrt(pinband)
+    output2 = "Peak-to-peak velocity = %0.5gcm/sec" % (2*sqrt(pinband))
     print output1 + output2
 
 
-def get_power_in_band(time, data, freqband_min, freqband_max):
+def calculate_power_from_fft(freq, fourier, n):
+    '''Calculate the one-sided power-spectrum density from an fft. Look
+    at comments for notes about the normalization. As normalized, the
+    half-height (in other words, the A in front of A sin (\omega t)) of a
+    velocity fluctuation at a given frequency should be sqrt(power) at that
+    frequency.'''
+    #Find the zero index.
+    zero_idx = abs(freq).argmin()
+    newfreq = freq[zero_idx:]
+    newfourier = fourier[zero_idx:]
 
-    freq, fourier, n = calculate_fft(time, data)
-    #Note that we needed to normalize by 1/N^2
-    #Factor of 2 is to account for negative frequencies, since we'll
-    #just deal with the positive part of the spectrum.
-    #Note that I shouldn't have to specify real() here, since this
-    #should be a real quantity anyway. But for some reason python
-    #wants to cast power to complex...
-    power = real(2*fourier*fourier.conjugate()/(n*n))
+    #Note the normalization here:
+    #The inverse transform a_m ~ (1/n) sum(k) A_k ...
+    #The velocity due to a frequency component will be
+    #(1/n)A_k + (1/n)A_-k. Since the magnitude of these two should be the
+    #same, it will be (2/n)mag(A_k). So the power, going as velocity^2,
+    #will be (4/n^2)*A_k*A_k.conjugate. Like this, the magnitude of the
+    #velocity due to a given frequency component will be sqrt(power).
+
+    #Note that I have to cast this as a real even though the quantity
+    #is already real, because Python gets confused and casts it as
+    #complex with Im{power} = 0 otherwise.
+    power = real(4*newfourier*newfourier.conjugate()/(n*n))
+
+    return newfreq, power
+
+
+def get_power_in_band(time, data, freqband_min, freqband_max):
+    freq, power = calculate_power_from_fft(*calculate_fft(time, data))
     
     powerinband = 0
-    if(freqband_max != 0):
-        powerinband = 0
-        for i in range(0, freq.size):
-            if (freq[i] > freqband_min) & (freq[i] < freqband_max):
-                powerinband = powerinband + power[i]
+    for i in range(0, freq.size):
+        if (freq[i] > freqband_min) & (freq[i] < freqband_max):
+            powerinband = powerinband + power[i]
     
     return powerinband    
 
@@ -872,6 +880,7 @@ def get_power_spectrum(filename, channel, element, start_time, end_time):
                                              start_time, end_time)
     #Note that we needed to normalize by 1/N^2
     power = 2*fourier*fourier.conjugate()/(n*n)
+
     #By this definition you can find the peak to peak velocity by taking the
     #power in the positive frequency band, multiplying by 2 to get the total
     #power at that frequency (positive and negative), then taking the square
@@ -1292,12 +1301,12 @@ def save_avg_profile(filename, start_num, end_num, omega1, omega2,
         savetxt(savefilename, c_[newr, couette], fmt="%12.6G")
 
 def calculate_fft(time, data):
-    if (time.size != data.size):
+    if (len(time) != len(data)):
         print "Error in calculate_fft(): Time and data must be same length."
         return False
     
     fourier = fft(data)
-    n = time.size
+    n = len(time)
     timestep = time[1] - time[0]
     freq = fftfreq(n, d=timestep)
 
