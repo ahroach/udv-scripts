@@ -719,27 +719,36 @@ def plot_wave_amplitude_profile(velocity, component, start_time, end_time,
     amplitude = zeros(velocity.r.size)
     for i in range(0, amplitude.size):
         power = get_power_in_band(velocity.time[start_num:end_num],
-                                  data[start_num:end_num, i],
+                                  filter_velocity(data[start_num:end_num, i],
+                                                  filter_threshold),
                                   freqband_min = freqband_min,
-                                  freqband_max = freqband_max,
-                                  filter_threshold = filter_threshold)
+                                  freqband_max = freqband_max)
         amplitude[i] = sqrt(power)
 
     plot(velocity.r, amplitude)
 
 
-def plot_power_spectrum_velocity(filename, channel, element, omega2, start_time, end_time, freqband_min = 0, freqband_max = 0, filter_threshold=1000):
-    data = generate_profiles_alltime_novr(filename, channel, omega2)
-    velocity = data['vt'][:,element]
-    #Filter the data
-    for i in range(5, velocity.size):
-        if abs(velocity[i] - 0.2*(velocity[i-1] + velocity[i-2] + velocity[i-3] + velocity[i-4] + velocity[i-5])) > filter_threshold:
-            velocity[i] = velocity[i-1]
+def plot_power_spectrum_velocity(velocity, component, radius, start_time,
+                                 end_time, freqband_min = 0, freqband_max = 0,
+                                 filter_threshold=1000):
+    if(component == 'vr'):
+        data = velocity.vr
+    elif(component == 'vtheta'):
+        data = velocity.vtheta;
+    elif(component == 'vz'):
+        data = velocity.vz
+    else:
+        print "Error: Allowable components are 'vr', 'vtheta', or 'vz'."
+        return False
 
+    start_num = velocity.get_index_near_time(start_time)
+    end_num = velocity.get_index_near_time(end_time)
+    idx = velocity.get_index_near_radius(radius)
+    
+    freq,fourier,n=calculate_fft(velocity.time[start_num:end_num],
+                                 filter_velocity(data[start_num:end_num, idx],
+                                                 filter_threshold))
 
-    freq, fourier, n = calculate_fft_timeseries(data['time'],
-                                             velocity,
-                                             start_time, end_time)
     #Note that we needed to normalize by 1/N^2
     #Factor of 2 is to account for negative frequencies, since we'll
     #just deal with the positive part of the spectrum.
@@ -753,43 +762,29 @@ def plot_power_spectrum_velocity(filename, channel, element, omega2, start_time,
     xlabel("Freq [Hz]")
     ylabel("Power Spectrum")
     legend()
-    axes = axis()
-    newaxes = [0.0, axes[1], axes[2], axes[3]]
-    axis(newaxes)
+    xlim(xmin=0.0)
     grid(b=1)
-
+    
     subplot(3,1,2)
     plot(freq, phase)
-
+    
     subplot(3,1,3)
-    start_pos = 0
-    end_pos = time.size
-    for i in range(0, data['time'].size):
-        if (data['time'][i] > start_time) & (data['time'][i-1] <= start_time):
-            start_pos = i
-        elif (data['time'][i] > end_time) & (data['time'][i-1] <= end_time):
-            end_pos = i-1
-
-    velocity = velocity[start_pos:end_pos]
-    time = data['time'][start_pos:end_pos]
-    plot(time, velocity)
+    plot(velocity.time[start_num:end_num], data[start_num:end_num, idx])
     xlabel("Time [sec]")
     ylabel("Velocity [cm/sec]")
+    
+    pinband = get_power_in_band(velocity.time[start_num:end_num],
+                                filter_velocity(data[start_num:end_num, idx],
+                                                filter_threshold),
+                                freqband_min,
+                                freqband_max)
+    output1 = "Power in band = %0.5g at r = %0.3gcm, " % (pinband,
+                                                          velocity.r[idx])
+    output2 = "amplitude = %0.5gcm/sec" % sqrt(pinband)
+    print output1 + output2
 
-    if(freqband_min != 0):
-        powerinband = 0
-        for i in range(0, freq.size):
-            if (freq[i] > freqband_min) & (freq[i] < freqband_max):
-                powerinband = powerinband + power[i]
-        print "powerinband = " + str(powerinband) + " at r = " + str(data['r'][element]) + " cm, amplitude = " + str(sqrt(powerinband)) + " cm/sec"
-    return data['r'][element], powerinband    
 
-
-def get_power_in_band(time, data,
-                      freqband_min = 0, freqband_max = 0,
-                      filter_threshold=1000):
-    #Filter the data
-    data = filter_velocity(data, filter_threshold)
+def get_power_in_band(time, data, freqband_min, freqband_max):
 
     freq, fourier, n = calculate_fft(time, data)
     #Note that we needed to normalize by 1/N^2
