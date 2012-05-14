@@ -693,7 +693,7 @@ def plot_timeseries(channel, idx, labelstring='', withpts=0):
 
 
 def plot_two_component_velocity_timeseries(velocity, radius):
-    '''Plot timeseries of a velocity object at a point specified by idx.'''
+    '''Plot timeseries of a velocity object at a specified radius'''
     idx = velocity.get_index_near_radius(radius)
 
     titlestring = "Shot %d, r=%.3gcm" % (velocity.shot.number,
