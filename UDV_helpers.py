@@ -849,62 +849,6 @@ def get_power_in_band(time, data, freqband_min, freqband_max):
     return powerinband    
 
 
-def plot_power_spectrum(filename, channel, element, start_time, end_time, freqband_min = 0, freqband_max = 0, logscale=1):
-    data = rudv.read_ultrasound(filename, channel)
-    r = calculate_radius(data)
-    time = data['time']
-    velocity = data['velocity'][:,element]
-    freq, fourier, n = calculate_fft_timeseries(time,
-                                             velocity,
-                                             start_time, end_time)
-    #Note that we needed to normalize by 1/N^2
-    power = 2*fourier*fourier.conjugate()/(n*n)
-    #By this definition you can find the peak to peak velocity by taking the
-    #power in the positive frequency band, multiplying by 2 to get the total
-    #power at that frequency (positive and negative), then taking the square
-    #root of that, then multiplying by two again
-    #Peak to peak velocity = 2*sqrt(2*positive_power)
-    
-    labelstring = filename+": r="+str(r[element])
-
-    subplot(2,1,1)
-    if(logscale==1):
-        semilogy(freq, power)
-    else:
-        plot(freq, power)
-    xlabel("Freq [Hz]")
-    if channel == 1:
-        ylabel("Power Spectrum of radial transducer")
-    if channel == 2:
-        ylabel("Power Spectrum of tangential transducer")
-    axes = axis()
-    newaxes = [0.0, axes[1], axes[2], axes[3]]
-    axis(newaxes)
-    grid(b=1)
-
-
-    subplot(2,1,2)
-    start_pos=0
-    end_pos=time.size-1
-    for i in range(0, time.size):
-        if (time[i] > start_time) & (time[i-1] <= start_time):
-            start_pos = i
-        elif (time[i] > end_time) & (time[i-1] <= end_time):
-            end_pos = i-1
-
-    velocity = velocity[start_pos:end_pos]
-    time = time[start_pos:end_pos]
-    plot(time, velocity, label=labelstring)
-    legend()
-    xlabel("Time [sec]")
-    ylabel("Velocity [cm/sec]")
-
-    if(freqband_min != 0):
-        powerinband = 0
-        for i in range(0, freq.size):
-            if (freq[i] > freqband_min) & (freq[i] < freqband_max):
-                powerinband = powerinband + power[i]
-        print "powerinband = " + str(powerinband)
     
 def get_power_spectrum(filename, channel, element, start_time, end_time):
     data = rudv.read_ultrasound(filename, channel)
