@@ -615,31 +615,6 @@ def plot_avg_vtheta_profile(vel_obj, start_num, end_num):
     plot(vel_obj.shot.idealcouette.r, vel_obj.shot.idealcouette.vtheta)
 
 
-def plot_profile(usound_data, profile, omega1, omega2, labelstring):
-    v1 = 2*pi*omega1*r1/60.0
-    v2 = 2*pi*omega2*r2/60.0
-    a = (v1*r1 - v2*r2)/(r1**2-r2**2)
-    b = (v1*r1 - a*r1**2)
-    r = calculate_radius(usound_data)
-
-    couette = zeros(usound_data['depth'].size)
-    for i in range(0, couette.size):
-        couette[i] = a*r[i] + b/r[i]
-
-    plot(r, profile, label = labelstring)
-    axvline(x=r1, color='black')
-    axvline(x=r2, color='black')
-    xlabel("r [cm]")
-    if (usound_data['channel'] == 2): #Tangential
-        plot(r, couette, 'k-')
-        ylabel(r"$v_\theta$ [cm/sec]")
-    else:
-        ylabel(r"$v_r$ [cm/sec]")
-        axhline(y=0, color='black')
-    legend()
-    grid(b=1)
-
-
 def plot_channel_velocity_contour(channel, unwrapped=0, n=30):
     '''Makes a contour plot of the raw velocity as a function of depth for a
     channel'''
