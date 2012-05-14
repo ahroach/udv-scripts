@@ -3,6 +3,7 @@ import math
 import cmath
 import scipy
 import scipy.interpolate
+import scipy.optimize
 import subprocess
 import os
 import shutil
@@ -863,20 +864,14 @@ def get_power_in_band(time, data, freqband_min, freqband_max):
     return powerinband    
 
 
-def fit_frequency(filename, channel, element, start_time, end_time, start_amplitude = 1.0, start_frequency=1.0, start_phase=0, start_offset=0):
-    data = rudv.read_ultrasound(filename, channel)
-    r = calculate_radius(data)
-    time = data['time']
-    start_pos = 0
-    end_pos = time.size
-    for i in range(0, time.size):
-        if (time[i] > start_time) & (time[i-1] <= start_time):
-            start_pos = i
-        elif (time[i] > end_time) & (time[i-1] <= end_time):
-            end_pos = i-1
+def fit_frequency_channel(channel, idx, start_time, end_time,
+                          start_amplitude = 1.0, start_frequency=1.0,
+                          start_phase=0, start_offset=0):
 
-    time = data['time'][start_pos:end_pos]
-    velocity = data['velocity'][start_pos:end_pos,element]
+    start_pos = channel.get_index_near_time(start_time)
+    end_pos = channel.get_index_near_time(end_time)
+    time = channel.time[start_pos:end_pos]
+    velocity = channel.velocity[start_pos:end_pos,idx]
     
     def residuals(p, y, t):
         A,frequency,theta,offset = p
@@ -888,7 +883,8 @@ def fit_frequency(filename, channel, element, start_time, end_time, start_amplit
 
     p0 = [start_amplitude, start_frequency, start_phase, start_offset]
 
-    plsq = scipy.optimize.leastsq(residuals, p0, args=(velocity, time), full_output=1)
+    plsq = scipy.optimize.leastsq(residuals, p0, args=(velocity, time),
+                                  full_output=1)
 
     print "Amplitude = " + str(plsq[0][0]) + " +/- " + str(sqrt(plsq[1][0][0]))
     print "Frequency = " + str(plsq[0][1]) + " +/- " + str(sqrt(plsq[1][1][1]))
@@ -896,7 +892,9 @@ def fit_frequency(filename, channel, element, start_time, end_time, start_amplit
     print "Offset = " + str(plsq[0][3]) + " +/- " + str(sqrt(plsq[1][3][3]))
 
     fitted_time = linspace(time[0], time[-1], 200)
-    fitted_amplitude = plsq[0][0]*sin(2*pi*plsq[0][1]*fitted_time + plsq[0][2]) + plsq[0][3]
+    fitted_amplitude = (plsq[0][0]*sin(2*pi*plsq[0][1]*fitted_time
+                                       + plsq[0][2])
+                        + plsq[0][3])
     initial_guess = p0[0]*sin(2*pi*p0[1]*fitted_time + p0[2]) + p0[3]
     
     plot(time, velocity, '-o')
