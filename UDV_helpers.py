@@ -532,11 +532,11 @@ class CouetteProfile():
         self.vtheta = zeros(self.r.size)
         v1 = rpmtorads(shot.ICspeed)*r1
         v2 = rpmtorads(shot.OCspeed)*r2
-        a = (v1*r1 - v2*r2)/(r1**2 - r2**2)
-        b = (v1*r1 - a*r1**2)
+        self.a = (v1*r1 - v2*r2)/(r1**2 - r2**2)
+        self.b = (v1*r1 - self.a*r1**2)
 
         for i in range(0, self.vtheta.size):
-            self.vtheta[i] = a*self.r[i] + b/self.r[i]
+            self.vtheta[i] = self.a*self.r[i] + self.b/self.r[i]
 
     
 def wrap_phase(angle):
@@ -1200,34 +1200,28 @@ def eval_shear_layer_2(r_data, t_data, profile_num, omega1, omega2, channel=2,
     return a, avg_ampl
 
 
-def save_avg_profile(filename, start_num, end_num, omega1, omega2,
-                     savefilename, scale=1, saveideal=0):
-    r_data = rudv.read_ultrasound(filename, 1)
-    t_data = rudv.read_ultrasound(filename, 2)
+def save_avg_profile(velocity, start_num, end_num, savefilename, scale=1,
+                     saveideal=0):
 
-    r, vr, vt = reconstruct_avg_velocities(r_data, t_data, start_num,
-                                           end_num, omega2)
-    omega = vt/r
+    r = velocity.r.copy()
+    omega = mean(velocity.vtheta[start_num:end_num, :], axis=0)/r
 
     plot(r, omega, label="data")
     ylabel(r"$\Omega$ [1/sec]")
     xlabel("r [cm/sec]")
 
+
     #Trim out the first few centimeters, and the points
     #after the outer cylinder
-    first_index = 0
-    last_index = r.size-1
-    for i in range(0, r.size):
-        if r[i] < 11.0:
-            first_index = i
-        if r[i] < r2:
-            last_index = i
+    first_index = velocity.get_index_near_radius(11.0)
+    last_index = velocity.get_index_near_radius(r2 - 0.2)
     r = r[first_index:last_index]
     omega = omega[first_index:last_index]
 
+
     #Now define the point at the inner cylinder by the inner cylinder speed
     r[0] = r1
-    omega[0] = omega1*2.0*pi/60.0
+    omega[0] = rpmtorads(velocity.shot.ICspeed)
 
     #Now fit a polynomial to this data
     z = polyfit(r, omega, 6)
@@ -1242,24 +1236,17 @@ def save_avg_profile(filename, start_num, end_num, omega1, omega2,
 
     plot(newr, newomega, label="Fitted and scaled")
 
-    v1 = 2*pi*omega1*r1/60.0
-    v2 = 2*pi*omega2*r2/60.0
-    a = (v1*r1 - v2*r2)/(r1**2-r2**2)
-    b = (v1*r1 - a*r1**2)
-    couette = zeros(newr.shape)
-    for i in range(0, couette.size):
-        couette[i] = a + b/(newr[i]*newr[i])
+    r_c = velocity.shot.idealcouette.r.copy()
+    couette= velocity.shot.idealcouette.vtheta*scale/r_c
 
-    couette=couette*scale
-
-    plot(newr, couette, label="Ideal Couette solution")
+    plot(r_c, couette, label="Ideal Couette solution")
     legend()
     
     if(saveideal==0):
         savetxt(savefilename, c_[newr, newomega], fmt="%12.6G")
     else:
         print("Saving Ideal Couette profile")
-        savetxt(savefilename, c_[newr, couette], fmt="%12.6G")
+        savetxt(savefilename, c_[r_c, couette], fmt="%12.6G")
 
 
 
