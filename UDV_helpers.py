@@ -547,6 +547,15 @@ def wrap_phase(angle):
 
     return angle
 
+def filter_velocity(velocity, filter_threshold):
+    '''Provides a simple filter for outliers in a velocity vector'''
+
+    for i in range(5, velocity.size):
+        if abs(velocity[i] - 0.2*(velocity[i-1] + velocity[i-2] + velocity[i-3] + velocity[i-4] + velocity[i-5])) > filter_threshold:
+            velocity[i] = velocity[i-1]
+
+    return velocity
+
 
 def show_logs(start_file, end_file):
     allfiles = glob.glob('*.BDD')
@@ -718,6 +727,7 @@ def plot_wave_amplitude_profile(velocity, component, start_time, end_time,
 
     plot(velocity.r, amplitude)
 
+
 def plot_power_spectrum_velocity(filename, channel, element, omega2, start_time, end_time, freqband_min = 0, freqband_max = 0, filter_threshold=1000):
     data = generate_profiles_alltime_novr(filename, channel, omega2)
     velocity = data['vt'][:,element]
@@ -779,11 +789,8 @@ def get_power_in_band(time, data,
                       freqband_min = 0, freqband_max = 0,
                       filter_threshold=1000):
     #Filter the data
-    for i in range(5, data.size):
-        if (abs(data[i] - 0.2*(data[i-1] + data[i-2] + data[i-3] + data[i-4]
-                               + data[i-5])) > filter_threshold):
-            data[i] = data[i-1]
-    
+    data = filter_velocity(data, filter_threshold)
+
     freq, fourier, n = calculate_fft(time, data)
     #Note that we needed to normalize by 1/N^2
     #Factor of 2 is to account for negative frequencies, since we'll
