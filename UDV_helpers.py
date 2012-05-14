@@ -33,16 +33,16 @@ class Shot:
         to the object, and runs add_channel_data() for all channels'''
         self.number = shot_num
         self.filename = str(shot_num) + '.BDD'
-        self.shot_length = sp.shot_params[shot_num]['shot_length']
-        self.ICspeed = sp.shot_params[shot_num]['ICspeed']
-        self.IRspeed = sp.shot_params[shot_num]['IRspeed']
-        self.ORspeed = sp.shot_params[shot_num]['ORspeed']
-        self.OCspeed = sp.shot_params[shot_num]['OCspeed']
-        self.current = sp.shot_params[shot_num]['current']
-        self.field_delay = sp.shot_params[shot_num]['field_delay']
-        self.field_length = sp.shot_params[shot_num]['t_field']
-        self.udv_delay = sp.shot_params[shot_num]['udv_delay']
-        self.channels_used = sp.shot_params[shot_num]['channels']
+        self.shot_length = sp.shot_params[shot_num]['shot_length'].copy()
+        self.ICspeed = sp.shot_params[shot_num]['ICspeed'].copy()
+        self.IRspeed = sp.shot_params[shot_num]['IRspeed'].copy()
+        self.ORspeed = sp.shot_params[shot_num]['ORspeed'].copy()
+        self.OCspeed = sp.shot_params[shot_num]['OCspeed'].copy()
+        self.current = sp.shot_params[shot_num]['current'].copy()
+        self.field_delay = sp.shot_params[shot_num]['field_delay'].copy()
+        self.field_length = sp.shot_params[shot_num]['t_field'].copy()
+        self.udv_delay = sp.shot_params[shot_num]['udv_delay'].copy()
+        self.channels_used = sp.shot_params[shot_num]['channels'].copy()
         self.channels = {}
         self.velocities = []
         self.idealcouette = CouetteProfile(self)
@@ -186,10 +186,10 @@ class ChannelData:
         #channel
         channel_idx = params['channels'].index(channel_num)
         
-        self.A = params['As'][channel_idx]
-        self.B = params['Bs'][channel_idx]
-        self.offset = params['offsets'][channel_idx]
-        self.port = params['ports'][channel_idx]
+        self.A = params['As'][channel_idx].copy()
+        self.B = params['Bs'][channel_idx].copy()
+        self.offset = params['offsets'][channel_idx].copy()
+        self.port = params['ports'][channel_idx].copy()
 
         
         self.time_points = self.time.size
@@ -322,10 +322,10 @@ class Velocity():
         self.progenitors.append(self.shot.get_channel(channel_num[0]))
 
         channel = self.progenitors[0]
-        self.time = channel.time
-        self.r = channel.r
-        self.azimuth = channel.azimuth
-        self.z = channel.z
+        self.time = channel.time.copy()
+        self.r = channel.r.copy()
+        self.azimuth = channel.azimuth.copy()
+        self.z = channel.z.copy()
         
 
         if (((channel.B == 0) or (channel.B == -180) or (channel.B == 180)) and
@@ -351,7 +351,7 @@ class Velocity():
             cosA = cos(degstorads(channel.A))
             sinB = sin(degstorads(channel.B))
             cosB = cos(degstorads(channel.B))
-            d = channel.depth
+            d = channel.depth.copy()
 
             #Calculate the the correction factor needed at each radius
             anglefactor = zeros(self.r.size)
@@ -404,7 +404,7 @@ class Velocity():
             use_ch1_r = False
             self.r = ch2.r[0:ch2_last_idx][::-1]
         
-        self.time = ch1.time
+        self.time = ch1.time.copy()
         
         #With two transducers, it's less clear what the z and azimuth
         #coordinates should be. Just make them nans.
@@ -685,11 +685,11 @@ def plot_wave_amplitude_profile(velocity, component, start_time, end_time,
     band as a function of radius. Note that the peak-to-peak velocity
     is twice the amplitude.'''
     if(component == 'vr'):
-        data = velocity.vr
+        data = velocity.vr.copy()
     elif(component == 'vtheta'):
-        data = velocity.vtheta;
+        data = velocity.vtheta.copy()
     elif(component == 'vz'):
-        data = velocity.vz
+        data = velocity.vz.copy()
     else:
         print "Error: Allowable components are 'vr', 'vtheta', or 'vz'."
         return False
@@ -716,11 +716,11 @@ def plot_power_spectrum_velocity(velocity, component, radius, start_time,
     '''Plot the power spectrum for a velocity component at specified radius.'''
     
     if(component == 'vr'):
-        data = velocity.vr
+        data = velocity.vr.copy()
     elif(component == 'vtheta'):
-        data = velocity.vtheta;
+        data = velocity.vtheta.copy()
     elif(component == 'vz'):
-        data = velocity.vz
+        data = velocity.vz.copy()
     else:
         print "Error: Allowable components are 'vr', 'vtheta', or 'vz'."
         return False
