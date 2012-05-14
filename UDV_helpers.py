@@ -1342,24 +1342,6 @@ def reconstruct_avg_velocities_nonaxisymmetric(r_data, t_data, profile_num, omeg
     return r, v_r, v_t
 
 
-def get_statistics(filename, channel, element, start_time, end_time):
-    data = rudv.read_ultrasound(filename, channel)
-    time = data['time']
-    velocity = data['velocity'][:,element]
-    start_pos=0
-    end_pos=time.size
-    for i in range(0, time.size):
-        if (time[i] > start_time) & (time[i-1] < start_time):
-            start_pos = i
-        elif (time[i] > end_time) & (time[i-1] < end_time):
-            end_pos = i-1
-
-    trimmed_velocity=velocity[start_pos:end_pos]
-    mean = trimmed_velocity.mean()
-    stddev = trimmed_velocity.std()
-
-    return mean, stddev
-
 def gen_vtheta_movie(filename, channel, omega2, primary_oscillation_start_time, primary_oscillation_end_time, start_time, end_time, desiredcells=200, rin=r1, filter_threshold=1000, background_subtract=0, derotate=0, maxv=10000, minv=-10000, max_diff_mean=10000, fps=10.0, speed=1.0, basedir='/tmp/abcd000', moviefilename='movie.avi'):
 
     #To be sure fps isn't cast as an integer, screwing up later math.
