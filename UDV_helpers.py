@@ -849,25 +849,6 @@ def get_power_in_band(time, data, freqband_min, freqband_max):
     return powerinband    
 
 
-    
-def get_power_spectrum(filename, channel, element, start_time, end_time):
-    data = rudv.read_ultrasound(filename, channel)
-    r = calculate_radius(data)
-    time = data['time']
-    velocity = data['velocity'][:,element]
-    freq, fourier, n = calculate_fft_timeseries(time,
-                                             velocity,
-                                             start_time, end_time)
-    #Note that we needed to normalize by 1/N^2
-    power = 2*fourier*fourier.conjugate()/(n*n)
-
-    #By this definition you can find the peak to peak velocity by taking the
-    #power in the positive frequency band, multiplying by 2 to get the total
-    #power at that frequency (positive and negative), then taking the square
-    #root of that, then multiplying by two again
-    #Peak to peak velocity = 2*sqrt(2*positive_power)
-    return freq, power
-
 def fit_frequency(filename, channel, element, start_time, end_time, start_amplitude = 1.0, start_frequency=1.0, start_phase=0, start_offset=0):
     data = rudv.read_ultrasound(filename, channel)
     r = calculate_radius(data)
