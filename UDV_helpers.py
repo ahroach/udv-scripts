@@ -33,16 +33,17 @@ class Shot:
         to the object, and runs add_channel_data() for all channels'''
         self.number = shot_num
         self.filename = str(shot_num) + '.BDD'
-        self.shot_length = sp.shot_params[shot_num]['shot_length'].copy()
-        self.ICspeed = sp.shot_params[shot_num]['ICspeed'].copy()
-        self.IRspeed = sp.shot_params[shot_num]['IRspeed'].copy()
-        self.ORspeed = sp.shot_params[shot_num]['ORspeed'].copy()
-        self.OCspeed = sp.shot_params[shot_num]['OCspeed'].copy()
-        self.current = sp.shot_params[shot_num]['current'].copy()
-        self.field_delay = sp.shot_params[shot_num]['field_delay'].copy()
-        self.field_length = sp.shot_params[shot_num]['t_field'].copy()
-        self.udv_delay = sp.shot_params[shot_num]['udv_delay'].copy()
-        self.channels_used = sp.shot_params[shot_num]['channels'].copy()
+        self.shot_length = sp.shot_params[shot_num]['shot_length']
+        self.ICspeed = sp.shot_params[shot_num]['ICspeed']
+        self.IRspeed = sp.shot_params[shot_num]['IRspeed']
+        self.ORspeed = sp.shot_params[shot_num]['ORspeed']
+        self.OCspeed = sp.shot_params[shot_num]['OCspeed']
+        self.current = sp.shot_params[shot_num]['current']
+        self.field_delay = sp.shot_params[shot_num]['field_delay']
+        self.field_length = sp.shot_params[shot_num]['t_field']
+        self.udv_delay = sp.shot_params[shot_num]['udv_delay']
+        #list() used to make a copy of channels.
+        self.channels_used = list(sp.shot_params[shot_num]['channels'])
         self.channels = {}
         self.velocities = []
         self.idealcouette = CouetteProfile(self)
@@ -186,10 +187,10 @@ class ChannelData:
         #channel
         channel_idx = params['channels'].index(channel_num)
         
-        self.A = params['As'][channel_idx].copy()
-        self.B = params['Bs'][channel_idx].copy()
-        self.offset = params['offsets'][channel_idx].copy()
-        self.port = params['ports'][channel_idx].copy()
+        self.A = params['As'][channel_idx]
+        self.B = params['Bs'][channel_idx]
+        self.offset = params['offsets'][channel_idx]
+        self.port = params['ports'][channel_idx]
 
         
         self.time_points = self.time.size
