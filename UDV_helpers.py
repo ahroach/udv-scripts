@@ -689,14 +689,34 @@ def plot_two_component_velocity_timeseries(velocity, radius):
     title(titlestring)
 
 
-def plot_wave_amplitude_profile(filename, channel, omega2, start_time, end_time, freqband_min = 0, freqband_max = 0, filter_threshold=1000):
-    data = generate_profiles_alltime_novr(filename, channel, omega2)
-    amplitude = zeros(size(data['r']))
-    for i in range(0, size(data['r'])):
-        r, power = get_power_in_band_velocity(data, i, start_time, end_time, freqband_min=freqband_min, freqband_max=freqband_max, filter_threshold=filter_threshold)
+def plot_wave_amplitude_profile(velocity, component, start_time, end_time,
+                                freqband_min = 0, freqband_max = 0,
+                                filter_threshold=1000):
+
+    if(component == 'vr'):
+        data = velocity.vr
+    elif(component == 'vtheta'):
+        data = velocity.vtheta;
+    elif(component == 'vz'):
+        data = velocity.vz
+    else:
+        print "Error: Allowable components are 'vr', 'vtheta', or 'vz'."
+        return False
+    
+
+    start_num = velocity.get_index_near_time(start_time)
+    end_num = velocity.get_index_near_time(end_time)
+    
+    amplitude = zeros(velocity.r.size)
+    for i in range(0, amplitude.size):
+        power = get_power_in_band(velocity.time[start_num:end_num],
+                                  data[start_num:end_num, i],
+                                  freqband_min = freqband_min,
+                                  freqband_max = freqband_max,
+                                  filter_threshold = filter_threshold)
         amplitude[i] = sqrt(power)
 
-    plot(data['r'], amplitude)
+    plot(velocity.r, amplitude)
 
 def plot_power_spectrum_velocity(filename, channel, element, omega2, start_time, end_time, freqband_min = 0, freqband_max = 0, filter_threshold=1000):
     data = generate_profiles_alltime_novr(filename, channel, omega2)
@@ -768,8 +788,10 @@ def get_power_in_band(time, data,
     #Note that we needed to normalize by 1/N^2
     #Factor of 2 is to account for negative frequencies, since we'll
     #just deal with the positive part of the spectrum.
-    power = zeros(fourier.size)
-    power = 2*fourier*fourier.conjugate()/(n*n)
+    #Note that I shouldn't have to specify real() here, since this
+    #should be a real quantity anyway. But for some reason python
+    #wants to cast power to complex...
+    power = real(2*fourier*fourier.conjugate()/(n*n))
     
     powerinband = 0
     if(freqband_max != 0):
