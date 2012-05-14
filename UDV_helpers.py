@@ -810,6 +810,20 @@ def plot_power_spectrum_channel(channel, idx, start_time,
     print output1 + output2
 
 
+def calculate_fft(time, data):
+    if (len(time) != len(data)):
+        print "Error in calculate_fft(): Time and data must be same length."
+        return False
+    
+    fourier = fft(data)
+    n = len(time)
+    timestep = time[1] - time[0]
+    freq = fftfreq(n, d=timestep)
+
+    fourier = fftshift(fourier)
+    freq = fftshift(freq)
+    return freq, fourier, n
+
 
 def calculate_power_from_fft(freq, fourier, n):
     '''Calculate the one-sided power-spectrum density from an fft. Look
@@ -1261,19 +1275,6 @@ def save_avg_profile(filename, start_num, end_num, omega1, omega2,
         print("Saving Ideal Couette profile")
         savetxt(savefilename, c_[newr, couette], fmt="%12.6G")
 
-def calculate_fft(time, data):
-    if (len(time) != len(data)):
-        print "Error in calculate_fft(): Time and data must be same length."
-        return False
-    
-    fourier = fft(data)
-    n = len(time)
-    timestep = time[1] - time[0]
-    freq = fftfreq(n, d=timestep)
-
-    fourier = fftshift(fourier)
-    freq = fftshift(freq)
-    return freq, fourier, n
 
 
 def reconstruct_avg_velocities_nonaxisymmetric(r_data, t_data, profile_num, omega2, oscillation_time):
