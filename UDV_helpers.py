@@ -540,6 +540,7 @@ class CouetteProfile():
 
     
 def wrap_phase(angle):
+    '''Make phase fit in the range -pi to pi.'''
     while (angle > pi):
         angle = angle - 2.0*pi
 
@@ -594,6 +595,7 @@ def plot_channel_velocity(channel, start_num, end_num, unwrapped=0,
 
 
 def plot_single_vtheta_profile(vel_obj, profile_num):
+    '''Plot a single azimuthal velocity profile for a velocity object.'''
     label_str = str(vel_obj.shot.number) +": t="+str(vel_obj.time[profile_num])
 
     plot(vel_obj.r, vel_obj.vtheta[profile_num,:], label=label_str)
@@ -601,6 +603,8 @@ def plot_single_vtheta_profile(vel_obj, profile_num):
 
 
 def plot_avg_vtheta_profile(vel_obj, start_num, end_num):
+    '''Plot the average azimuthal velocity profile for a Velocity object,
+    from the specified start index to the end index.'''
     label_str = "%d: Avg from t=%.3g to t=%.3g" % (vel_obj.shot.number,
                                                    vel_obj.time[start_num],
                                                    vel_obj.time[end_num])
@@ -734,6 +738,8 @@ def plot_wave_amplitude_profile(velocity, component, start_time, end_time,
 def plot_power_spectrum_velocity(velocity, component, radius, start_time,
                                  end_time, freqband_min = 0, freqband_max = 0,
                                  filter_threshold=1000):
+    '''Plot the power spectrum for a velocity component at specified radius.'''
+    
     if(component == 'vr'):
         data = velocity.vr
     elif(component == 'vtheta'):
@@ -779,6 +785,7 @@ def plot_power_spectrum_velocity(velocity, component, radius, start_time,
 def plot_power_spectrum_channel(channel, idx, start_time,
                                 end_time, freqband_min = 0, freqband_max = 0,
                                 filter_threshold=1000):
+    '''Plot the power spectrum from a point in a measurement channel'''
     start_num = channel.get_index_near_time(start_time)
     end_num = channel.get_index_near_time(end_time)
 
@@ -812,6 +819,9 @@ def plot_power_spectrum_channel(channel, idx, start_time,
 
 
 def calculate_fft(time, data):
+    '''Calculate the fft given the time and data vectors. Returns the
+    fftshifted results (with frequency=0 in the middle).'''
+    
     if (len(time) != len(data)):
         print "Error in calculate_fft(): Time and data must be same length."
         return False
@@ -832,6 +842,7 @@ def calculate_power_from_fft(freq, fourier, n):
     half-height (in other words, the A in front of A sin (\omega t)) of a
     velocity fluctuation at a given frequency should be sqrt(power) at that
     frequency.'''
+
     #Find the zero index.
     zero_idx = abs(freq).argmin()
     newfreq = freq[zero_idx:]
@@ -867,6 +878,7 @@ def get_power_in_band(time, data, freqband_min, freqband_max):
 def fit_frequency_channel(channel, idx, start_time, end_time,
                           start_amplitude = 1.0, start_frequency=1.0,
                           start_phase=0, start_offset=0):
+    '''Fit a sinusoid to fluctuations seen on a given channel.'''
 
     start_pos = channel.get_index_near_time(start_time)
     end_pos = channel.get_index_near_time(end_time)
@@ -927,7 +939,8 @@ def plot_spectrogram(channel, idx, start_time=0, end_time=1000, timechunk=3):
     ylabel("Frequency [Hz]")
     
 
-def plot_two_component_avg_velocities(velocity, start_num, end_num, labelstring='', scale=1, rlim=0, time=0):
+def plot_two_component_avg_velocities(velocity, start_num, end_num,
+                                      labelstring='', scale=1, rlim=0, time=0):
     '''Plots the average v_r and v_theta for the specified Velocity object.
     start_num and end_num are the indices to average between, unless time=1,
     in which case they are times in seconds.'''
