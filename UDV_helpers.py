@@ -775,6 +775,42 @@ def plot_power_spectrum_velocity(velocity, component, radius, start_time,
     print output1 + output2
 
 
+def plot_power_spectrum_channel(channel, idx, start_time,
+                                end_time, freqband_min = 0, freqband_max = 0,
+                                filter_threshold=1000):
+    start_num = channel.get_index_near_time(start_time)
+    end_num = channel.get_index_near_time(end_time)
+
+    freq,power=calculate_power_from_fft(*calculate_fft(channel.time[start_num:end_num],
+                                                       filter_velocity(channel.velocity[start_num:end_num, idx],
+                                                                       filter_threshold)))
+
+    subplot(2,1,1)
+    semilogy(freq, power)
+    xlabel("Freq [Hz]")
+    ylabel("Power Spectrum")
+    legend()
+    xlim(xmin=0.0)
+    grid(b=1)
+    
+    subplot(2,1,2)
+    plot(channel.time[start_num:end_num],
+         channel.velocity[start_num:end_num, idx])
+    xlabel("Time [sec]")
+    ylabel("Velocity [cm/sec]")
+    
+    pinband = get_power_in_band(channel.time[start_num:end_num],
+                                filter_velocity(channel.velocity[start_num:end_num, idx],
+                                                filter_threshold),
+                                freqband_min,
+                                freqband_max)
+    output1 = "Power in band = %0.5g at depth = %0.3gcm, " % (pinband,
+                                                          channel.depth[idx])
+    output2 = "Peak-to-peak velocity = %0.5gcm/sec" % (2*sqrt(pinband))
+    print output1 + output2
+
+
+
 def calculate_power_from_fft(freq, fourier, n):
     '''Calculate the one-sided power-spectrum density from an fft. Look
     at comments for notes about the normalization. As normalized, the
