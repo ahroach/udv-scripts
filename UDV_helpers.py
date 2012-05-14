@@ -755,33 +755,16 @@ def plot_power_spectrum_velocity(filename, channel, element, omega2, start_time,
     return data['r'][element], powerinband    
 
 
-def get_power_in_band_velocity(velocity, component, radius, start_time, end_time,
-                         freqband_min = 0, freqband_max = 0,
-                         filter_threshold=1000):
-
-    start_pos = velocity.get_index_near_time(start_time)
-    end_pos = velocity.get_index_near_time(end_time)
-
-    idx = velocity.get_index_near_radius(radius)
-
-    if(component == 'vr'):
-        v = velocity.vr[start_pos:end_pos,idx]
-    elif(component == 'vtheta'):
-        v = velocity.vtheta[start_pos:end_pos,idx]
-    elif(component == 'vz'):
-        v = velocity.vt[start_pos:end_pos,idx]
-    else:
-        print "Unrecognized velocity component. Use 'vr', 'vtheta', or 'vz'."
-        return False
-    
-    
+def get_power_in_band(time, data,
+                      freqband_min = 0, freqband_max = 0,
+                      filter_threshold=1000):
     #Filter the data
-    for i in range(5, v.size):
-        if (abs(v[i] - 0.2*(v[i-1] + v[i-2] + v[i-3] + v[i-4] + v[i-5]))
-            > filter_threshold):
-            v[i] = v[i-1]
+    for i in range(5, data.size):
+        if (abs(data[i] - 0.2*(data[i-1] + data[i-2] + data[i-3] + data[i-4]
+                               + data[i-5])) > filter_threshold):
+            data[i] = data[i-1]
     
-    freq, fourier, n = calculate_fft(velocity.time[start_pos:end_pos], v)
+    freq, fourier, n = calculate_fft(time, data)
     #Note that we needed to normalize by 1/N^2
     #Factor of 2 is to account for negative frequencies, since we'll
     #just deal with the positive part of the spectrum.
@@ -794,13 +777,8 @@ def get_power_in_band_velocity(velocity, component, radius, start_time, end_time
         for i in range(0, freq.size):
             if (freq[i] > freqband_min) & (freq[i] < freqband_max):
                 powerinband = powerinband + power[i]
-        
-    output1 =  "powerinband = %0.4g at r=%0.2gcm," % (powerinband,
-                                                      velocity.r[idx])
-    output2 = " amplitude = %0.4gcm/sec" % (sqrt(powerinband))
-    print output1 + output2
-        
-    return velocity.r[idx], powerinband    
+    
+    return powerinband    
 
 
 def plot_power_spectrum(filename, channel, element, start_time, end_time, freqband_min = 0, freqband_max = 0, logscale=1):
