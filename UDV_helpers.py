@@ -274,16 +274,10 @@ class ChannelData:
         for i in range(0,d.size):
             self.z[i] = d[i]*sinA*cosB + zoffset
 
-    def get_index_after_time(self, time):
-        '''Find the index in the time_array of the first element after
-        the specified time'''
-        idx = nan
-        temp_idx = self.time_points - 1
-        while(temp_idx >=0):
-            if self.time[temp_idx] > time:
-                idx = temp_idx
-            temp_idx = temp_idx - 1
-        return idx
+    def get_index_near_time(self, time):
+        '''Find the index in the time_array of the element closest to the
+        specified time'''
+        return abs(self.time - time).argmin()
 
     def list_params(self):
         '''Lists information about the channel'''
@@ -508,16 +502,10 @@ class Velocity():
                                     rpmtorads(self.shot.OCspeed)*r)
 
 
-    def get_index_after_time(self, time):
-        '''Find the index in the time_array of the first element after
-        the specified time'''
-        idx = nan
-        temp_idx = size(self.time) - 1
-        while(temp_idx >=0):
-            if self.time[temp_idx] > time:
-                idx = temp_idx
-            temp_idx = temp_idx - 1
-        return idx
+    def get_index_near_time(self, time):
+        '''Find the index in the time_array of the element closest to the
+        specified time'''
+        return abs(self.time - time).argmin()
                   
     def get_index_near_radius(self, radius):
         '''Find the index in the radius array of the element with r
@@ -651,12 +639,8 @@ def plot_channel_velocity_contour(channel, unwrapped=0, n=30):
 
 
 def plot_two_component_velocity_contours(velocity, start_time, end_time, n=30):
-    start_idx = velocity.get_index_after_time(start_time)
-    end_idx = velocity.get_index_after_time(end_time)
-    if(isnan(start_idx) or isnan(end_idx)):
-        print "Valid times are from %g to %g secs." % (velocity.time[0],
-                                                       velocity.time[-1])
-        return False
+    start_idx = velocity.get_index_near_time(start_time)
+    end_idx = velocity.get_index_near_time(end_time)
 
     subplot(2,1,1)
     contourf(velocity.time[start_idx:end_idx],
@@ -771,29 +755,52 @@ def plot_power_spectrum_velocity(filename, channel, element, omega2, start_time,
     return data['r'][element], powerinband    
 
 
-def get_power_in_band_velocity(data, element, start_time, end_time, freqband_min = 0, freqband_max = 0, filter_threshold=1000):
+def get_power_in_band_velocity(velocity, component, radius, start_time, end_time,
+                         freqband_min = 0, freqband_max = 0,
+                         filter_threshold=1000):
 
-    velocity = data['vt'][:,element]
-    #Filter the data
-    for i in range(5, velocity.size):
-        if abs(velocity[i] - 0.2*(velocity[i-1] + velocity[i-2] + velocity[i-3] + velocity[i-4] + velocity[i-5])) > filter_threshold:
-            velocity[i] = velocity[i-1]
+    start_pos = velocity.get_index_near_time(start_time)
+    end_pos = velocity.get_index_near_time(end_time)
+
+    idx = velocity.get_index_near_radius(radius)
+
+    if(component == 'vr'):
+        v = velocity.vr[start_pos:end_pos,idx]
+    elif(component == 'vtheta'):
+        v = velocity.vtheta[start_pos:end_pos,idx]
+    elif(component == 'vz'):
+        v = velocity.vt[start_pos:end_pos,idx]
+    else:
+        print "Unrecognized velocity component. Use 'vr', 'vtheta', or 'vz'."
+        return False
     
-    freq, fourier, n = calculate_fft_timeseries(data['time'],
-                                             velocity,
-                                             start_time, end_time)
+    
+    #Filter the data
+    for i in range(5, v.size):
+        if (abs(v[i] - 0.2*(v[i-1] + v[i-2] + v[i-3] + v[i-4] + v[i-5]))
+            > filter_threshold):
+            v[i] = v[i-1]
+    
+    freq, fourier, n = calculate_fft(velocity.time[start_pos:end_pos], v)
     #Note that we needed to normalize by 1/N^2
     #Factor of 2 is to account for negative frequencies, since we'll
     #just deal with the positive part of the spectrum.
+    power = zeros(fourier.size)
     power = 2*fourier*fourier.conjugate()/(n*n)
     
-    if(freqband_min != 0):
+    powerinband = 0
+    if(freqband_max != 0):
         powerinband = 0
         for i in range(0, freq.size):
             if (freq[i] > freqband_min) & (freq[i] < freqband_max):
                 powerinband = powerinband + power[i]
-        print "powerinband = " + str(powerinband) + " at r = " + str(data['r'][element]) + " cm, amplitude = " + str(sqrt(powerinband)) + " cm/sec"
-    return data['r'][element], powerinband    
+        
+    output1 =  "powerinband = %0.4g at r=%0.2gcm," % (powerinband,
+                                                      velocity.r[idx])
+    output2 = " amplitude = %0.4gcm/sec" % (sqrt(powerinband))
+    print output1 + output2
+        
+    return velocity.r[idx], powerinband    
 
 
 def plot_power_spectrum(filename, channel, element, start_time, end_time, freqband_min = 0, freqband_max = 0, logscale=1):
@@ -915,10 +922,8 @@ def fit_frequency(filename, channel, element, start_time, end_time, start_amplit
 def plot_spectrogram(channel, idx, start_time=0, end_time=1000, timechunk=3):
     '''Plots a spectrogram of the velocity measured on the specified channel
     object at the location specified by the index idx.'''
-    start = channel.get_index_after_time(start_time)
-    end = channel.get_index_after_time(end_time)
-    if(isnan(end)):
-        end = size(channel.time)-1
+    start = channel.get_index_near_time(start_time)
+    end = channel.get_index_near_time(end_time)
 
     subplot(2,1,1)
     plot(channel.time[start:end], channel.velocity[start:end, idx])
@@ -943,12 +948,9 @@ def plot_two_component_avg_velocities(velocity, start_num, end_num, labelstring=
     start_num and end_num are the indices to average between, unless time=1,
     in which case they are times in seconds.'''
     if(time == 1):
-        start_num = velocity.get_index_after_time(start_num)
-        end_num = velocity.get_index_after_time(end_num)
-        if(isnan(start_num) or isnan(end_num)):
-            print "Valid times are from %g to %g secs." % (velocity.time[0],
-                                                           velocity.time[-1])
-            return False
+        start_num = velocity.get_index_near_time(start_num)
+        end_num = velocity.get_index_near_time(end_num)
+
     if (start_num < 0) or (end_num > size(velocity.time)):
         print "Invalid start or end time indices."
         return False
@@ -987,12 +989,8 @@ def find_avg_velocity_at_r(velocity, start, end, radius, time=0):
     directly refer to indices in the time array. Returns vr_mean, vr_stddev,
     vt_mean, vt_stddev.'''
     if(time == 1):
-        start = velocity.get_index_after_time(start)
-        end = velocity.get_index_after_time(end)
-        if(isnan(start) or isnan(end)):
-            print "Valid times are from %g to %g secs." % (velocity.time[0],
-                                                           velocity.time[-1])
-            return False
+        start = velocity.get_index_near_time(start)
+        end = velocity.get_index_near_time(end)
 
     r_idx = velocity.get_index_near_radius(radius)
     vr = velocity.vr[start:end, r_idx]
@@ -1291,18 +1289,14 @@ def save_avg_profile(filename, start_num, end_num, omega1, omega2,
         print("Saving Ideal Couette profile")
         savetxt(savefilename, c_[newr, couette], fmt="%12.6G")
 
-def calculate_fft_timeseries(time, data, start_time, end_time, filter_threshold=1000):
-    start_pos = 0
-    end_pos = time.size
-    for i in range(0, time.size):
-        if (time[i] > start_time) & (time[i-1] <= start_time):
-            start_pos = i
-        elif (time[i] > end_time) & (time[i-1] <= end_time):
-            end_pos = i-1
-
-    fourier = fft(data[start_pos:end_pos])
-    n = end_pos - start_pos
-    timestep = time[start_pos+1] - time[start_pos]
+def calculate_fft(time, data):
+    if (time.size != data.size):
+        print "Error in calculate_fft(): Time and data must be same length."
+        return False
+    
+    fourier = fft(data)
+    n = time.size
+    timestep = time[1] - time[0]
     freq = fftfreq(n, d=timestep)
 
     fourier = fftshift(fourier)
