@@ -522,7 +522,6 @@ class Velocity():
                 self.vtheta[j,i] = (self.vtheta[j,i] +
                                     rpmtorads(self.shot.OCspeed)*r)
 
-
     def gen_velocity_two_transducers_nonaxi(self, ch1, ch2):
         #Create copies of the original channel objects. We're going to make
         #changes to the data in these things to pass to
@@ -530,10 +529,76 @@ class Velocity():
         #modify the original channels.
         tempch1 = ch1.duplicate()
         tempch2 = ch2.duplicate()
+        
+        #We are going to shift the time base of each measurement forward
+        #by the amount m*azimuth*t_rotation/(2*pi). So the maximum amount
+        #that any measurement will be shifted is m*t_rotation/2. And the
+        #maximum amount that any measurement will be shifted back is
+        #-m*t_rotation/2. So cut off this amount from the final common time
+        #base, so that we know that we'll always have points between which to
+        #interpolate.
+        dt = tempch1.time[1]-tempch1.time[0]
+        time_buffer = int(ceil(((self.m*self.t_rotation/2.0)/dt) + 1))
+        tempch1.time = tempch1.time[time_buffer:-time_buffer]
+        tempch2.time = tempch1.time
 
+        #Now reset the velocity structures in each temp channel to zeros
+        #of the appropriate size: Same number of spatial points, shorter
+        #time base.
+        tempch1.velocity = zeros([len(tempch1.time), len(tempch1.depth)])
+        tempch2.velocity = zeros([len(tempch2.time), len(tempch2.depth)])
+        tempch1.unwrapped_velocity = zeros([len(tempch1.time),
+                                            len(tempch1.depth)])
+        tempch2.unwrapped_velocity = zeros([len(tempch2.time),
+                                            len(tempch2.depth)])
+
+        #Now go through each position of each of these velocity structures,
+        #fit a spline, and interpolate onto the new time structure.
+
+        #The names of these are too long. Just redefine them quickly.
+        scipy_splrep = scipy.interpolate.splrep
+        scipy_splev = scipy.interpolate.splev
+        
+        for i in range(0, len(tempch1.depth)):
+            f = scipy.interpolate.interp1d((ch1.time +
+                                            self.m*ch1.azimuth[i]*
+                                            self.t_rotation/(2*pi)),
+                                           ch1.velocity[:, i],
+                                           kind='linear')
+            tempch1.velocity[:,i] = f(tempch1.time)
+
+            f = scipy.interpolate.interp1d((ch1.time +
+                                            self.m*ch1.azimuth[i]*
+                                            self.t_rotation/(2*pi)),
+                                           ch1.unwrapped_velocity[:, i],
+                                           kind='linear')
+            tempch1.unwrapped_velocity[:,i] = f(tempch1.time)
+        
+        
+        for i in range(0, len(tempch2.depth)):
+            f = scipy.interpolate.interp1d((ch2.time +
+                                            self.m*ch2.azimuth[i]*
+                                            self.t_rotation/(2*pi)),
+                                           ch2.velocity[:, i],
+                                           kind='linear')
+            tempch2.velocity[:,i] = f(tempch2.time)
+
+            f = scipy.interpolate.interp1d((ch2.time +
+                                            self.m*ch2.azimuth[i]*
+                                            self.t_rotation/(2*pi)),
+                                           ch2.unwrapped_velocity[:, i],
+                                           kind='linear')
+            tempch2.unwrapped_velocity[:,i] = f(tempch2.time)
+
+        
+        #Just for good form, reset the azimuth in both cases to zero, since
+        #we have effectively put every measurement at the same azimuth.
+        tempch1.azimuth = zeros(len(tempch1.depth))
+        tempch2.azimuth = zeros(len(tempch2.depth))
+        
         #Okay, pass these channels to gen_velocity_two_transducers().
         self.gen_velocity_two_transducers(tempch1, tempch2)
-        #We're done with out fake channels, so get rid of them.
+        #We're done with our fake channels, so get rid of them.
         del(tempch1)
         del(tempch2)
 
