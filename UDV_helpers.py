@@ -313,10 +313,15 @@ class Velocity():
             print "Error: 0 channels presented to Velocity.__init__()."
             return None
         elif size(channel_nums) == 1:
-            self.m = 0
-            self.t_rotation = 0
             self.progenitors.append(self.shot.get_channel(channel_nums[0]))
-            self.gen_velocity_one_transducer(self.progenitors[0])
+            if (m==0):
+                self.m = 0
+                self.t_rotation = 0
+                self.gen_velocity_one_transducer(self.progenitors[0])
+            else:
+                self.m = m
+                self.t_rotation = t_rotation
+                self.gen_velocity_one_transducer_nonaxi(self.progenitors[0])
         elif size(channel_nums) == 2:
             self.progenitors.append(self.shot.get_channel(channel_nums[0]))
             self.progenitors.append(self.shot.get_channel(channel_nums[1]))
@@ -378,7 +383,7 @@ class Velocity():
             cosA = cos(degstorads(channel.A))
             sinB = sin(degstorads(channel.B))
             cosB = cos(degstorads(channel.B))
-            d = channel.depth.copy()
+            d = channel.depth - channel.offset
 
             #Calculate the the correction factor needed at each radius
             anglefactor = zeros(self.r.size)
@@ -404,6 +409,60 @@ class Velocity():
         self.vr = self.vr[:,::-1]
         self.vtheta = self.vtheta[:,::-1]
         self.vz = self.vz[:,::-1]
+
+    def gen_velocity_one_transducer_nonaxi(self, channel):
+        #Create a copy of the original channel object. We're going to make
+        #changes to the data in this thing to pass to
+        #gen_velocity_one_transducers(), but we of course don't want to
+        #modify the original channel.
+        tempchannel = channel.duplicate()
+        
+        #We are going to shift the time base of each measurement forward
+        #by the amount m*azimuth*t_rotation/(2*pi). So the maximum amount
+        #that any measurement will be shifted is m*t_rotation/2. And the
+        #maximum amount that any measurement will be shifted back is
+        #-m*t_rotation/2. So cut off this amount from the final common time
+        #base, so that we know that we'll always have points between which to
+        #interpolate.
+        dt = tempchannel.time[1]-tempchannel.time[0]
+        time_buffer = int(ceil(((self.m*self.t_rotation/2.0)/dt) + 1))
+        tempchannel.time = tempchannel.time[time_buffer:-time_buffer]
+
+        #Now reset the velocity structures in each temp channel to zeros
+        #of the appropriate size: Same number of spatial points, shorter
+        #time base.
+        tempchannel.velocity = zeros([len(tempchannel.time),
+                                      len(tempchannel.depth)])
+        tempchannel.unwrapped_velocity = zeros([len(tempchannel.time),
+                                                len(tempchannel.depth)])
+
+        #Now go through each position of each of these velocity structures,
+        #make a fit, and interpolate onto the new time structure.
+        
+        for i in range(0, len(tempchannel.depth)):
+            f = scipy.interpolate.interp1d((channel.time +
+                                            self.m*channel.azimuth[i]*
+                                            self.t_rotation/(2*pi)),
+                                           channel.velocity[:, i],
+                                           kind='linear')
+            tempchannel.velocity[:,i] = f(tempchannel.time)
+
+            f = scipy.interpolate.interp1d((channel.time +
+                                            self.m*channel.azimuth[i]*
+                                            self.t_rotation/(2*pi)),
+                                           channel.unwrapped_velocity[:, i],
+                                           kind='linear')
+            tempchannel.unwrapped_velocity[:,i] = f(tempchannel.time)
+        
+        
+        #Just for good form, reset the azimuth in both cases to zero, since
+        #we have effectively put every measurement at the same azimuth.
+        tempchannel.azimuth = zeros(len(tempchannel.depth))
+        
+        #Okay, pass the channel to gen_velocity_one_transducer().
+        self.gen_velocity_one_transducer(tempchannel)
+        #We're done with the fake channel, so get rid of it.
+        del(tempchannel)
 
     def gen_velocity_two_transducers(self, ch1, ch2):
         '''Generate velocity from two transducers. Currently assumes we are
@@ -553,12 +612,8 @@ class Velocity():
                                             len(tempch2.depth)])
 
         #Now go through each position of each of these velocity structures,
-        #fit a spline, and interpolate onto the new time structure.
+        #make a fit, and interpolate onto the new time structure.
 
-        #The names of these are too long. Just redefine them quickly.
-        scipy_splrep = scipy.interpolate.splrep
-        scipy_splev = scipy.interpolate.splev
-        
         for i in range(0, len(tempch1.depth)):
             f = scipy.interpolate.interp1d((ch1.time +
                                             self.m*ch1.azimuth[i]*
