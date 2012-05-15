@@ -79,7 +79,7 @@ class Shot:
         #Otherwise add the channel and return that.
         return self.add_channel(channel_num)
 
-    def add_velocity(self, channel_nums, m=0, t_rotation=0):
+    def add_velocity(self, channel_nums, m=0, period=0):
         '''Adds and returns a Velocity object produced using channel_nums
         for this Shot.'''
         channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
@@ -92,10 +92,10 @@ class Shot:
                 return False
 
         
-        self.velocities.append(Velocity(self, channel_nums, m, t_rotation))
+        self.velocities.append(Velocity(self, channel_nums, m, period))
         return self.velocities[-1]
     
-    def get_velocity(self, channel_nums, m=0, t_rotation=0):
+    def get_velocity(self, channel_nums, m=0, period=0):
         '''Returns a Velocity object produced using the specified
         channel_nums for this Shot.'''
         channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
@@ -112,15 +112,15 @@ class Shot:
 
             #Now check to see if these channels match the channel_nums, and
             #that m also matches. If m!=0, also check to make sure that
-            #the rotation times match.
+            #the period times match.
             progenitor_list.sort()
             if ((progenitor_list == channel_nums) and
                 (self.velocities[idx].m == m) and
-                ((m==0) or (self.velocities[idx].t_rotation == t_rotation))):
+                ((m==0) or (self.velocities[idx].period == period))):
                 return self.velocities[idx]
 
         #Otherwise add this new velocity set and return that.
-        return self.add_velocity(channel_nums, m=m, t_rotation=t_rotation)
+        return self.add_velocity(channel_nums, m=m, period=period)
 
     def sanitize_channel_nums_for_velocities(self, channel_nums):
         '''Makes sure we have the channel_nums as a sorted list, even if
@@ -305,7 +305,7 @@ class Velocity():
     processed and presented in the v_r, v_theta, and v_z components.
     __init__() tries to be smart about which generation routine to call based
     on the number of channels presented.'''
-    def __init__(self, shot, channel_nums, m=0, t_rotation=0):
+    def __init__(self, shot, channel_nums, m=0, period=0):
         '''Tries to be smart about selecting generation methods, based
         on the number of channels required and whether or not a non-zero
         m has been specified.'''
@@ -319,23 +319,23 @@ class Velocity():
             self.progenitors.append(self.shot.get_channel(channel_nums[0]))
             if (m==0):
                 self.m = 0
-                self.t_rotation = 0
+                self.period = 0
                 self.gen_velocity_one_transducer(self.progenitors[0])
             else:
                 self.m = m
-                self.t_rotation = t_rotation
+                self.period = period
                 self.gen_velocity_one_transducer_nonaxi(self.progenitors[0])
         elif size(channel_nums) == 2:
             self.progenitors.append(self.shot.get_channel(channel_nums[0]))
             self.progenitors.append(self.shot.get_channel(channel_nums[1]))
             if (m==0):
                 self.m = 0
-                self.t_rotation = 0
+                self.period = 0
                 self.gen_velocity_two_transducers(self.progenitors[0],
                                                   self.progenitors[1])
             else:
                 self.m = m
-                self.t_rotation = t_rotation
+                self.period = period
                 self.gen_velocity_two_transducers_nonaxi(self.progenitors[0],
                                                          self.progenitors[1])
         elif size(channel_nums) == 3:
@@ -343,7 +343,7 @@ class Velocity():
             self.progenitors.append(self.shot.get_channel(channel_nums[1]))
             self.progenitors.append(self.shot.get_channel(channel_nums[2]))
             self.m = 0
-            self.t_rotation = 0
+            self.period = 0
             self.gen_velocity_three_transducers(self.progenitors[0],
                                                 self.progenitors[1],
                                                 self.progenitors[2])
@@ -415,7 +415,7 @@ class Velocity():
 
     def gen_velocity_one_transducer_nonaxi(self, channel):
         '''Find the velocity fields using one transducer, assuming a
-        nonaxisymmetric velocity distribution, with m and t_rotation provided
+        nonaxisymmetric velocity distribution, with m and period provided
         in the call to __init__() (and probably to the call to
         Shot.get_velocity(). Assumes that we are only dealing with azimuthal
         velocities for now. Note that this method essentially corrects
@@ -428,14 +428,14 @@ class Velocity():
         tempchannel = channel.duplicate()
         
         #We are going to shift the time base of each measurement forward
-        #by the amount m*azimuth*t_rotation/(2*pi). So the maximum amount
-        #that any measurement will be shifted is m*t_rotation/2. And the
+        #by the amount m*azimuth*period/(2*pi). So the maximum amount
+        #that any measurement will be shifted is m*period/2. And the
         #maximum amount that any measurement will be shifted back is
-        #-m*t_rotation/2. So cut off this amount from the final common time
+        #-m*period/2. So cut off this amount from the final common time
         #base, so that we know that we'll always have points between which to
         #interpolate.
         dt = tempchannel.time[1]-tempchannel.time[0]
-        time_buffer = int(ceil(((self.m*self.t_rotation/2.0)/dt) + 1))
+        time_buffer = int(ceil(((self.m*self.period/2.0)/dt) + 1))
         tempchannel.time = tempchannel.time[time_buffer:-time_buffer]
 
         #Now reset the velocity structures in each temp channel to zeros
@@ -452,14 +452,14 @@ class Velocity():
         for i in range(0, len(tempchannel.depth)):
             f = scipy.interpolate.interp1d((channel.time +
                                             self.m*channel.azimuth[i]*
-                                            self.t_rotation/(2*pi)),
+                                            self.period/(2*pi)),
                                            channel.velocity[:, i],
                                            kind='linear')
             tempchannel.velocity[:,i] = f(tempchannel.time)
 
             f = scipy.interpolate.interp1d((channel.time +
                                             self.m*channel.azimuth[i]*
-                                            self.t_rotation/(2*pi)),
+                                            self.period/(2*pi)),
                                            channel.unwrapped_velocity[:, i],
                                            kind='linear')
             tempchannel.unwrapped_velocity[:,i] = f(tempchannel.time)
@@ -593,7 +593,7 @@ class Velocity():
 
     def gen_velocity_two_transducers_nonaxi(self, ch1, ch2):
         '''Find the velocity fields using two transducers, assuming a
-        nonaxisymmetric velocity distribution, with m and t_rotation provided
+        nonaxisymmetric velocity distribution, with m and period provided
         in the call to __init__() (and probably to the call to
         Shot.get_velocity(). Decomposes only into v_r and v_theta.'''
         #Create copies of the original channel objects. We're going to make
@@ -604,14 +604,14 @@ class Velocity():
         tempch2 = ch2.duplicate()
         
         #We are going to shift the time base of each measurement forward
-        #by the amount m*azimuth*t_rotation/(2*pi). So the maximum amount
-        #that any measurement will be shifted is m*t_rotation/2. And the
+        #by the amount m*azimuth*period/(2*pi). So the maximum amount
+        #that any measurement will be shifted is m*period/2. And the
         #maximum amount that any measurement will be shifted back is
-        #-m*t_rotation/2. So cut off this amount from the final common time
+        #-m*period/2. So cut off this amount from the final common time
         #base, so that we know that we'll always have points between which to
         #interpolate.
         dt = tempch1.time[1]-tempch1.time[0]
-        time_buffer = int(ceil(((self.m*self.t_rotation/2.0)/dt) + 1))
+        time_buffer = int(ceil(((self.m*self.period/2.0)/dt) + 1))
         tempch1.time = tempch1.time[time_buffer:-time_buffer]
         tempch2.time = tempch1.time
 
@@ -631,14 +631,14 @@ class Velocity():
         for i in range(0, len(tempch1.depth)):
             f = scipy.interpolate.interp1d((ch1.time +
                                             self.m*ch1.azimuth[i]*
-                                            self.t_rotation/(2*pi)),
+                                            self.period/(2*pi)),
                                            ch1.velocity[:, i],
                                            kind='linear')
             tempch1.velocity[:,i] = f(tempch1.time)
 
             f = scipy.interpolate.interp1d((ch1.time +
                                             self.m*ch1.azimuth[i]*
-                                            self.t_rotation/(2*pi)),
+                                            self.period/(2*pi)),
                                            ch1.unwrapped_velocity[:, i],
                                            kind='linear')
             tempch1.unwrapped_velocity[:,i] = f(tempch1.time)
@@ -647,14 +647,14 @@ class Velocity():
         for i in range(0, len(tempch2.depth)):
             f = scipy.interpolate.interp1d((ch2.time +
                                             self.m*ch2.azimuth[i]*
-                                            self.t_rotation/(2*pi)),
+                                            self.period/(2*pi)),
                                            ch2.velocity[:, i],
                                            kind='linear')
             tempch2.velocity[:,i] = f(tempch2.time)
 
             f = scipy.interpolate.interp1d((ch2.time +
                                             self.m*ch2.azimuth[i]*
-                                            self.t_rotation/(2*pi)),
+                                            self.period/(2*pi)),
                                            ch2.unwrapped_velocity[:, i],
                                            kind='linear')
             tempch2.unwrapped_velocity[:,i] = f(tempch2.time)
