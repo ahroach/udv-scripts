@@ -79,7 +79,7 @@ class Shot:
         #Otherwise add the channel and return that.
         return self.add_channel(channel_num)
 
-    def add_velocity(self, channel_nums):
+    def add_velocity(self, channel_nums, m=0, t_rotation=0):
         '''Adds and returns a Velocity object produced using channel_nums
         for this Shot.'''
         channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
@@ -92,10 +92,10 @@ class Shot:
                 return False
 
         
-        self.velocities.append(Velocity(self, channel_nums))
+        self.velocities.append(Velocity(self, channel_nums, m, t_rotation))
         return self.velocities[-1]
     
-    def get_velocity(self, channel_nums):
+    def get_velocity(self, channel_nums, m=0, t_rotation=0):
         '''Returns a Velocity object produced using the specified
         channel_nums for this Shot.'''
         channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
@@ -110,14 +110,17 @@ class Shot:
             for progenitor in self.velocities[idx].progenitors:
                 progenitor_list.append(progenitor.channel)
 
-            #Now check to see if these channels match the channel_nums, and,
-            #if so, return that.
+            #Now check to see if these channels match the channel_nums, and
+            #that m also matches. If m!=0, also check to make sure that
+            #the rotation times match.
             progenitor_list.sort()
-            if progenitor_list == channel_nums:
+            if ((progenitor_list == channel_nums) and
+                (self.velocities[idx].m == m) and
+                ((m==0) or (self.velocities[idx].t_rotation == t_rotation))):
                 return self.velocities[idx]
 
         #Otherwise add this new velocity set and return that.
-        return self.add_velocity(channel_nums)
+        return self.add_velocity(channel_nums, m=m, t_rotation=t_rotation)
 
     def sanitize_channel_nums_for_velocities(self, channel_nums):
         '''Makes sure we have the channel_nums as a sorted list, even if
@@ -292,6 +295,9 @@ class ChannelData:
         print "UDV delay: %ds, Data-taking time: %gs" % (self.shot.udv_delay,
                                                          self.time[-1])
 
+    def duplicate(self):
+        dup_chan = ChannelData(self.shot, self.channel)
+        return dup_chan
 
 class Velocity():
     '''A class for processed velocity measurements. These are distinct from
@@ -299,30 +305,50 @@ class Velocity():
     processed and presented in the v_r, v_theta, and v_z components.
     __init__() tries to be smart about which generation routine to call based
     on the number of channels presented.'''
-    def __init__(self, shot, channel_nums):
+    def __init__(self, shot, channel_nums, m=0, t_rotation=0):
         self.shot = shot
+        self.progenitors = []
+    
         if size(channel_nums) == 0:
             print "Error: 0 channels presented to Velocity.__init__()."
             return None
         elif size(channel_nums) == 1:
-            self.generate_velocity_one_transducer(channel_nums)
+            self.m = 0
+            self.t_rotation = 0
+            self.progenitors.append(self.shot.get_channel(channel_nums[0]))
+            self.gen_velocity_one_transducer(self.progenitors[0])
         elif size(channel_nums) == 2:
-            self.generate_velocity_two_transducers(channel_nums)
+            self.progenitors.append(self.shot.get_channel(channel_nums[0]))
+            self.progenitors.append(self.shot.get_channel(channel_nums[1]))
+            if (m==0):
+                self.m = 0
+                self.t_rotation = 0
+                self.gen_velocity_two_transducers(self.progenitors[0],
+                                                  self.progenitors[1])
+            else:
+                self.m = m
+                self.t_rotation = t_rotation
+                self.gen_velocity_two_transducers_nonaxi(self.progenitors[0],
+                                                         self.progenitors[1])
         elif size(channel_nums) == 3:
-            self.generate_velocity_three_transducers(channel_nums)
+            self.progenitors.append(self.shot.get_channel(channel_nums[0]))
+            self.progenitors.append(self.shot.get_channel(channel_nums[1]))
+            self.progenitors.append(self.shot.get_channel(channel_nums[2]))
+            self.m = 0
+            self.t_rotation = 0
+            self.gen_velocity_three_transducers(self.progenitors[0],
+                                                self.progenitors[1],
+                                                self.progenitors[2])
         else:
             print "Error: Can't generate velocity from %d measurements" % size(channel_nums)
             return None
 
-    def generate_velocity_one_transducer(self, channel_num):
+    def gen_velocity_one_transducer(self, channel):
         '''Generate velocity from a single transducer. If it is purely radial
         or purely vertical, a purely radial or vertical velocity is created.
         Otherwise, the velocity is assumed to be in the azimuthal direction,
         and the appropriate angle corrections are applied to the velocity.'''
-        self.progenitors = []
-        self.progenitors.append(self.shot.get_channel(channel_num[0]))
-
-        channel = self.progenitors[0]
+        
         self.time = channel.time.copy()
         self.r = channel.r.copy()
         self.azimuth = channel.azimuth.copy()
@@ -379,17 +405,10 @@ class Velocity():
         self.vtheta = self.vtheta[:,::-1]
         self.vz = self.vz[:,::-1]
 
-    def generate_velocity_two_transducers(self, channel_num):
+    def gen_velocity_two_transducers(self, ch1, ch2):
         '''Generate velocity from two transducers. Currently assumes we are
            just getting contributions from v_r and v_theta'''
-        
-        self.progenitors = []
-        self.progenitors.append(self.shot.get_channel(channel_num[0]))
-        self.progenitors.append(self.shot.get_channel(channel_num[1]))
-        
-        ch1 = self.progenitors[0]
-        ch2 = self.progenitors[1]
-        
+                
         #Find the index of the deepest point (smallest radius)
         ch1_last_idx = ch1.r.argmin()
         ch2_last_idx = ch2.r.argmin()
@@ -504,6 +523,20 @@ class Velocity():
                                     rpmtorads(self.shot.OCspeed)*r)
 
 
+    def gen_velocity_two_transducers_nonaxi(self, ch1, ch2):
+        #Create copies of the original channel objects. We're going to make
+        #changes to the data in these things to pass to
+        #gen_velocity_two_transducers(), but we of course don't want to
+        #modify the original channels.
+        tempch1 = ch1.duplicate()
+        tempch2 = ch2.duplicate()
+
+        #Okay, pass these channels to gen_velocity_two_transducers().
+        self.gen_velocity_two_transducers(tempch1, tempch2)
+        #We're done with out fake channels, so get rid of them.
+        del(tempch1)
+        del(tempch2)
+
     def get_index_near_time(self, time):
         '''Find the index in the time_array of the element closest to the
         specified time'''
@@ -549,6 +582,7 @@ def wrap_phase(angle):
         angle = angle + 2.0*pi
 
     return angle
+
 
 def filter_velocity(velocity, filter_threshold):
     '''Provides a simple filter for outliers in a velocity vector'''
@@ -956,6 +990,7 @@ def plot_two_component_avg_velocities(velocity, start_num, end_num,
     axvline(x=r2, color='black')
     grid(b=1)
 
+
 def find_avg_velocity_at_r(velocity, start, end, radius, time=0):
     '''Finds the mean and stddev of v_r and v_theta at the specified radius.
     If time = 1, start and end and starting and ending times. Otherwise, they
@@ -1024,6 +1059,7 @@ def find_shear(filename, start_time, end_time, omega1, omega2, rlimin, rlimout, 
     grid(b=1)
     legend()
 
+
 def filter_outliers(x, stddevs):
     mx = median(x)
     b = abs(x-mx)
@@ -1034,6 +1070,7 @@ def filter_outliers(x, stddevs):
 
     x_masked = ma.masked_inside(x, mx - mad*stddevs, mx + mad*stddevs)
     return x_masked
+
 
 def show_shear_layer_evolution(filename, omega1, omega2, channel=2, rmin=10,
                                rmax=18, filteroutliers=0):
@@ -1104,6 +1141,7 @@ def show_shear_layer_evolution(filename, omega1, omega2, channel=2, rmin=10,
         plot(time, layer_amplitude/layer_width)
         ylabel("Shear parameter [1/cm*sec]")
         xlabel("Time [sec]")
+
 
 def eval_shear_layer(r_data, t_data, profile_num, omega1, omega2, channel=2,
                      time=0, rmin=10, rmax=18, display=0):
@@ -1383,6 +1421,7 @@ def gen_vtheta_movie(filename, channel, omega2, primary_oscillation_start_time, 
     subprocess.check_call(command)
     shutil.rmtree(basedir)
 
+
 def plot_vtheta_mode(filename, channel, omega2, start_time, end_time, desiredcells=200, rin=r1, filter_threshold=1000, background_subtract=0, derotate=0, maxv=10000, minv=-10000, max_diff_mean=10000, levels=0):
 
     data = generate_profiles_alltime_novr(filename, channel, omega2)
@@ -1504,6 +1543,7 @@ def plot_vtheta_mode(filename, channel, omega2, start_time, end_time, desiredcel
         matplotlib.colorbar.ColorbarBase.set_label(bar_instance, r"$v_{\theta} - \bar{v_{\theta}}$ [cm/sec]")
         
     return C.levels
+
 
 def play_channel_velocity_animation(channel, speed=1.0,
                                     saveoutput=0, savefilename=''):
