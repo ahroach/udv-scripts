@@ -411,6 +411,13 @@ class Velocity():
         self.vz = self.vz[:,::-1]
 
     def gen_velocity_one_transducer_nonaxi(self, channel):
+        '''Find the velocity fields using one transducer, assuming a
+        nonaxisymmetric velocity distribution, with m and t_rotation provided
+        in the call to __init__() (and probably to the call to
+        Shot.get_velocity(). Assumes that we are only dealing with azimuthal
+        velocities for now. Note that this method essentially corrects
+        for the azimuthal offset along a measurement chord, making each
+        measurement appear to be made at \theta=0.'''
         #Create a copy of the original channel object. We're going to make
         #changes to the data in this thing to pass to
         #gen_velocity_one_transducers(), but we of course don't want to
@@ -582,6 +589,10 @@ class Velocity():
                                     rpmtorads(self.shot.OCspeed)*r)
 
     def gen_velocity_two_transducers_nonaxi(self, ch1, ch2):
+        '''Find the velocity fields using two transducers, assuming a
+        nonaxisymmetric velocity distribution, with m and t_rotation provided
+        in the call to __init__() (and probably to the call to
+        Shot.get_velocity(). Decomposes only into v_r and v_theta.'''
         #Create copies of the original channel objects. We're going to make
         #changes to the data in these things to pass to
         #gen_velocity_two_transducers(), but we of course don't want to
