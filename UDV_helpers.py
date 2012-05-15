@@ -306,6 +306,9 @@ class Velocity():
     __init__() tries to be smart about which generation routine to call based
     on the number of channels presented.'''
     def __init__(self, shot, channel_nums, m=0, t_rotation=0):
+        '''Tries to be smart about selecting generation methods, based
+        on the number of channels required and whether or not a non-zero
+        m has been specified.'''
         self.shot = shot
         self.progenitors = []
     
