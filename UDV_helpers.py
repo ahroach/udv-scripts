@@ -1678,6 +1678,84 @@ def plot_vtheta_mode(filename, channel, omega2, start_time, end_time, desiredcel
         
     return C.levels
 
+def project_velocity_timeseries_on_rt_plane(velocity, mid_time,
+                                            numpoints=400,
+                                            rin=r1, rout=r2,
+                                            subtract_m0 = 0):
+    '''Projects a timeseries onto the r-\theta plane. Measurements should
+    be at the same azimuthal location for most accurate results. The m
+    and period for the nonaxisymmetric modes are brought along in the
+    Velocity object. You just have to specify the mid-point time for the
+    desired projection. If subtract_m0 is set, the axisymmetric component
+    is subtracted off.'''
+
+    x = linspace(-r2, r2, num=numpoints)
+    y = linspace(-r2, r2, num=numpoints)
+    vr = zeros([x.size, y.size])
+    vtheta = zeros([x.size, y.size])
+
+    #The phase decreases with time, for a function going as
+    #exp(k\cdot x - \omega t)
+    phase = -2*pi*velocity.time/velocity.period
+
+    #For each radial location, define an interpolation function
+    #to the velocity.
+    #Note that we have to reverse these arrays so the phase is in
+    #increasing order, otherwise the interpolation routines won't work
+    vr_fit = {}
+    vtheta_fit = {}
+    for i in range(len(velocity.r)):
+        vr_fit[i]= scipy.interpolate.interp1d(phase[::-1],
+                                              velocity.vr[::-1, i],
+                                              kind='linear')
+
+        vtheta_fit[i]= scipy.interpolate.interp1d(phase[::-1],
+                                              velocity.vtheta[::-1, i],
+                                              kind='linear')
+
+    #If we want to subtract off the axisymmetric component, find
+    #100 dummy velocities over the full range of the phases that will
+    #be plotted, and find the mean of this to be subtracted later.
+    if(subtract_m0):
+        meanvr = zeros(len(velocity.r))
+        meanvtheta = zeros(len(velocity.r))
+        dummyphases = linspace(-pi*velocity.m - mid_time*2*pi/velocity.period,
+                               pi*velocity.m - mid_time*2*pi/velocity.period,
+                               100)
+        for i in range(0, len(meanvr)):
+            meanvr[i] = (vr_fit[i](dummyphases)).mean()
+            meanvtheta[i] = (vtheta_fit[i](dummyphases)).mean()
+
+
+    #Note what appear to be flipped indices in vr and vt below. This
+    #is so the call to contour(x, y, v) displays properly.
+    for i in range(0, x.size):
+        for j in range(0, y.size):
+            r = sqrt(x[i]**2 + y[j]**2)
+            if ((r < rin) or (r > rout)):
+                vr[j][i] = nan
+                vtheta[j][i] = nan
+            else:
+                azimuth = math.atan2(y[j], x[i])
+                desired_phase = (velocity.m*azimuth -
+                                 mid_time*2*pi/velocity.period)
+                #Just do a nearest-neighbor thing in radius, since
+                #these are fairly fine-grained measurements in that
+                #dimension.
+                ridx = velocity.get_index_near_radius(r)
+                #Now get vr and vtheta from the azimuthal interpolation fits
+                #at that radius
+                vr[j][i] = vr_fit[ridx](desired_phase)
+                vtheta[j][i] = vtheta_fit[ridx](desired_phase)
+                #And subtract off the axisymmetric component at that radius,
+                #if desired.
+                if(subtract_m0):
+                    vr[j][i] -= meanvr[ridx]
+                    vtheta[j][i] -= meanvtheta[ridx]
+    
+    contourf(x, y, vtheta, 50)
+    axis('equal')
+
 
 def play_channel_velocity_animation(channel, speed=1.0,
                                     saveoutput=0, savefilename=''):
