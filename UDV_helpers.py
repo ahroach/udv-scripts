@@ -1680,7 +1680,8 @@ def plot_vtheta_mode(filename, channel, omega2, start_time, end_time, desiredcel
         
     return C.levels
 
-def project_velocity_timeseries_on_rt_plane(velocity, mid_time,
+def project_velocity_timeseries_on_rt_plane(velocity, component,
+                                            mid_time,
                                             numpoints=400,
                                             rin=r1, rout=r2,
                                             subtract_m0 = 0):
@@ -1688,13 +1689,13 @@ def project_velocity_timeseries_on_rt_plane(velocity, mid_time,
     be at the same azimuthal location for most accurate results. The m
     and period for the nonaxisymmetric modes are brought along in the
     Velocity object. You just have to specify the mid-point time for the
-    desired projection. If subtract_m0 is set, the axisymmetric component
-    is subtracted off.'''
+    desired projection. If subtract_m0 is set, the axisymmetric contribution
+    is subtracted off. Returns an x vector, a y vector, and the velocity
+    array'''
 
     x = linspace(-r2, r2, num=numpoints)
     y = linspace(-r2, r2, num=numpoints)
-    vr = zeros([x.size, y.size])
-    vtheta = zeros([x.size, y.size])
+    v = zeros([x.size, y.size])
 
     #The phase decreases with time, for a function going as
     #exp(k\cdot x - \omega t)
@@ -1704,30 +1705,38 @@ def project_velocity_timeseries_on_rt_plane(velocity, mid_time,
     #to the velocity.
     #Note that we have to reverse these arrays so the phase is in
     #increasing order, otherwise the interpolation routines won't work
-    vr_fit = {}
-    vtheta_fit = {}
-    for i in range(len(velocity.r)):
-        vr_fit[i]= UnivariateSpline(phase[::-1],
-                                    velocity.vr[::-1, i],
-                                    k=3, s=0)
+    v_fit = {}
 
-        vtheta_fit[i]= UnivariateSpline(phase[::-1],
-                                        velocity.vtheta[::-1, i],
-                                        k=3, s=0)
+    if(component == 'vr'):
+        for i in range(velocity.r.size):
+            v_fit[i]= UnivariateSpline(phase[::-1],
+                                       velocity.vr[::-1, i],
+                                       k=3, s=0)
+    elif(component == 'vtheta'):
+        for i in range(velocity.r.size):
+            v_fit[i]= UnivariateSpline(phase[::-1],
+                                       velocity.vtheta[::-1, i],
+                                       k=3, s=0)
+    elif(component == 'vz'):
+        for i in range(velocity.r.size):
+            v_fit[i]= UnivariateSpline(phase[::-1],
+                                       velocity.vz[::-1, i],
+                                       k=3, s=0)
+    else:
+        print "Unrecognized component. Must be 'vr', 'vtheta', or 'vz'."
+        return False
+    
 
     #If we want to subtract off the axisymmetric component, find
     #100 dummy velocities over the full range of the phases that will
     #be plotted, and find the mean of this to be subtracted later.
     if(subtract_m0):
-        meanvr = zeros(len(velocity.r))
-        meanvtheta = zeros(len(velocity.r))
+        mean = zeros(velocity.r.size)
         dummyphases = linspace(-pi*velocity.m - mid_time*2*pi/velocity.period,
                                pi*velocity.m - mid_time*2*pi/velocity.period,
                                100)
-        for i in range(0, len(meanvr)):
-            meanvr[i] = (vr_fit[i](dummyphases)).mean()
-            meanvtheta[i] = (vtheta_fit[i](dummyphases)).mean()
-
+        for i in range(0, mean.size):
+            mean[i] = (v_fit[i](dummyphases)).mean()
 
     #Note what appear to be flipped indices in vr and vt below. This
     #is so the call to contour(x, y, v) displays properly.
@@ -1735,8 +1744,7 @@ def project_velocity_timeseries_on_rt_plane(velocity, mid_time,
         for j in range(0, y.size):
             r = sqrt(x[i]**2 + y[j]**2)
             if ((r < rin) or (r > rout)):
-                vr[j][i] = nan
-                vtheta[j][i] = nan
+                v[j][i] = nan
             else:
                 azimuth = math.atan2(y[j], x[i])
                 desired_phase = (velocity.m*azimuth -
@@ -1745,18 +1753,15 @@ def project_velocity_timeseries_on_rt_plane(velocity, mid_time,
                 #these are fairly fine-grained measurements in that
                 #dimension.
                 ridx = velocity.get_index_near_radius(r)
-                #Now get vr and vtheta from the azimuthal interpolation fits
+                #Now get the velocity from the azimuthal interpolation fit
                 #at that radius
-                vr[j][i] = vr_fit[ridx](desired_phase)
-                vtheta[j][i] = vtheta_fit[ridx](desired_phase)
+                v[j][i] = v_fit[ridx](desired_phase)
                 #And subtract off the axisymmetric component at that radius,
                 #if desired.
                 if(subtract_m0):
-                    vr[j][i] -= meanvr[ridx]
-                    vtheta[j][i] -= meanvtheta[ridx]
+                    v[j][i] -= mean[ridx]
     
-    contourf(x, y, vtheta, 50)
-    axis('equal')
+    return x, y, v
 
 
 def play_channel_velocity_animation(channel, speed=1.0,
