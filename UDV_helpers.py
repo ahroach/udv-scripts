@@ -8,6 +8,7 @@ import subprocess
 import os
 import shutil
 import glob
+from copy import deepcopy
 import matplotlib.animation as animation
 from numpy import *
 from pylab import *
@@ -425,7 +426,7 @@ class Velocity():
         #changes to the data in this thing to pass to
         #gen_velocity_one_transducers(), but we of course don't want to
         #modify the original channel.
-        tempchannel = channel.duplicate()
+        tempchannel = deepcopy(channel)
         
         #We are going to shift the time base of each measurement forward
         #by the amount m*azimuth*period/(2*pi). So the maximum amount
@@ -600,8 +601,8 @@ class Velocity():
         #changes to the data in these things to pass to
         #gen_velocity_two_transducers(), but we of course don't want to
         #modify the original channels.
-        tempch1 = ch1.duplicate()
-        tempch2 = ch2.duplicate()
+        tempch1 = deepcopy(ch1.duplicate)
+        tempch2 = deepcopy(ch2.duplicate)
         
         #We are going to shift the time base of each measurement forward
         #by the amount m*azimuth*period/(2*pi). So the maximum amount
