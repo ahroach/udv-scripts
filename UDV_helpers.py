@@ -3,6 +3,7 @@ import math
 import cmath
 import scipy
 import scipy.interpolate
+from scipy.interpolate import UnivariateSpline
 import scipy.optimize
 import subprocess
 import os
@@ -451,18 +452,18 @@ class Velocity():
         #make a fit, and interpolate onto the new time structure.
         
         for i in range(0, len(tempchannel.depth)):
-            f = scipy.interpolate.interp1d((channel.time +
-                                            self.m*channel.azimuth[i]*
-                                            self.period/(2*pi)),
-                                           channel.velocity[:, i],
-                                           kind='linear')
+            f = UnivariateSpline((channel.time +
+                                  self.m*channel.azimuth[i]*
+                                  self.period/(2*pi)),
+                                 channel.velocity[:, i],
+                                 k=3, s=0)
             tempchannel.velocity[:,i] = f(tempchannel.time)
 
-            f = scipy.interpolate.interp1d((channel.time +
-                                            self.m*channel.azimuth[i]*
-                                            self.period/(2*pi)),
-                                           channel.unwrapped_velocity[:, i],
-                                           kind='linear')
+            f = UnivariateSpline((channel.time +
+                                  self.m*channel.azimuth[i]*
+                                  self.period/(2*pi)),
+                                 channel.unwrapped_velocity[:, i],
+                                 k=3, s=0)
             tempchannel.unwrapped_velocity[:,i] = f(tempchannel.time)
         
         
@@ -630,34 +631,34 @@ class Velocity():
         #make a fit, and interpolate onto the new time structure.
 
         for i in range(0, len(tempch1.depth)):
-            f = scipy.interpolate.interp1d((ch1.time +
-                                            self.m*ch1.azimuth[i]*
-                                            self.period/(2*pi)),
-                                           ch1.velocity[:, i],
-                                           kind='linear')
+            f = UnivariateSpline((ch1.time +
+                                  self.m*ch1.azimuth[i]*
+                                  self.period/(2*pi)),
+                                 ch1.velocity[:, i],
+                                 k=3, s=0)
             tempch1.velocity[:,i] = f(tempch1.time)
 
-            f = scipy.interpolate.interp1d((ch1.time +
-                                            self.m*ch1.azimuth[i]*
-                                            self.period/(2*pi)),
-                                           ch1.unwrapped_velocity[:, i],
-                                           kind='linear')
+            f = UnivariateSpline((ch1.time +
+                                  self.m*ch1.azimuth[i]*
+                                  self.period/(2*pi)),
+                                 ch1.unwrapped_velocity[:, i],
+                                 k=3, s=0)
             tempch1.unwrapped_velocity[:,i] = f(tempch1.time)
         
         
         for i in range(0, len(tempch2.depth)):
-            f = scipy.interpolate.interp1d((ch2.time +
-                                            self.m*ch2.azimuth[i]*
-                                            self.period/(2*pi)),
-                                           ch2.velocity[:, i],
-                                           kind='linear')
+            f = UnivariateSpline((ch2.time +
+                                  self.m*ch2.azimuth[i]*
+                                  self.period/(2*pi)),
+                                 ch2.velocity[:, i],
+                                 k=3, s=0)
             tempch2.velocity[:,i] = f(tempch2.time)
 
-            f = scipy.interpolate.interp1d((ch2.time +
-                                            self.m*ch2.azimuth[i]*
-                                            self.period/(2*pi)),
-                                           ch2.unwrapped_velocity[:, i],
-                                           kind='linear')
+            f = UnivariateSpline((ch2.time +
+                                  self.m*ch2.azimuth[i]*
+                                  self.period/(2*pi)),
+                                 ch2.unwrapped_velocity[:, i],
+                                 k=3, s=0)
             tempch2.unwrapped_velocity[:,i] = f(tempch2.time)
 
         
@@ -1706,13 +1707,13 @@ def project_velocity_timeseries_on_rt_plane(velocity, mid_time,
     vr_fit = {}
     vtheta_fit = {}
     for i in range(len(velocity.r)):
-        vr_fit[i]= scipy.interpolate.interp1d(phase[::-1],
-                                              velocity.vr[::-1, i],
-                                              kind='linear')
+        vr_fit[i]= UnivariateSpline(phase[::-1],
+                                    velocity.vr[::-1, i],
+                                    k=3, s=0)
 
-        vtheta_fit[i]= scipy.interpolate.interp1d(phase[::-1],
-                                              velocity.vtheta[::-1, i],
-                                              kind='linear')
+        vtheta_fit[i]= UnivariateSpline(phase[::-1],
+                                        velocity.vtheta[::-1, i],
+                                        k=3, s=0)
 
     #If we want to subtract off the axisymmetric component, find
     #100 dummy velocities over the full range of the phases that will
