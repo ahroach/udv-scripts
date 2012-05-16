@@ -428,14 +428,20 @@ class Velocity():
         #gen_velocity_one_transducers(), but we of course don't want to
         #modify the original channel.
         tempchannel = deepcopy(channel)
-        
-        #We are going to shift the time base of each measurement forward
-        #by the amount m*azimuth*period/(2*pi). So the maximum amount
-        #that any measurement will be shifted is m*period/2. And the
-        #maximum amount that any measurement will be shifted back is
-        #-m*period/2. So cut off this amount from the final common time
-        #base, so that we know that we'll always have points between which to
-        #interpolate.
+
+        #Due to the shifted azimuthal location of each measurement, each
+        #measurement at the same time along the UDV beam is at a different
+        #phase of the wave, phase = k\cdotx - \omega t. But we want to
+        #transform everything to a system where it is as if we had made
+        #each measurement at the same time and at the same azimuthal location.
+        #To find the required time shift in the signal for that to happen,
+        #we equate the phase of the measurement made, with the desired result
+        #m(\theta + \theta_offset) - \omega t = m \theta - \omega(t+t_shift)
+        #So we must offset the time by an amount -m\theta_shift*period/(2*pi).
+        #The maximum amount that the time base will have to be shifted in
+        #either direction is m*period/2, so we'll trim that amount from
+        #each of the time arrays to make sure that we'll always be
+        #interpolating between measured points.
         dt = tempchannel.time[1]-tempchannel.time[0]
         time_buffer = int(ceil(((self.m*self.period/2.0)/dt) + 1))
         tempchannel.time = tempchannel.time[time_buffer:-time_buffer]
@@ -452,14 +458,14 @@ class Velocity():
         #make a fit, and interpolate onto the new time structure.
         
         for i in range(0, len(tempchannel.depth)):
-            f = UnivariateSpline((channel.time +
+            f = UnivariateSpline((channel.time -
                                   self.m*channel.azimuth[i]*
                                   self.period/(2*pi)),
                                  channel.velocity[:, i],
                                  k=3, s=0)
             tempchannel.velocity[:,i] = f(tempchannel.time)
 
-            f = UnivariateSpline((channel.time +
+            f = UnivariateSpline((channel.time -
                                   self.m*channel.azimuth[i]*
                                   self.period/(2*pi)),
                                  channel.unwrapped_velocity[:, i],
@@ -605,13 +611,19 @@ class Velocity():
         tempch1 = deepcopy(ch1.duplicate)
         tempch2 = deepcopy(ch2.duplicate)
         
-        #We are going to shift the time base of each measurement forward
-        #by the amount m*azimuth*period/(2*pi). So the maximum amount
-        #that any measurement will be shifted is m*period/2. And the
-        #maximum amount that any measurement will be shifted back is
-        #-m*period/2. So cut off this amount from the final common time
-        #base, so that we know that we'll always have points between which to
-        #interpolate.
+        #Due to the shifted azimuthal location of each measurement, each
+        #measurement at the same time along the UDV beam is at a different
+        #phase of the wave, phase = k\cdotx - \omega t. But we want to
+        #transform everything to a system where it is as if we had made
+        #each measurement at the same time and at the same azimuthal location.
+        #To find the required time shift in the signal for that to happen,
+        #we equate the phase of the measurement made, with the desired result
+        #m(\theta + \theta_offset) - \omega t = m \theta - \omega(t+t_shift)
+        #So we must offset the time by an amount -m\theta_shift*period/(2*pi).
+        #The maximum amount that the time base will have to be shifted in
+        #either direction is m*period/2, so we'll trim that amount from
+        #each of the time arrays to make sure that we'll always be
+        #interpolating between measured points.
         dt = tempch1.time[1]-tempch1.time[0]
         time_buffer = int(ceil(((self.m*self.period/2.0)/dt) + 1))
         tempch1.time = tempch1.time[time_buffer:-time_buffer]
@@ -631,14 +643,14 @@ class Velocity():
         #make a fit, and interpolate onto the new time structure.
 
         for i in range(0, len(tempch1.depth)):
-            f = UnivariateSpline((ch1.time +
+            f = UnivariateSpline((ch1.time -
                                   self.m*ch1.azimuth[i]*
                                   self.period/(2*pi)),
                                  ch1.velocity[:, i],
                                  k=3, s=0)
             tempch1.velocity[:,i] = f(tempch1.time)
 
-            f = UnivariateSpline((ch1.time +
+            f = UnivariateSpline((ch1.time -
                                   self.m*ch1.azimuth[i]*
                                   self.period/(2*pi)),
                                  ch1.unwrapped_velocity[:, i],
@@ -647,14 +659,14 @@ class Velocity():
         
         
         for i in range(0, len(tempch2.depth)):
-            f = UnivariateSpline((ch2.time +
+            f = UnivariateSpline((ch2.time -
                                   self.m*ch2.azimuth[i]*
                                   self.period/(2*pi)),
                                  ch2.velocity[:, i],
                                  k=3, s=0)
             tempch2.velocity[:,i] = f(tempch2.time)
 
-            f = UnivariateSpline((ch2.time +
+            f = UnivariateSpline((ch2.time -
                                   self.m*ch2.azimuth[i]*
                                   self.period/(2*pi)),
                                  ch2.unwrapped_velocity[:, i],
