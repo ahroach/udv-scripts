@@ -1570,18 +1570,38 @@ def gen_vtheta_movie(filename, channel, omega2, primary_oscillation_start_time, 
     shutil.rmtree(basedir)
 
 
+def plot_vtheta_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
+                            minvelocity=nan, maxvelocity=nan,
+                            nlevels=50):
+    '''Simply plot the structure of a nonaxisymmetric vtheta mode,
+    without the axisymmetric background.'''
+    x, y, v = project_velocity_timeseries_on_rt_plane(velocity, 'vtheta',
+                                                      mid_time, numpoints=400,
+                                                      rin=rin, rout=rout,
+                                                      subtract_m0=1,
+                                                      plot_rotation=0)
+    
+    contourf(x, y, v.clip(minvelocity, maxvelocity), nlevels)
+    axis('equal')
+    xlim(-r2, r2)
+    ylim(-r2, r2)
+    colorbar()
+
+
 def project_velocity_timeseries_on_rt_plane(velocity, component,
                                             mid_time,
                                             numpoints=400,
                                             rin=r1, rout=r2,
-                                            subtract_m0 = 0):
-    '''Projects a timeseries onto the r-\theta plane. Measurements should
-    be at the same azimuthal location for most accurate results. The m
-    and period for the nonaxisymmetric modes are brought along in the
-    Velocity object. You just have to specify the mid-point time for the
-    desired projection. If subtract_m0 is set, the axisymmetric contribution
-    is subtracted off. Returns an x vector, a y vector, and the velocity
-    array'''
+                                            subtract_m0 = 0,
+                                            plot_rotation=0):
+    '''Projects a timeseries onto the r-\theta plane. Measurements
+    should be at the same azimuthal location for most accurate
+    results. The m and period for the nonaxisymmetric modes are
+    brought along in the Velocity object. You just have to specify the
+    mid-point time for the desired projection. If subtract_m0 is set,
+    the axisymmetric contribution is subtracted off. The plot_rotation
+    angle specifies the number of radians to rotate the plot of the
+    mode. Returns an x vector, a y vector, and the velocity array'''
 
     x = linspace(-r2, r2, num=numpoints)
     y = linspace(-r2, r2, num=numpoints)
@@ -1627,7 +1647,7 @@ def project_velocity_timeseries_on_rt_plane(velocity, component,
                                100)
         for i in range(0, mean.size):
             mean[i] = (v_fit[i](dummyphases)).mean()
-
+    
     #Note what appear to be flipped indices in vr and vt below. This
     #is so the call to contour(x, y, v) displays properly.
     for i in range(0, x.size):
@@ -1636,7 +1656,9 @@ def project_velocity_timeseries_on_rt_plane(velocity, component,
             if ((r < rin) or (r > rout)):
                 v[j][i] = nan
             else:
-                azimuth = math.atan2(y[j], x[i])
+                #Find the azimuth of a point in the plot. Take into account
+                #the desired overall plot rotation.
+                azimuth = wrap_phase(math.atan2(y[j], x[i]) + plot_rotation)
                 desired_phase = (velocity.m*azimuth -
                                  mid_time*2*pi/velocity.period)
                 #Just do a nearest-neighbor thing in radius, since
