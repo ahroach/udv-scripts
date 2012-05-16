@@ -1587,6 +1587,87 @@ def plot_vtheta_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
     ylim(-r2, r2)
     colorbar()
 
+def play_vtheta_mode_animation(velocity, start_time=nan, end_time=nan, rin=r1,
+                               rout=r2, fps=24, speed=1.0, savefilename='',
+                               minvelocity=nan, maxvelocity=nan,
+                               numpoints=400, nlevels=50,
+                               rotate_with_mode=0):
+    '''Create an animation of an azimuthal velocity mode.'''
+
+    #Make sure that the start and end times are outside of the range
+    #that would lead to extrapolation, and hence unexpected results.
+    
+    min_time = velocity.time[0] + velocity.m*velocity.period/2.0
+    max_time = velocity.time[-1] - velocity.m*velocity.period/2.0
+
+    if((isnan(start_time)) or (start_time < min_time)
+       or (start_time > max_time)):
+        start_time = min_time
+
+    if((isnan(end_time)) or (end_time < min_time)
+       or (end_time > max_time)):
+        end_time = max_time
+
+    #Calculate the time step from frame to frame, and set up an array
+    #of every time that we want to display.
+    dt = 1.0*speed/fps
+
+    times = arange(start_time, end_time, dt)
+
+    #If we want to rotate with the mode, set up an array of the rotation
+    #angle corresponding to each time.
+    if(rotate_with_mode):
+        rot_angles = -times*2.0*pi*velocity.m/velocity.period
+    else:
+        rot_angles = zeros(times.size)
+
+    #Now do the transformations of all of the velocity fields, and stick
+    #them in a list
+    vs = []
+    print "Beginning to process frames"
+    for i in range(0,times.size):
+        x, y, v = \
+        project_velocity_timeseries_on_rt_plane(velocity, 'vtheta',
+                                                times[i], numpoints=numpoints,
+                                                rin=rin, rout=rout,
+                                                subtract_m0=1,
+                                                plot_rotation = rot_angles[i])
+        v.clip(minvelocity, maxvelocity)
+        vs.append(v)
+        sys.stdout.write('\x1b[1A\x1b[2K\x1b[J')
+        print "%d of %d frames complete" % (i, times.size)
+
+    #Now set everything up for the plots
+    fig = figure(figsize=(6, 6), dpi=80)
+    subplots_adjust(left=0.0, right=1.0, bottom=0.0, top=1.0)
+    ax = fig.add_subplot(111, autoscale_on=False, xlim=(-rout,rout),
+                         ylim=(-rout, rout))
+    axis('equal')
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    #We'll have a label with out time in the upper left corner
+    time_text = ax.text(0.05, 0.95, '', transform=ax.transAxes)
+
+
+    levels=linspace(minvelocity, maxvelocity, nlevels)
+    def draw_contour(i):
+        ct = contourf(x, y, vs[i], levels=levels)
+        time_text.set_text("t=%0.4gs" % times[i])
+        return ct, time_text
+
+    #blit=True fails for now, not sure why.
+    ani = animation.FuncAnimation(fig, draw_contour, range(0,times.size),
+                                  interval = 1000/fps, blit=False)
+
+    if(savefilename):
+        ani.save(savefilename, fps=fps)
+
+    show()
+    #Won't display without an error. 
+    magic_squirrel()
+
+    
 
 def project_velocity_timeseries_on_rt_plane(velocity, component,
                                             mid_time,
@@ -1657,8 +1738,9 @@ def project_velocity_timeseries_on_rt_plane(velocity, component,
                 v[j][i] = nan
             else:
                 #Find the azimuth of a point in the plot. Take into account
-                #the desired overall plot rotation.
-                azimuth = wrap_phase(math.atan2(y[j], x[i]) + plot_rotation)
+                #the desired overall plot rotation. Subtracting here leads
+                #to a clockwise plot rotation.
+                azimuth = wrap_phase(math.atan2(y[j], x[i]) - plot_rotation)
                 desired_phase = (velocity.m*azimuth -
                                  mid_time*2*pi/velocity.period)
                 #Just do a nearest-neighbor thing in radius, since
