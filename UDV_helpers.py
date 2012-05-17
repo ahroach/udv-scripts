@@ -9,6 +9,7 @@ import subprocess
 import os
 import shutil
 import glob
+import string
 from copy import deepcopy
 import matplotlib.animation as animation
 from numpy import *
@@ -1556,85 +1557,92 @@ def plot_vtheta_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
     ylim(-r2, r2)
     colorbar()
 
-def save_vtheta_mode_animation(velocity, savefilename, start_time=nan,
+def save_vtheta_mode_animation(velocity, filename, start_time=nan,
                                end_time=nan, rin=r1,
                                rout=r2, fps=24, speed=1.0,
                                minvelocity=nan, maxvelocity=nan,
                                numpoints=400, nlevels=50,
                                rotate_with_mode=0):
     '''Create an animation of an azimuthal velocity mode.'''
-
+    tmpfilebase = "/tmp/__tmp%s%s" % (string.ascii_letters[randint(0,51)],
+                                      string.ascii_letters[randint(0,51)])
+    
     #Make sure that the start and end times are outside of the range
     #that would lead to extrapolation, and hence unexpected results.
     
     min_time = velocity.time[0] + velocity.m*velocity.period/2.0
     max_time = velocity.time[-1] - velocity.m*velocity.period/2.0
-
+    
     if((isnan(start_time)) or (start_time < min_time)
        or (start_time > max_time)):
         start_time = min_time
-
+    
     if((isnan(end_time)) or (end_time < min_time)
        or (end_time > max_time)):
         end_time = max_time
-
+    
     #Calculate the time step from frame to frame, and set up an array
     #of every time that we want to display.
     dt = 1.0*speed/fps
-
+    
     times = arange(start_time, end_time, dt)
-
+    
     #If we want to rotate with the mode, set up an array of the rotation
     #angle corresponding to each time.
     if(rotate_with_mode):
         rot_angles = -(times*2.0*pi*velocity.m/velocity.period % (2*pi))
     else:
         rot_angles = zeros(times.size)
-
-    #Now do the transformations of all of the velocity fields, and stick
-    #them in a list
-    vs = zeros([times.size, numpoints, numpoints])
-    print "Beginning to process frames"
-    for i in range(0,times.size):
-        x, y, vs[i] = \
-        project_velocity_timeseries_on_rt_plane(velocity, 'vtheta',
-                                                times[i], numpoints=numpoints,
-                                                rin=rin, rout=rout,
-                                                subtract_m0=1,
-                                                plot_rotation = rot_angles[i])
-
-        sys.stdout.write('\x1b[1A\x1b[2K\x1b[J')
-        print "%d of %d arrays processed" % (i, times.size)
-
-    vs.clip(minvelocity, maxvelocity)
-
+    
+    
     #Now set everything up for the plots
     fig = figure(figsize=(6, 6), dpi=80)
     subplots_adjust(left=0.0, right=1.0, bottom=0.0, top=1.0)
     ax = fig.add_subplot(111, autoscale_on=False, xlim=(-rout,rout),
                          ylim=(-rout, rout))
     axis('equal')
-    ax.set_xticks([])
-    ax.set_yticks([])
-
-    #We'll have a label with out time in the upper left corner
-    time_text = ax.text(0.05, 0.95, '', transform=ax.transAxes)
-
-
+    
     levels=linspace(minvelocity, maxvelocity, nlevels)
-    def draw_contour(i):
-        ct = contourf(x, y, vs[i], levels=levels)
-        time_text.set_text("t=%0.4gs" % times[i])
-        return ct, time_text
-
-    #blit=True fails for now, not sure why.
-    ani = animation.FuncAnimation(fig, draw_contour, range(0,times.size),
-                                  interval = 1000/fps, blit=False)
-
-    ani.save(savefilename, fps=fps)
-
-    del(ani)
+    
+    #Now do the transformations of all of the velocity fields, and stick
+    #them in a list
+    print "Beginning to process frames"
+    framefilenames = {}
+    for i in range(0,times.size):
+        x, y, v = \
+        project_velocity_timeseries_on_rt_plane(velocity, 'vtheta',
+                                                times[i], numpoints=numpoints,
+                                                rin=rin, rout=rout,
+                                                subtract_m0=1,
+                                                plot_rotation = rot_angles[i])
+        #Draw the contour plot
+        v.clip(minvelocity, maxvelocity)        
+        ax.contourf(x, y, v, levels)
+        
+        #Set the label text
+        ax.text(0.05, 0.95, "t=%0.4gs" % times[i], transform=ax.transAxes)
+        
+        #For some reason this gets reset when I do cla() on the previous frame
+        ax.set_xticks([])
+        ax.set_yticks([])
+        
+        #Save the png file
+        framefilenames[i] = "%s%0.4d.png" % (tmpfilebase, i)
+        savefig(framefilenames[i])
+        
+        #And clear for the next round
+        ax.cla()
+        sys.stdout.write('\x1b[1A\x1b[2K\x1b[J')
+        print "%d of %d frames assembled" % (i, times.size)
+    
     close(fig)
+    assemblecmd = ['avconv', '-y', '-r', str(fps), '-b', '1800k', '-i',
+                   '%s%%04d.png' % tmpfilebase, filename]
+    
+    subprocess.check_call(assemblecmd)
+    for framefilename in framefilenames:
+        os.remove(framefilenames[framefilename])
+
 
 def project_velocity_timeseries_on_rt_plane(velocity, component,
                                             mid_time,
