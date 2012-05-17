@@ -1098,7 +1098,7 @@ def plot_spectrogram(channel, idx, start_time=0, end_time=1000, timechunk=3):
 
     subplot(2,1,2)
     fs = 1.0/(channel.time[2]-channel.time[1])
-    nfft = int(round(fs*timechunk))
+    nfft = rint(fs*timechunk)
     noverlap=nfft-1
     Pxx, freqs, bins, im = specgram(channel.velocity[start:end, idx],
                                     NFFT=nfft, Fs=fs, noverlap=noverlap)
