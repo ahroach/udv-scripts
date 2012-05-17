@@ -442,9 +442,14 @@ class Velocity():
         #either direction is m*period/2, so we'll trim that amount from
         #each of the time arrays to make sure that we'll always be
         #interpolating between measured points.
-        dt = tempchannel.time[1]-tempchannel.time[0]
-        time_buffer = int(ceil(((self.m*self.period/2.0)/dt) + 1))
-        tempchannel.time = tempchannel.time[time_buffer:-time_buffer]
+        
+        #Also, choose a dt such that m*period/dt = 200. We're upsampling
+        #here so that when we go to plot this on the r-theta plane,
+        #we have an easier time of it.
+        dt = self.m*self.period/200
+        time_buffer = self.m*self.period/2
+        tempchannel.time = arange(tempchannel.time[0] + time_buffer,
+                                  tempchannel.time[-1] - time_buffer, dt)
 
         #Now reset the velocity structures in each temp channel to zeros
         #of the appropriate size: Same number of spatial points, shorter
@@ -624,10 +629,14 @@ class Velocity():
         #either direction is m*period/2, so we'll trim that amount from
         #each of the time arrays to make sure that we'll always be
         #interpolating between measured points.
-        dt = tempch1.time[1]-tempch1.time[0]
-        time_buffer = int(ceil(((self.m*self.period/2.0)/dt) + 1))
-        tempch1.time = tempch1.time[time_buffer:-time_buffer]
-        tempch2.time = tempch1.time
+
+        #Also, choose a dt such that m*period/dt = 200. We're upsampling
+        #here so that when we go to plot this on the r-theta plane,
+        #we have an easier time of it.
+        dt = self.m*self.period/200
+        time_buffer = self.m*self.period/2
+        tempchannel.time = arange(tempchannel.time[0] + time_buffer,
+                                  tempchannel.time[-1] - time_buffer, dt)
 
         #Now reset the velocity structures in each temp channel to zeros
         #of the appropriate size: Same number of spatial points, shorter
