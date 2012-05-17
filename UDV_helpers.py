@@ -745,7 +745,9 @@ def filter_velocity(velocity, filter_threshold):
     '''Provides a simple filter for outliers in a velocity vector'''
 
     for i in range(5, velocity.size):
-        if abs(velocity[i] - 0.2*(velocity[i-1] + velocity[i-2] + velocity[i-3] + velocity[i-4] + velocity[i-5])) > filter_threshold:
+        if abs(velocity[i] - 0.2*(velocity[i-1] + velocity[i-2] + 
+                                  velocity[i-3] + velocity[i-4] + 
+                                  velocity[i-5])) > filter_threshold:
             velocity[i] = velocity[i-1]
 
     return velocity
