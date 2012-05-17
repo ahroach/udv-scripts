@@ -1634,7 +1634,7 @@ def save_vtheta_mode_animation(velocity, savefilename, start_time=nan,
     ani.save(savefilename, fps=fps)
 
     del(ani)
-    
+    close(fig)
 
 def project_velocity_timeseries_on_rt_plane(velocity, component,
                                             mid_time,
