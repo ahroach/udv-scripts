@@ -1633,7 +1633,7 @@ def save_vtheta_mode_animation(velocity, filename, start_time=nan,
         #And clear for the next round
         ax.cla()
         sys.stdout.write('\x1b[1A\x1b[2K\x1b[J')
-        print "%d of %d frames assembled" % (i, times.size)
+        print "%d of %d frames assembled" % (i+1, times.size)
     
     close(fig)
     assemblecmd = ['avconv', '-y', '-r', str(fps), '-b', '1800k', '-i',
