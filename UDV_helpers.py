@@ -1697,46 +1697,43 @@ def project_velocity_timeseries_on_rt_plane(velocity, component,
     y = linspace(-r2, r2, num=numpoints)
     v = zeros([x.size, y.size])
 
-    #The phase decreases with time, for a function going as
-    #exp(k\cdot x - \omega t)
-    phase = -2*pi*velocity.time/velocity.period
-
-    #For each radial location, define an interpolation function
-    #to the velocity.
-    #Note that we have to reverse these arrays so the phase is in
-    #increasing order, otherwise the interpolation routines won't work
-    v_fit = {}
-
     if(component == 'vr'):
-        for i in range(velocity.r.size):
-            v_fit[i]= UnivariateSpline(phase[::-1],
-                                       velocity.vr[::-1, i],
-                                       k=3, s=0)
+        v_component = velocity.vr
     elif(component == 'vtheta'):
-        for i in range(velocity.r.size):
-            v_fit[i]= UnivariateSpline(phase[::-1],
-                                       velocity.vtheta[::-1, i],
-                                       k=3, s=0)
+        v_component = velocity.vtheta
     elif(component == 'vz'):
-        for i in range(velocity.r.size):
-            v_fit[i]= UnivariateSpline(phase[::-1],
-                                       velocity.vz[::-1, i],
-                                       k=3, s=0)
+        v_component = velocity.vz
     else:
         print "Unrecognized component. Must be 'vr', 'vtheta', or 'vz'."
         return False
     
 
-    #If we want to subtract off the axisymmetric component, find
-    #100 dummy velocities over the full range of the phases that will
-    #be plotted, and find the mean of this to be subtracted later.
+    #The phase decreases with time, for a function going as
+    #exp(k\cdot x - \omega t)
+    phase = -2.0*pi*velocity.time/velocity.period
+
+    #Define this function, so we can find the nearest phase measurement
+    #that we have for each desired phase.
+    #We know that this was created with a linear fit, so it should be easy.
+    b = phase[0]
+    m = (phase[-1] - b)/(phase.size-1)
+    minv = 1.0/m
+    def get_index_near_phase(desired_phase):
+        return rint((desired_phase-b)*minv)
+
+    #If we want to subtract off the axisymmetric component, take the 
+    #average of velocities over the full range of the phases that will
+    #be plotted, to be subtracted later.
     if(subtract_m0):
         mean = zeros(velocity.r.size)
-        dummyphases = linspace(-pi*velocity.m - mid_time*2*pi/velocity.period,
-                               pi*velocity.m - mid_time*2*pi/velocity.period,
-                               100)
+        phase_min = -pi*velocity.m - mid_time*2.0*pi/velocity.period
+        phase_max = pi*velocity.m - mid_time*2.0*pi/velocity.period
+        phase_min_idx = get_index_near_phase(phase_min)
+        phase_max_idx = get_index_near_phase(phase_max)
         for i in range(0, mean.size):
-            mean[i] = (v_fit[i](dummyphases)).mean()
+            #I flip the indices here because phase becomes more negative
+            #with time.
+            mean[i] = v_component[phase_max_idx:phase_min_idx, i].mean()
     
     #Note what appear to be flipped indices in vr and vt below. This
     #is so the call to contour(x, y, v) displays properly.
@@ -1752,13 +1749,14 @@ def project_velocity_timeseries_on_rt_plane(velocity, component,
                 azimuth = wrap_phase(math.atan2(y[j], x[i]) - plot_rotation)
                 desired_phase = (velocity.m*azimuth -
                                  mid_time*2*pi/velocity.period)
-                #Just do a nearest-neighbor thing in radius, since
-                #these are fairly fine-grained measurements in that
-                #dimension.
+
+                #Just do a nearest-neighbor thing in radius and phase,
+                #since these are fairly fine-grained measurements in
+                #these dimensions now.
                 ridx = velocity.get_index_near_radius(r)
-                #Now get the velocity from the azimuthal interpolation fit
-                #at that radius
-                v[j][i] = v_fit[ridx](desired_phase)
+                phaseidx = get_index_near_phase(desired_phase)
+                v[j][i] = v_component[phaseidx, ridx]
+
                 #And subtract off the axisymmetric component at that radius,
                 #if desired.
                 if(subtract_m0):
