@@ -1067,10 +1067,10 @@ def fit_frequency_channel(channel, idx, start_time, end_time,
     plsq = scipy.optimize.leastsq(residuals, p0, args=(velocity, time),
                                   full_output=1)
 
-    print "Amplitude = " + str(plsq[0][0]) + " +/- " + str(sqrt(plsq[1][0][0]))
-    print "Frequency = " + str(plsq[0][1]) + " +/- " + str(sqrt(plsq[1][1][1]))
-    print "Phase = " + str(plsq[0][2]) + " +/- " + str(sqrt(plsq[1][2][2]))
-    print "Offset = " + str(plsq[0][3]) + " +/- " + str(sqrt(plsq[1][3][3]))
+    print "Amplitude = %0.3g +/- %0.3g" % (plsq[0][0], sqrt(plsq[1][0][0]))
+    print "Frequency = %0.3g +/- %0.3g" % (plsq[0][1], sqrt(plsq[1][1][1]))
+    print "Phase = %0.3g +/- %0.3g" % (plsq[0][2], sqrt(plsq[1][2][2]))
+    print "Offset = %0.3g +/- %0.3g" % (plsq[0][3], sqrt(plsq[1][3][3]))
 
     fitted_time = linspace(time[0], time[-1], 200)
     fitted_amplitude = (plsq[0][0]*sin(2*pi*plsq[0][1]*fitted_time
