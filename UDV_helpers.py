@@ -1539,48 +1539,6 @@ def reconstruct_avg_velocities_nonaxisymmetric(r_data, t_data, profile_num, omeg
     return r, v_r, v_t
 
 
-def gen_vtheta_movie(filename, channel, omega2, primary_oscillation_start_time, primary_oscillation_end_time, start_time, end_time, desiredcells=200, rin=r1, filter_threshold=1000, background_subtract=0, derotate=0, maxv=10000, minv=-10000, max_diff_mean=10000, fps=10.0, speed=1.0, basedir='/tmp/abcd000', moviefilename='movie.avi'):
-
-    #To be sure fps isn't cast as an integer, screwing up later math.
-    fps = float(fps)
-
-    #First get the primary oscillation info
-    levels = plot_vtheta_mode(filename, channel, omega2, primary_oscillation_start_time, primary_oscillation_end_time, desiredcells=desiredcells, rin=rin, filter_threshold=filter_threshold, background_subtract=background_subtract, maxv=maxv, minv=minv, max_diff_mean=max_diff_mean)
-
-    #Now start assembling these frames
-    osc_period = primary_oscillation_end_time - primary_oscillation_start_time
-    num_frames = int((end_time - start_time)*fps/speed)
-
-    os.mkdir(basedir)
-    
-    for i in range(0, num_frames):
-        frame_start_time = start_time + i/(fps/speed)
-        frame_end_time = frame_start_time + osc_period
-
-        clf()
-        plot_vtheta_mode(filename, channel, omega2, frame_start_time, frame_end_time, desiredcells=desiredcells, rin=rin, filter_threshold=filter_threshold, background_subtract=background_subtract, derotate=derotate, maxv=maxv, minv=minv, max_diff_mean=max_diff_mean, levels=levels)
-        outputfile = basedir + '/' + str("%04d" % i) + '.png'
-        savefig(outputfile)
-        print 'Wrote file', outputfile
-
-    #Now compile into a movie
-    command = ('mencoder',
-               'mf://' + basedir + '/????.png',
-               '-mf',
-               'type=png:fps=' + str(fps),
-               '-ovc',
-               'lavc',
-               '-lavcopts',
-               'vcodec=mpeg4',
-               '-oac',
-               'copy',
-               '-o',
-               moviefilename)
-
-    subprocess.check_call(command)
-    shutil.rmtree(basedir)
-
-
 def plot_vtheta_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
                             minvelocity=nan, maxvelocity=nan,
                             nlevels=50):
