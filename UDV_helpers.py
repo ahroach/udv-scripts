@@ -1596,8 +1596,9 @@ def plot_vtheta_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
     ylim(-r2, r2)
     colorbar()
 
-def play_vtheta_mode_animation(velocity, start_time=nan, end_time=nan, rin=r1,
-                               rout=r2, fps=24, speed=1.0, savefilename='',
+def save_vtheta_mode_animation(velocity, savefilename, start_time=nan,
+                               end_time=nan, rin=r1,
+                               rout=r2, fps=24, speed=1.0,
                                minvelocity=nan, maxvelocity=nan,
                                numpoints=400, nlevels=50,
                                rotate_with_mode=0):
@@ -1626,25 +1627,26 @@ def play_vtheta_mode_animation(velocity, start_time=nan, end_time=nan, rin=r1,
     #If we want to rotate with the mode, set up an array of the rotation
     #angle corresponding to each time.
     if(rotate_with_mode):
-        rot_angles = -times*2.0*pi*velocity.m/velocity.period
+        rot_angles = -(times*2.0*pi*velocity.m/velocity.period % (2*pi))
     else:
         rot_angles = zeros(times.size)
 
     #Now do the transformations of all of the velocity fields, and stick
     #them in a list
-    vs = []
+    vs = zeros([times.size, numpoints, numpoints])
     print "Beginning to process frames"
     for i in range(0,times.size):
-        x, y, v = \
+        x, y, vs[i] = \
         project_velocity_timeseries_on_rt_plane(velocity, 'vtheta',
                                                 times[i], numpoints=numpoints,
                                                 rin=rin, rout=rout,
                                                 subtract_m0=1,
                                                 plot_rotation = rot_angles[i])
-        v.clip(minvelocity, maxvelocity)
-        vs.append(v)
+
         sys.stdout.write('\x1b[1A\x1b[2K\x1b[J')
-        print "%d of %d frames complete" % (i, times.size)
+        print "%d of %d arrays processed" % (i, times.size)
+
+    vs.clip(minvelocity, maxvelocity)
 
     #Now set everything up for the plots
     fig = figure(figsize=(6, 6), dpi=80)
@@ -1669,13 +1671,9 @@ def play_vtheta_mode_animation(velocity, start_time=nan, end_time=nan, rin=r1,
     ani = animation.FuncAnimation(fig, draw_contour, range(0,times.size),
                                   interval = 1000/fps, blit=False)
 
-    if(savefilename):
-        ani.save(savefilename, fps=fps)
+    ani.save(savefilename, fps=fps)
 
-    show()
-    #Won't display without an error. 
-    magic_squirrel()
-
+    del(ani)
     
 
 def project_velocity_timeseries_on_rt_plane(velocity, component,
