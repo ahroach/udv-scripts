@@ -932,7 +932,6 @@ def plot_power_spectrum_velocity(velocity, component, radius, start_time,
     semilogy(freq, power)
     xlabel("Freq [Hz]")
     ylabel("Power Spectrum")
-    legend()
     xlim(xmin=0.0)
     grid(b=1)
     
@@ -948,7 +947,7 @@ def plot_power_spectrum_velocity(velocity, component, radius, start_time,
                                 freqband_max)
     output1 = "Power in band = %0.5g at r = %0.3gcm, " % (pinband,
                                                           velocity.r[idx])
-    output2 = "Peak-to-peak velocity = %0.5gcm/sec" % (2*sqrt(pinband))
+    output2 = "Trough-to-peak velocity = %0.5gcm/sec" % (2*sqrt(pinband))
     print output1 + output2
 
 
