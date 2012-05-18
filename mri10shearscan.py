@@ -1,6 +1,6 @@
 from numpy import *
 from pylab import *
-numshots = 50
+numshots = 20
 
 shot = zeros(numshots)
 speed = zeros(numshots)
@@ -32,7 +32,7 @@ saturatedfrequency[i] = 0.39
 saturatedfrequencyerr[i] = 0.02
 freqband_min[i] = 0.28
 freqband_max[i] = 0.58
-saturatedpower[i] = 13.4408
+saturatedpower[i] = 25.728
 saturatedintervalstart[i] = 32 
 saturatedintervalstop[i] = 59
 timefieldon[i] = 20
@@ -49,7 +49,7 @@ saturatedfrequency[i] = 0.450
 saturatedfrequencyerr[i] = 0.01
 freqband_min[i] = 0.23
 freqband_max[i] = 0.67
-saturatedpower[i] = 37.813
+saturatedpower[i] = 73.902
 saturatedintervalstart[i] = 32 
 saturatedintervalstop[i] = 49
 timefieldon[i] = 20
@@ -66,7 +66,7 @@ saturatedfrequency[i] = 0.48
 saturatedfrequencyerr[i] = 0.10
 freqband_min[i] = 0.39
 freqband_max[i] = 0.63
-saturatedpower[i] = 0.06465
+saturatedpower[i] = 0.12453
 saturatedintervalstart[i] = 50 
 saturatedintervalstop[i] = 74
 timefieldon[i] = 20
@@ -117,7 +117,7 @@ saturatedfrequency[i] = 0.277
 saturatedfrequencyerr[i] = 0.02
 freqband_min[i] = 0.20
 freqband_max[i] = 0.35
-saturatedpower[i] = 5.41325
+saturatedpower[i] = 11.637
 saturatedintervalstart[i] = 50 
 saturatedintervalstop[i] = 69
 timefieldon[i] = 20
@@ -132,9 +132,9 @@ irspeed[i] = 140
 current[i] = 800
 saturatedfrequency[i] = 0.257
 saturatedfrequencyerr[i] = 0.02
-freqband_min[i] = 0.22
+freqband_min[i] = 0.17
 freqband_max[i] = 0.32
-saturatedpower[i] = 0.3334
+saturatedpower[i] = 0.7979
 saturatedintervalstart[i] = 55 
 saturatedintervalstop[i] = 69
 timefieldon[i] = 20
@@ -151,7 +151,7 @@ saturatedfrequency[i] = 0.465
 saturatedfrequencyerr[i] = 0.005
 freqband_min[i] = 0.40
 freqband_max[i] = 0.50
-saturatedpower[i] = 13.62497
+saturatedpower[i] = 25.118
 saturatedintervalstart[i] = 40 
 saturatedintervalstop[i] = 59
 timefieldon[i] = 20
@@ -169,7 +169,7 @@ saturatedfrequency[i] = 0.31
 saturatedfrequencyerr[i] = 0.01
 freqband_min[i] = 0.30
 freqband_max[i] = 0.40
-saturatedpower[i] = 1.2151
+saturatedpower[i] = 2.9192
 saturatedintervalstart[i] = 40 
 saturatedintervalstop[i] = 55
 timefieldon[i] = 20
@@ -186,7 +186,7 @@ saturatedfrequency[i] = 0.62
 saturatedfrequencyerr[i] = 0.01
 freqband_min[i] = 0.55
 freqband_max[i] = 0.70
-saturatedpower[i] = 66.8109
+saturatedpower[i] = 128.33
 saturatedintervalstart[i] = 35 
 saturatedintervalstop[i] = 49
 timefieldon[i] = 20
@@ -203,7 +203,7 @@ saturatedfrequency[i] = 0.30
 saturatedfrequencyerr[i] = 0.01
 freqband_min[i] = 0.25
 freqband_max[i] = 0.35
-saturatedpower[i] = 2.3233
+saturatedpower[i] = 4.1602
 saturatedintervalstart[i] = 30 
 saturatedintervalstop[i] = 49
 timefieldon[i] = 20
@@ -220,7 +220,7 @@ saturatedfrequency[i] = 0.71
 saturatedfrequencyerr[i] = 0.01
 freqband_min[i] = 0.65
 freqband_max[i] = 0.80
-saturatedpower[i] = 81.261
+saturatedpower[i] = 123.51
 saturatedintervalstart[i] = 30 
 saturatedintervalstop[i] = 39
 timefieldon[i] = 20
@@ -237,7 +237,7 @@ saturatedfrequency[i] = 0.28
 saturatedfrequencyerr[i] = 0.01
 freqband_min[i] = 0.20
 freqband_max[i] = 0.40
-saturatedpower[i] = 5.350
+saturatedpower[i] = 9.0627
 saturatedintervalstart[i] = 30 
 saturatedintervalstop[i] = 39
 timefieldon[i] = 20
@@ -254,7 +254,7 @@ saturatedfrequency[i] = 0.456
 saturatedfrequencyerr[i] = 0.01
 freqband_min[i] = 0.35
 freqband_max[i] = 0.60
-saturatedpower[i] = 31.105
+saturatedpower[i] = 71.254
 saturatedintervalstart[i] = 32 
 saturatedintervalstop[i] = 39
 timefieldon[i] = 20
@@ -288,7 +288,7 @@ saturatedfrequency[i] = 0.39
 saturatedfrequencyerr[i] = 0.05
 freqband_min[i] = 0.35
 freqband_max[i] = 0.55
-saturatedpower[i] = 3.35407
+saturatedpower[i] = 6.5673
 saturatedintervalstart[i] = 40 
 saturatedintervalstop[i] = 59
 timefieldon[i] = 20
@@ -304,15 +304,16 @@ current[i] = 1200
 saturatedfrequency[i] = 0.54
 saturatedfrequencyerr[i] = 0.03
 freqband_min[i] = 0.45
-freqband_max[i] = 0.55
-saturatedpower[i] = 18.3904
+freqband_max[i] = 0.65
+saturatedpower[i] = 41.484
 saturatedintervalstart[i] = 40 
-saturatedintervalstop[i] = 39
+saturatedintervalstop[i] = 49
 timefieldon[i] = 20
 timesaturated[i] = 40
 timefieldoff[i] = 50
 saturatedshear[i] = -2.62309
 
+#Just go out to 32 seconds. A little wacky after that.
 i=17
 shot[i] = 1055
 speed[i] = 400
@@ -322,9 +323,9 @@ saturatedfrequency[i] = 0.88
 saturatedfrequencyerr[i] = 0.05
 freqband_min[i] = 0.70
 freqband_max[i] = 1.0
-saturatedpower[i] = 84.462
+saturatedpower[i] = 240.62
 saturatedintervalstart[i] = 25 
-saturatedintervalstop[i] = 39
+saturatedintervalstop[i] = 32
 timefieldon[i] = 20
 timesaturated[i] = 25
 timefieldoff[i] = 40
@@ -376,7 +377,7 @@ eta = 2.43e3 #Magnetic diffusivity in cm^2/sec
 
 def plot_amplitudes():
     mrized_data = get_data()
-    scatter(mrized_data['irspeed']*2.0*pi/60, mrized_data['current']*2.8669, mrized_data['saturatedpower']*20, label='_nolegend_')
+    scatter(mrized_data['irspeed']*2.0*pi/60, mrized_data['current']*2.8669, mrized_data['saturatedpower']*10, label='_nolegend_')
     xlabel("IR Speed [rad/sec]")
     ylabel("B [Gauss]")
     title("$P_{fundamental}$")
@@ -386,7 +387,7 @@ def plot_amplitudes():
 
 def plot_amplitudes_shear():
     mrized_data = get_data()
-    scatter(-mrized_data['saturatedshear'], mrized_data['current']*2.8669, mrized_data['saturatedpower']*30, label='_nolegend_')
+    scatter(-mrized_data['saturatedshear'], mrized_data['current']*2.8669, mrized_data['saturatedpower']*15, label='_nolegend_')
     xlabel("Saturated shear, 12-16cm [rad/cm*sec]")
     ylabel("B [Gauss]")
     title("$P_{fundamental}$")
