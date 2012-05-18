@@ -164,7 +164,7 @@ class ChannelData:
         from Shot.__init__().'''
 
         if(not(shot.channels_used.__contains__(channel_num))):
-            print "Error: Shot %d doesn't use channel %d" % (shot_num,
+            print "Error: Shot %d doesn't use channel %d" % (shot.number,
                                                              channel_num)
             return False
 
@@ -187,7 +187,7 @@ class ChannelData:
         params = sp.shot_params[shot.number]
         
         if(params.__contains__('trouble_flag')):
-            print "Shot %d has trouble_flag set. Check notebook." % shot_num
+            print "Shot %d has trouble_flag set. Check notebook." % shot.number
 
         #Pick out the transducer mounting parameters to correspond to this
         #channel
