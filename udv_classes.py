@@ -80,12 +80,29 @@ class Shot:
 
     def del_channel(self, channel_num):
         '''Delete a channel and associated velocity objects.
+        
+        Note that this is a rather destructive action, since it also
+        wipes out all velocity objects that used that channel, so it
+        should be used with caution.'''
+        
+        #First get rid of all of the velocity objects that use this channel.
+        self.del_velocities_derived_from_channel(channel_num)
+        
+        #Now that we've done that, get rid of the channel
+        self.channels.pop(channel_num)
+    
+    def del_velocities_derived_from_channel(self, channel_num):
+        """Delete velocity objects associated with a channel
 
-        Note that this is a rather destructive action, since it wipes
-        out all velocity objects that used that channel, so it should
-        be used with caution.'''
+        Gets rid of all velocity objects that were derived from a
+        certain channel. This is useful if we want to change some
+        aspect of the channel, like the transducer angle if we've
+        found a better calibration, or the threshold used to unwrap
+        the velocity, and we want to be sure that none of the velocity
+        objects that use the old definitions will still be around."""
+        
         velocities_to_be_removed = []
-        #First check all of the velocity objects to see if this channel
+        #Check all of the velocity objects to see if this channel
         #is used in its progenitors. If so, get rid of it.
         for velocity in self.velocities:
             for progenitor in velocity.progenitors:
@@ -93,9 +110,6 @@ class Shot:
                     velocities_to_be_removed.append(velocity)
         for velocity in velocities_to_be_removed:
             self.velocities.remove(velocity)
-        
-        #Now that we've done that, get rid of the channel
-        self.channels.pop(channel_num)
     
     def get_velocity(self, channel_nums, m=0, period=0):
         '''Returns a Velocity object produced using the specified
