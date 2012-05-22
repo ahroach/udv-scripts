@@ -543,16 +543,16 @@ class Velocity():
         for i in range (0, self.time.size):
             if(use_ch1_r):
                 ch1_v[i,:] = ch1.unwrapped_velocity[i,0:ch1_last_idx][::-1]
-                tck = scipy.interpolate.splrep(ch2.r[0:ch2_last_idx][::-1],
-                                               ch2.unwrapped_velocity[i,0:ch2_last_idx][::-1],
-                                               s=0)
-                ch2_v[i,:] = scipy.interpolate.splev(self.r, tck, der=0)
+                f = UnivariateSpline(ch2.r[0:ch2_last_idx][::-1],
+                                     ch2.unwrapped_velocity[i,0:ch2_last_idx][::-1],
+                                     k=3, s=0)
+                ch2_v[i,:] = f(self.r)
             else:
                 ch2_v[i,:] = ch2.unwrapped_velocity[i,0:ch2_last_idx][::-1]
-                tck = scipy.interpolate.splrep(ch1.r[0:ch1_last_idx][::-1],
-                                               ch1.unwrapped_velocity[i,0:ch1_last_idx][::-1],
-                                               s=0)
-                ch1_v[i,:] = scipy.interpolate.splev(self.r, tck, der=0)
+                f = UnivariateSpline(ch1.r[0:ch1_last_idx][::-1],
+                                     ch1.unwrapped_velocity[i,0:ch1_last_idx][::-1],
+                                     k=3, s=0)
+                ch1_v[i,:] = f(self.r)
 
         #Now define a matrix for doing the transformations.
         #v = T \cdot v_measured
