@@ -156,7 +156,8 @@ class ChannelData:
         self.shot = shot
         
         #Read in the data from the UDV file
-        data = rudv.read_ultrasound(shot.filename, channel_num)
+        data = rudv.read_ultrasound(shot.filename, channel_num,
+                                    verbose=0)
 
         self.velocity = data['velocity']
         self.echo = data['echo']

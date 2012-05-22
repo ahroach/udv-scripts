@@ -2,7 +2,7 @@ import os
 from pylab import *
 from scipy import *
 
-def read_ultrasound(filename, channel):
+def read_ultrasound(filename, channel, verbose=1):
     #UDOP constants:
     Data_Type_Velocity = 0
     Data_Type_Echo = 1
@@ -53,7 +53,8 @@ def read_ultrasound(filename, channel):
     #Read the comment block
     fid.seek(16, 0)
     comment = fromfile(fid, dtype='|S510', count=1)[0]
-    print comment
+    if(verbose):
+        print comment
 
     #Define the number of used channels
     Mpx_Mode = udv_params(fid, 1, 52)
@@ -64,7 +65,8 @@ def read_ultrasound(filename, channel):
     if Mpx_Mode & 2 > 0:
         multiplexer_mode = 1
         First_Ch = int(Mpx_Mode / 65536) #First channel in the sequence
-        print "First Channel: " + str(First_Ch)
+        if (verbose):
+            print "First Channel: " + str(First_Ch)
         jt = 1 << (First_Ch + 3)
         for i in range(1, 10):
             jt = jt << 1
@@ -75,7 +77,8 @@ def read_ultrasound(filename, channel):
         #Now verify that the requested channel exists.
         channel_found = 0
         fid.seek(Ofs_Data)
-        print "Number of channels used: " + str(Nb_Used_Channels)
+        if (verbose):
+            print "Number of channels used: " + str(Nb_Used_Channels)
         for i in range(1, Nb_Used_Channels + 1):
             if Get_No_Channel(fid) == channel:
                 channel_found = 1
@@ -211,7 +214,8 @@ def read_ultrasound(filename, channel):
         else:
             N = fromfile(fid, dtype='uint16', count=1)[0] #Num of bytes in profile
             fid.seek(N-2,1)
-    print str(profile_number) + " profiles read"
+    if(verbose):
+        print str(profile_number) + " profiles read"
 
     #Convert from the Doppler frequency to velocity in cm/s
     

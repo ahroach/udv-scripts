@@ -42,20 +42,6 @@ def filter_velocity(velocity, filter_threshold):
     return velocity
 
 
-def show_logs(start_file, end_file):
-    allfiles = glob.glob('*.BDD')
-    files=[]
-    for file in allfiles:
-        if (file >= start_file) and (file <= end_file):
-            files.append(file)
-
-    files = sort(files)
-
-    for file in files:
-        print file
-        usound_data = rudv.read_ultrasound(file, 0)
-        print     
-
 def plot_channel_velocity(channel, start_num, end_num, unwrapped=0,
                           labelstring="", time=0):
     '''Plots the velocity measured by a specified channel. start_num
