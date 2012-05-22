@@ -103,11 +103,13 @@ class Shot:
         
         velocities_to_be_removed = []
         #Check all of the velocity objects to see if this channel
-        #is used in its progenitors. If so, get rid of it.
+        #is used in its progenitors. If so, add it to the list of
+        #objects that we're going to get rid of.
         for velocity in self.velocities:
-            for progenitor in velocity.progenitors:
-                if (progenitor.channel == channel_num):
-                    velocities_to_be_removed.append(velocity)
+            if(velocity.used_channel(channel_num)):
+                velocities_to_be_removed.append(velocity)
+
+        #Now get rid of all of those objects.
         for velocity in velocities_to_be_removed:
             self.velocities.remove(velocity)
     
@@ -120,17 +122,11 @@ class Shot:
         #return it
 
         for velocity in self.velocities:
-            #First make a list of the channel numbers from all of the
-            #progenitor ChannelData objects for this Velocity object
-            progenitor_list = list()
-            for progenitor in velocity.progenitors:
-                progenitor_list.append(progenitor.channel)
-
-            #Now check to see if these channels match the channel_nums, and
+            #Now check to see if the progenitor channels the channel_nums, and
             #that m also matches. If m!=0, also check to make sure that
-            #the period times match.
-            progenitor_list.sort()
-            if ((progenitor_list == channel_nums) and
+            #the period times match. If all that checks out, return this
+            #velocity.
+            if ((velocity.get_progenitor_channels() == channel_nums) and
                 (velocity.m == m) and
                 ((m==0) or (velocity.period == period))):
                 return velocity
@@ -149,7 +145,6 @@ class Shot:
                 print "Error: Shot %d doesn't use channel %d." % (self.number,
                                                                   channel_num)
                 return False
-
         
         self.velocities.append(Velocity(self, channel_nums, m, period))
         return self.velocities[-1]
@@ -777,7 +772,7 @@ class Velocity():
         specified radius'''
         return abs(self.r - radius).argmin()
     
-    def list_progenitors(self):
+    def list_progenitor_params(self):
         '''List information about the channels that were combined to
         create a Velocity object.'''
         num_progenitors = len(self.progenitors)
@@ -788,6 +783,26 @@ class Velocity():
                                                progenitor.A,
                                                progenitor.B,
                                                progenitor.port)
+
+    def get_progenitor_channels(self):
+        """Return a list of the channel numbers used to make a
+        Velocity object."""
+        
+        progenitor_channels = []
+        for progenitor in self.progenitors:
+            progenitor_channels.append(progenitor.channel)
+        progenitor_channels.sort()
+        return progenitor_channels
+    
+    def used_channel(self, channel_num):
+        """Boolean function that evaluates whether a specified
+        channel_num was used to form this velocity."""
+
+        #Check to see if this channel is present in our progenitors
+        if self.get_progenitor_channels().__contains__(channel_num):
+            return True
+        else:
+            return False
 
 class CouetteProfile():
     def __init__(self, shot):
