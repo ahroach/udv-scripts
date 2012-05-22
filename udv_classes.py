@@ -626,8 +626,8 @@ class Velocity():
         #changes to the data in these things to pass to
         #gen_velocity_two_transducers(), but we of course don't want to
         #modify the original channels.
-        tempch1 = deepcopy(ch1.duplicate)
-        tempch2 = deepcopy(ch2.duplicate)
+        tempch1 = deepcopy(ch1)
+        tempch2 = deepcopy(ch2)
         
         #Due to the shifted azimuthal location of each measurement, each
         #measurement at the same time along the UDV beam is at a different
@@ -646,10 +646,13 @@ class Velocity():
         #Also, choose a dt such that m*period/dt = 200. We're upsampling
         #here so that when we go to plot this on the r-theta plane,
         #we have an easier time of it.
+        
+        #@3 2ill use a common time base for both channels
         dt = self.m*self.period/200
         time_buffer = self.m*self.period/2
-        tempchannel.time = arange(tempchannel.time[0] + time_buffer,
-                                  tempchannel.time[-1] - time_buffer, dt)
+        tempch1.time = np.arange(tempch1.time[0] + time_buffer,
+                                 tempch1.time[-1] - time_buffer, dt)
+        tempch2.time = tempch1.time.copy()
 
         #Now reset the velocity structures in each temp channel to zeros
         #of the appropriate size: Same number of spatial points, shorter
