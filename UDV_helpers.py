@@ -830,6 +830,25 @@ def plot_vtheta_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
     ylim(-r2, r2)
     colorbar()
 
+
+def plot_vr_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
+                        minvelocity=nan, maxvelocity=nan,
+                        nlevels=50):
+    '''Simply plot the structure of a nonaxisymmetric vr mode,
+    without the axisymmetric background.'''
+    x, y, v = project_velocity_timeseries_on_rt_plane(velocity, 'vr',
+                                                      mid_time, numpoints=400,
+                                                      rin=rin, rout=rout,
+                                                      subtract_m0=1,
+                                                      plot_rotation=0)
+    
+    contourf(x, y, v.clip(minvelocity, maxvelocity), nlevels)
+    axis('equal')
+    xlim(-r2, r2)
+    ylim(-r2, r2)
+    colorbar()
+
+
 def save_vtheta_mode_animation(velocity, filename, start_time=nan,
                                end_time=nan, rin=r1,
                                rout=r2, fps=24, speed=1.0,
