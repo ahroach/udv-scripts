@@ -3,7 +3,7 @@ from scipy.interpolate import UnivariateSpline
 from copy import deepcopy
 import shot_params as sp
 import shot_db_ops as sdo
-from numpy import *
+import numpy as np
 
 '''Provides Shot, Channel, and Velocity objects to be used in processing
 UDV data. Also provides get_shot() (and the associated add_shot()) and
@@ -225,7 +225,7 @@ class ChannelData:
         '''Adds the unwrapped velocity to the channel information using
         the specified threshold.'''
         #Add the unwrapped velocity to the channel information
-        self.unwrapped_velocity = zeros(self.velocity.shape)
+        self.unwrapped_velocity = np.zeros(self.velocity.shape)
         self.unwrap_threshold = threshold
     
         maxvelocity = self.maxvelocity
@@ -235,7 +235,7 @@ class ChannelData:
             #from the face of the transducer to the current radius. Iterate
             #along, adding one when we jump 2\pi, and subtracting one when
             #we go back the other way.
-            wraps = zeros(self.spatial_points)
+            wraps = np.zeros(self.spatial_points)
             for i in range(10, self.spatial_points):
                 if (self.velocity[j, i] -
                     self.velocity[j, i-1]) < -threshold*maxvelocity:
@@ -255,7 +255,7 @@ class ChannelData:
     def calculate_radius(self):
         '''Calculate the radial location of the measured points'''
         d = self.depth - self.offset
-        self.r = zeros(self.depth.size)
+        self.r = np.zeros(self.depth.size)
 
         sinA = sin(degstorads(self.A))
         cosA = cos(degstorads(self.A))
@@ -266,7 +266,7 @@ class ChannelData:
     def calculate_azimuth(self):
         '''Calculate the azimuthal location of the measured points'''
         d = self.depth - self.offset
-        self.azimuth = zeros(self.depth.size)
+        self.azimuth = np.zeros(self.depth.size)
         azimuthoffset = sp.ports[self.port]['theta']
 
         sinA = sin(degstorads(self.A))
@@ -282,7 +282,7 @@ class ChannelData:
     def calculate_height(self):
         '''Calculate the height of the measured points'''
         d = self.depth - self.offset
-        self.z = zeros(self.depth.size)
+        self.z = np.zeros(self.depth.size)
         
         zoffset = sp.ports[self.port]['z']
         
@@ -382,20 +382,20 @@ class Velocity():
             (channel.A == 90)):
             #This thing is just pointed vertically, so just use the unwrapped
             #velocity and the the position from the original channel
-            self.vr = ones(channel.unwrapped_velocity.shape)*nan
-            self.vtheta = ones(channel.unwrapped_velocity.shape)*nan
+            self.vr = np.ones(channel.unwrapped_velocity.shape)*nan
+            self.vtheta = np.ones(channel.unwrapped_velocity.shape)*nan
             self.vz = channel.unwrapped_velocity/cos(degstorads(channel.B))
         elif (channel.A == 0):
             #In the unlikely event that we got this dead on in the radial
             #direction
             self.vr = -1.0*channel.unwrapped_velocity
-            self.vtheta = ones(channel.unwrapped_velocity.shape)*nan
-            self.vz = ones(channel.unwrapped_velocity.shape)*nan
+            self.vtheta = np.ones(channel.unwrapped_velocity.shape)*nan
+            self.vz = np.ones(channel.unwrapped_velocity.shape)*nan
         else:
             #Otherwise, just assume the velocity is in the azimuthal direction
-            self.vr = ones(channel.unwrapped_velocity.shape)*nan
-            self.vtheta = zeros(channel.unwrapped_velocity.shape)
-            self.vz = ones(channel.unwrapped_velocity.shape)*nan
+            self.vr = np.ones(channel.unwrapped_velocity.shape)*nan
+            self.vtheta = np.zeros(channel.unwrapped_velocity.shape)
+            self.vz = np.ones(channel.unwrapped_velocity.shape)*nan
 
             sinA = sin(degstorads(channel.A))
             cosA = cos(degstorads(channel.A))
@@ -404,7 +404,7 @@ class Velocity():
             d = channel.depth - channel.offset
 
             #Calculate the the correction factor needed at each radius
-            anglefactor = zeros(self.r.size)
+            anglefactor = np.zeros(self.r.size)
             
             for i in range(0, self.r.size):
                 anglefactor[i] = (sqrt(1-sinA**2*cosB**2)*
@@ -461,16 +461,16 @@ class Velocity():
         #we have an easier time of it.
         dt = self.m*self.period/200
         time_buffer = self.m*self.period/2
-        tempchannel.time = arange(tempchannel.time[0] + time_buffer,
-                                  tempchannel.time[-1] - time_buffer, dt)
+        tempchannel.time = np.arange(tempchannel.time[0] + time_buffer,
+                                     tempchannel.time[-1] - time_buffer, dt)
 
         #Now reset the velocity structures in each temp channel to zeros
         #of the appropriate size: Same number of spatial points, shorter
         #time base.
-        tempchannel.velocity = zeros([len(tempchannel.time),
-                                      len(tempchannel.depth)])
-        tempchannel.unwrapped_velocity = zeros([len(tempchannel.time),
-                                                len(tempchannel.depth)])
+        tempchannel.velocity = np.zeros([len(tempchannel.time),
+                                         len(tempchannel.depth)])
+        tempchannel.unwrapped_velocity = np.zeros([len(tempchannel.time),
+                                                   len(tempchannel.depth)])
 
         #Now go through each position of each of these velocity structures,
         #make a fit, and interpolate onto the new time structure.
@@ -493,7 +493,7 @@ class Velocity():
         
         #Just for good form, reset the azimuth in both cases to zero, since
         #we have effectively put every measurement at the same azimuth.
-        tempchannel.azimuth = zeros(len(tempchannel.depth))
+        tempchannel.azimuth = np.zeros(len(tempchannel.depth))
         
         #Okay, pass the channel to gen_velocity_one_transducer().
         self.gen_velocity_one_transducer(tempchannel)
@@ -523,17 +523,17 @@ class Velocity():
         
         #With two transducers, it's less clear what the z and azimuth
         #coordinates should be. Just make them nans.
-        self.z = ones(self.r.size)*nan
-        self.azimuth = ones(self.r.size)*nan
+        self.z = np.ones(self.r.size)*nan
+        self.azimuth = np.ones(self.r.size)*nan
 
         
-        self.vr = zeros((self.time.size, self.r.size))
-        self.vtheta = zeros((self.time.size, self.r.size))
-        self.vz = ones((self.time.size, self.r.size))*nan
+        self.vr = np.zeros((self.time.size, self.r.size))
+        self.vtheta = np.zeros((self.time.size, self.r.size))
+        self.vz = np.ones((self.time.size, self.r.size))*nan
 
         #Set up some temporary arrays to store the velocities
-        ch1_v = zeros((self.time.size, self.r.size))
-        ch2_v = zeros((self.time.size, self.r.size))
+        ch1_v = np.zeros((self.time.size, self.r.size))
+        ch2_v = np.zeros((self.time.size, self.r.size))
 
         #Now interpolate and resample the velocity onto the same radial grid,
         #again keeping in mind that we need to reverse these arrays as inputs
@@ -580,7 +580,7 @@ class Velocity():
         alpha1 = arctan(sinA1*sinB1/cosA1)
         alpha2 = arctan(sinA2*sinB2/cosA2)
 
-        T = zeros([2,2])
+        T = np.zeros([2,2])
 
         for i in range(0, self.r.size):
             r = self.r[i]
@@ -603,7 +603,7 @@ class Velocity():
 
             #Now invert the matrix so we can apply it to the measured
             #velocities
-            Tinv = linalg.inv(T)
+            Tinv = np.linalg.inv(T)
 
             #Now cycle through every time point at this radius,
             #and dot the inverted transformation matrix into the
@@ -657,12 +657,12 @@ class Velocity():
         #Now reset the velocity structures in each temp channel to zeros
         #of the appropriate size: Same number of spatial points, shorter
         #time base.
-        tempch1.velocity = zeros([len(tempch1.time), len(tempch1.depth)])
-        tempch2.velocity = zeros([len(tempch2.time), len(tempch2.depth)])
-        tempch1.unwrapped_velocity = zeros([len(tempch1.time),
-                                            len(tempch1.depth)])
-        tempch2.unwrapped_velocity = zeros([len(tempch2.time),
-                                            len(tempch2.depth)])
+        tempch1.velocity = np.zeros([len(tempch1.time), len(tempch1.depth)])
+        tempch2.velocity = np.zeros([len(tempch2.time), len(tempch2.depth)])
+        tempch1.unwrapped_velocity = np.zeros([len(tempch1.time),
+                                               len(tempch1.depth)])
+        tempch2.unwrapped_velocity = np.zeros([len(tempch2.time),
+                                               len(tempch2.depth)])
 
         #Now go through each position of each of these velocity structures,
         #make a fit, and interpolate onto the new time structure.
@@ -701,8 +701,8 @@ class Velocity():
         
         #Just for good form, reset the azimuth in both cases to zero, since
         #we have effectively put every measurement at the same azimuth.
-        tempch1.azimuth = zeros(len(tempch1.depth))
-        tempch2.azimuth = zeros(len(tempch2.depth))
+        tempch1.azimuth = np.zeros(len(tempch1.depth))
+        tempch2.azimuth = np.zeros(len(tempch2.depth))
         
         #Okay, pass these channels to gen_velocity_two_transducers().
         self.gen_velocity_two_transducers(tempch1, tempch2)
@@ -735,8 +735,8 @@ class Velocity():
 class CouetteProfile():
     def __init__(self, shot):
         self.shot = shot
-        self.r = linspace(r1, r2, 200)
-        self.vtheta = zeros(self.r.size)
+        self.r = np.linspace(r1, r2, 200)
+        self.vtheta = np.zeros(self.r.size)
         v1 = rpmtorads(shot.ICspeed)*r1
         v2 = rpmtorads(shot.OCspeed)*r2
         self.a = (v1*r1 - v2*r2)/(r1**2 - r2**2)
