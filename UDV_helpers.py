@@ -799,7 +799,7 @@ def reconstruct_avg_velocities_nonaxisymmetric(r_data, t_data, profile_num, omeg
         A[1,1] = sinalpha_t
         B = linalg.inv(A)
         v_meas = [r_resampled[i], t_profile[i]]
-        v_actual = dot(B, v_meas)
+        v_actual = np.dot(B, v_meas)
         v_r[i] = v_actual[0]
         #Just find v_t based on azimuthal transducer.  In other words,
         #pretend that v_r is zero to avoid the noise of the radial transducer.

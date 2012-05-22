@@ -631,9 +631,9 @@ class Velocity():
             #and dot the inverted transformation matrix into the
             #measurements to find v_r and v_theta
             for j in range(0, self.time.size):
-                [self.vr[j,i], self.vtheta[j,i]] = dot(Tinv,
-                                                       [ch1_v[j,i],
-                                                       ch2_v[j,i]])
+                [self.vr[j,i], self.vtheta[j,i]] = np.dot(Tinv,
+                                                          [ch1_v[j,i],
+                                                           ch2_v[j,i]])
                 #Add the azimuthal velocity offset due to the transducer
                 #motion to find the velocity in the lab frame.
                 self.vtheta[j,i] = (self.vtheta[j,i] +
