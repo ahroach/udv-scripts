@@ -1,3 +1,18 @@
+"""Provides a number of routines for plotting and analyzing UDV data
+
+When a channel or velocity is required as input to a routine, it is
+referring to a Channel or Velocity object as defined in
+udv_classes.py. The get_shot() method also in udv_classes.py is the
+best way to get a Shot object, and the get_channel() or get_velocity()
+methods of the Shot object should be used to get the appropriate
+Channel or Velocity object. As an example, we might run
+
+from udv_classes import get_shot
+plot_avg_vtheta_profile(get_shot(852).get_velocity((1,2)), 100, 150)
+
+to plot the average vtheta obtained from combining channels 1 and 2
+from shot 852."""
+
 import math
 import cmath
 import scipy
@@ -30,16 +45,16 @@ def wrap_phase(angle):
     return angle
 
 
-def filter_velocity(velocity, filter_threshold):
+def filter_velocity(data, filter_threshold):
     '''Provides a simple filter for outliers in a velocity vector'''
 
-    for i in range(5, velocity.size):
-        if abs(velocity[i] - 0.2*(velocity[i-1] + velocity[i-2] + 
-                                  velocity[i-3] + velocity[i-4] + 
-                                  velocity[i-5])) > filter_threshold:
-            velocity[i] = velocity[i-1]
+    for i in range(5, data.size):
+        if abs(data[i] - 0.2*(data[i-1] + data[i-2] + 
+                              data[i-3] + data[i-4] + 
+                              data[i-5])) > filter_threshold:
+            data[i] = data[i-1]
 
-    return velocity
+    return data
 
 
 def plot_channel_velocity(channel, start_num, end_num, unwrapped=0,
@@ -63,25 +78,26 @@ def plot_channel_velocity(channel, start_num, end_num, unwrapped=0,
                                    channel.time[end_num])  
 
 
-def plot_single_vtheta_profile(vel_obj, profile_num):
+def plot_single_vtheta_profile(velocity, profile_num):
     '''Plot a single azimuthal velocity profile for a velocity object.'''
-    label_str = str(vel_obj.shot.number) +": t="+str(vel_obj.time[profile_num])
+    label_str = "Shot %d: t=%0.3g" % (velocity.shot.number,
+                                      velocity.time[profile_num])
 
-    plot(vel_obj.r, vel_obj.vtheta[profile_num,:], label=label_str)
-    plot(vel_obj.shot.idealcouette.r, vel_obj.shot.idealcouette.vtheta)
+    plot(velocity.r, velocity.vtheta[profile_num,:], label=label_str)
+    plot(velocity.shot.idealcouette.r, velocity.shot.idealcouette.vtheta)
 
 
-def plot_avg_vtheta_profile(vel_obj, start_num, end_num):
+def plot_avg_vtheta_profile(velocity, start_num, end_num):
     '''Plot the average azimuthal velocity profile for a Velocity object,
     from the specified start index to the end index.'''
-    label_str = "%d: Avg from t=%.3g to t=%.3g" % (vel_obj.shot.number,
-                                                   vel_obj.time[start_num],
-                                                   vel_obj.time[end_num])
+    label_str = "%d: Avg from t=%.3g to t=%.3g" % (velocity.shot.number,
+                                                   velocity.time[start_num],
+                                                   velocity.time[end_num])
 
-    plot(vel_obj.r,
-         mean(vel_obj.vtheta[start_num:end_num, :], axis=0),
+    plot(velocity.r,
+         mean(velocity.vtheta[start_num:end_num, :], axis=0),
          label = label_str)
-    plot(vel_obj.shot.idealcouette.r, vel_obj.shot.idealcouette.vtheta)
+    plot(velocity.shot.idealcouette.r, velocity.shot.idealcouette.vtheta)
 
 
 def plot_channel_velocity_contour(channel, unwrapped=0, n=30):
