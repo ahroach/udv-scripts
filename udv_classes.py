@@ -818,40 +818,41 @@ class CouetteProfile():
             self.vtheta[i] = self.a*self.r[i] + self.b/self.r[i]
 
 
-shots=[]
-    
-def get_shot(shot_num):
-    '''Returns a Shot object for the specified shot number.'''
-    
-    #Check to see if we've created this shot before, and, if so,
-    #return it
-    for shot in shots:
-        if (shot.number == shot_num):
+class ShotList():
+    def __init__(self):
+        self.shots = []
+
+    def get_shot(self, shot_num):
+        """Returns a Shot object for the specified shot number."""
+
+        #Check to see if we've created this shot before, and, if so,
+        #return it
+        for shot in self.shots:
+            if (shot.number == shot_num):
+                return shot
+
+        #Looks like we don't have it yet, so let's add it.
+        return self.add_shot(shot_num)
+
+    def add_shot(self, shot_num):
+        """Adds and returns a Shot object for the specified shot number."""
+        
+        #Try to create this shot, checking to make sure that Shot.__init__
+        #doesn't return False.
+        shot = Shot(shot_num)
+        if(shot):
+            self.shots.append(shot)
             return shot
     
-    #I guess we didn't find a shot that fits the bill. So let's add one.
-    return add_shot(shot_num)
-
-def add_shot(shot_num):
-    '''Adds and returns a Shot object for the specified shot number.'''
-    
-    #Try to create this shot, checking to make sure that Shot.__init__
-    #doesn't return False.
-    shot = Shot(shot_num)
-    if(shot):
-        shots.append(shot)
-        return shot
-
-def del_shot(shot_num):
-    '''Deletes Shot objects for the specified shot number.'''
-    
-    for shot in shots:
-        if (shot.number == shot_num):
-            shots.remove(shot)
-
+    def del_shot(self, shot_num):
+        """Deletes Shot object from the list for the specified shot number."""
+        
+        for shot in self.shots:
+            if (shot.number == shot_num):
+                self.shots.remove(shot)
 
 def wrap_phase(angle):
-    '''Make phase fit in the range -pi to pi.'''
+    """Make phase fit in the range -pi to pi."""
     while (angle > math.pi):
         angle = angle - 2.0*math.pi
 

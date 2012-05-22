@@ -7,8 +7,9 @@ best way to get a Shot object, and the get_channel() or get_velocity()
 methods of the Shot object should be used to get the appropriate
 Channel or Velocity object. As an example, we might run
 
-from udv_classes import get_shot
-plot_avg_vtheta_profile(get_shot(852).get_velocity((1,2)), 100, 150)
+import udv_classes
+shot = udv_classes.ShotList().get_shot
+plot_avg_vtheta_profile(shot(852).get_velocity((1,2)), 100, 150)
 
 to plot the average vtheta obtained from combining channels 1 and 2
 from shot 852."""
