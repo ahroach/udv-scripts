@@ -1091,14 +1091,20 @@ def play_channel_velocity_animation(channel, speed=1.0,
     magic_squirrel()
 
 
-def play_two_component_velocity_animation(velocity, speed=1.0, rlim=0.0,
-                                          saveoutput=0, savefilename=''):
-    '''Plays an animation of the v_r and v_theta velocity components from
-    the specified Velocity object. If saveoutput=1 is specified and a
-    filename is given, an mpeg4 movie will be written. Note that this
-    requires having ffmpeg in the path somewhere. Consider adding a symlink
-    to avconv if appropriate for your system.'''
+def play_two_component_velocity_animation(velocity, speed=1.0,
+                                          rlim=0.0, fps=24.0,
+                                          saveoutput=0,
+                                          savefilename=''):
+
+    '''Plays an animation of the v_r and v_theta velocity components
+    from the specified Velocity object. If saveoutput=1 is specified
+    and a filename is given, an mpeg4 movie will be written. Note that
+    this requires having ffmpeg in the path somewhere. Consider adding
+    a symlink to avconv if appropriate for your system.'''
     dt = (velocity.time[1]-velocity.time[0])/speed
+    if (dt < 1.0/fps):
+        #The time sampling rate is larger than we actually need for the movie.
+        dt = 1.0/fps
 
     rlim_idx = velocity.get_index_near_radius(rlim)
     
@@ -1113,7 +1119,7 @@ def play_two_component_velocity_animation(velocity, speed=1.0, rlim=0.0,
                                 velocity.vr[:,rlim_idx:].max()))
 
     ylabel(r"$v_r$ [cm/sec]")
-    xlabel("Depth [cm]")
+    xlabel("r [cm]")
 
     ax1.grid()
     ax2.grid()
@@ -1133,15 +1139,18 @@ def play_two_component_velocity_animation(velocity, speed=1.0, rlim=0.0,
         time_text.set_text('')
         return line1, line2, time_text
     
-    def draw_velocities(i):
-        line1.set_data(velocity.r[rlim_idx:], velocity.vtheta[i,rlim_idx:])
-        line2.set_data(velocity.r[rlim_idx:], velocity.vr[i,rlim_idx:])
-        time_text.set_text(time_template%(velocity.time[i]))
+    def draw_velocities(t):
+        t_idx = velocity.get_index_near_time(t)
+        line1.set_data(velocity.r[rlim_idx:],
+                       velocity.vtheta[t_idx,rlim_idx:])
+        line2.set_data(velocity.r[rlim_idx:],
+                       velocity.vr[t_idx,rlim_idx:])
+        time_text.set_text(time_template%(velocity.time[t_idx]))
         return line1, line2, time_text
 
     if (saveoutput):
         ani = animation.FuncAnimation(fig, draw_velocities,
-                                      range(0, velocity.time.size),
+                                      arange(0, velocity.time[-1], dt),
                                       interval = 1, blit=True,
                                       init_func=init)
         
@@ -1151,7 +1160,7 @@ def play_two_component_velocity_animation(velocity, speed=1.0, rlim=0.0,
         #Consider ln -s /usr/bin/avconv /usr/bin/ffmpeg
     else:
         ani = animation.FuncAnimation(fig, draw_velocities,
-                                      range(0, velocity.time.size),
+                                      arange(0, velocity.time[-1], dt),
                                       interval = dt*1000, blit=True,
                                       init_func=init)
         
