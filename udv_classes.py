@@ -10,11 +10,12 @@ from copy import deepcopy
 import shot_params as sp
 import shot_db_ops as sdo
 import numpy as np
+import math
 
 r1 = 7.06
 r2 = 20.30
-rpmtorads = lambda x: x*2.0*pi/60.0
-degstorads = lambda x: x*pi/180.0
+rpmtorads = lambda x: x*2.0*math.pi/60.0
+degstorads = lambda x: x*math.pi/180.0
 
 class Shot:
     def __init__(self, shot_num):
@@ -50,7 +51,7 @@ class Shot:
             add_channel(channel)
 
     def get_channel(self, channel_num):
-        '''Returns ChannelData object for specified channel number for this Shot.
+        '''Returns ChannelData object for specified channel for this Shot.
 
         Returns a ChannelData object corresponding to channel_num. Should
         be equivalent to Shot.channels[channel_num], with the only difference
@@ -265,11 +266,11 @@ class ChannelData:
         d = self.depth - self.offset
         self.r = np.zeros(self.depth.size)
 
-        sinA = sin(degstorads(self.A))
-        cosA = cos(degstorads(self.A))
-        sinB = sin(degstorads(self.B))
+        sinA = math.sin(degstorads(self.A))
+        cosA = math.cos(degstorads(self.A))
+        sinB = math.sin(degstorads(self.B))
         for i in range(0,d.size):
-            self.r[i] = sqrt((d[i]*sinA*sinB)**2 + (r2 - d[i]*cosA)**2)
+            self.r[i] = math.sqrt((d[i]*sinA*sinB)**2 + (r2 - d[i]*cosA)**2)
     
     def calculate_azimuth(self):
         '''Calculate the azimuthal location of the measured points'''
@@ -277,14 +278,14 @@ class ChannelData:
         self.azimuth = np.zeros(self.depth.size)
         azimuthoffset = sp.ports[self.port]['theta']
 
-        sinA = sin(degstorads(self.A))
-        cosA = cos(degstorads(self.A))
-        sinB = sin(degstorads(self.B))
+        sinA = math.sin(degstorads(self.A))
+        cosA = math.cos(degstorads(self.A))
+        sinB = math.sin(degstorads(self.B))
         
         for i in range(0,d.size):
-            self.azimuth[i] = arcsin(d[i]*sinA*sinB/
-                                     sqrt((d[i]*sinA*sinB)**2 +
-                                          (r2 - d[i]*cosA)**2))
+            self.azimuth[i] = math.asin(d[i]*sinA*sinB/
+                                        math.sqrt((d[i]*sinA*sinB)**2 +
+                                                  (r2 - d[i]*cosA)**2))
             self.azimuth[i] = wrap_phase(self.azimuth[i] + azimuthoffset)    
     
     def calculate_height(self):
@@ -294,10 +295,10 @@ class ChannelData:
         
         zoffset = sp.ports[self.port]['z']
         
-        sinA = sin(degstorads(self.A))
-        cosA = cos(degstorads(self.A))
-        sinB = sin(degstorads(self.B))
-        cosB = cos(degstorads(self.B))
+        sinA = math.sin(degstorads(self.A))
+        cosA = math.cos(degstorads(self.A))
+        sinB = math.sin(degstorads(self.B))
+        cosB = math.cos(degstorads(self.B))
         
         for i in range(0,d.size):
             self.z[i] = d[i]*sinA*cosB + zoffset
@@ -339,10 +340,10 @@ class Velocity():
         self.shot = shot
         self.progenitors = []
     
-        if size(channel_nums) == 0:
+        if len(channel_nums) == 0:
             print "Error: 0 channels presented to Velocity.__init__()."
             return None
-        elif size(channel_nums) == 1:
+        elif len(channel_nums) == 1:
             self.progenitors.append(self.shot.get_channel(channel_nums[0]))
             if (m==0):
                 self.m = 0
@@ -352,7 +353,7 @@ class Velocity():
                 self.m = m
                 self.period = period
                 self.gen_velocity_one_transducer_nonaxi(self.progenitors[0])
-        elif size(channel_nums) == 2:
+        elif len(channel_nums) == 2:
             self.progenitors.append(self.shot.get_channel(channel_nums[0]))
             self.progenitors.append(self.shot.get_channel(channel_nums[1]))
             if (m==0):
@@ -365,7 +366,7 @@ class Velocity():
                 self.period = period
                 self.gen_velocity_two_transducers_nonaxi(self.progenitors[0],
                                                          self.progenitors[1])
-        elif size(channel_nums) == 3:
+        elif len(channel_nums) == 3:
             self.progenitors.append(self.shot.get_channel(channel_nums[0]))
             self.progenitors.append(self.shot.get_channel(channel_nums[1]))
             self.progenitors.append(self.shot.get_channel(channel_nums[2]))
@@ -396,35 +397,37 @@ class Velocity():
             (channel.A == 90)):
             #This thing is just pointed vertically, so just use the unwrapped
             #velocity and the the position from the original channel
-            self.vr = np.ones(channel.unwrapped_velocity.shape)*nan
-            self.vtheta = np.ones(channel.unwrapped_velocity.shape)*nan
-            self.vz = channel.unwrapped_velocity/cos(degstorads(channel.B))
+            self.vr = np.ones(channel.unwrapped_velocity.shape)*np.nan
+            self.vtheta = np.ones(channel.unwrapped_velocity.shape)*np.nan
+            self.vz = (channel.unwrapped_velocity/
+                       math.cos(degstorads(channel.B)))
         elif (channel.A == 0):
             #In the unlikely event that we got this dead on in the radial
             #direction
             self.vr = -1.0*channel.unwrapped_velocity
-            self.vtheta = np.ones(channel.unwrapped_velocity.shape)*nan
-            self.vz = np.ones(channel.unwrapped_velocity.shape)*nan
+            self.vtheta = np.ones(channel.unwrapped_velocity.shape)*np.nan
+            self.vz = np.ones(channel.unwrapped_velocity.shape)*np.nan
         else:
             #Otherwise, just assume the velocity is in the azimuthal direction
-            self.vr = np.ones(channel.unwrapped_velocity.shape)*nan
+            self.vr = np.ones(channel.unwrapped_velocity.shape)*np.nan
             self.vtheta = np.zeros(channel.unwrapped_velocity.shape)
-            self.vz = np.ones(channel.unwrapped_velocity.shape)*nan
+            self.vz = np.ones(channel.unwrapped_velocity.shape)*np.nan
 
-            sinA = sin(degstorads(channel.A))
-            cosA = cos(degstorads(channel.A))
-            sinB = sin(degstorads(channel.B))
-            cosB = cos(degstorads(channel.B))
+            sinA = math.sin(degstorads(channel.A))
+            cosA = math.cos(degstorads(channel.A))
+            sinB = math.sin(degstorads(channel.B))
+            cosB = math.cos(degstorads(channel.B))
             d = channel.depth - channel.offset
 
             #Calculate the the correction factor needed at each radius
             anglefactor = np.zeros(self.r.size)
             
             for i in range(0, self.r.size):
-                anglefactor[i] = (sqrt(1-sinA**2*cosB**2)*
-                                  sin(math.atan(sinA*sinB/cosA) +
-                                      math.asin(d[i]*sinA*sinB/self.r[i])))
-            
+                anglefactor[i] = (math.sqrt(1-sinA**2*cosB**2)*
+                                  math.sin(math.atan(sinA*sinB/cosA) +
+                                           math.asin(d[i]*sinA*sinB/
+                                                     self.r[i])))
+                
             #Now iterate over every time, applying the correction factor
             #and also adding offset due to the transducer motion to find
             #the velocity in the lab frame.
@@ -495,14 +498,14 @@ class Velocity():
         for i in range(0, len(tempchannel.depth)):
             f = UnivariateSpline((channel.time -
                                   self.m*channel.azimuth[i]*
-                                  self.period/(2*pi)),
+                                  self.period/(2*math.pi)),
                                  channel.velocity[:, i],
                                  k=3, s=0)
             tempchannel.velocity[:,i] = f(tempchannel.time)
 
             f = UnivariateSpline((channel.time -
                                   self.m*channel.azimuth[i]*
-                                  self.period/(2*pi)),
+                                  self.period/(2*math.pi)),
                                  channel.unwrapped_velocity[:, i],
                                  k=3, s=0)
             tempchannel.unwrapped_velocity[:,i] = f(tempchannel.time)
@@ -542,13 +545,13 @@ class Velocity():
         
         #With two transducers, it's less clear what the z and azimuth
         #coordinates should be. Just make them nans.
-        self.z = np.ones(self.r.size)*nan
-        self.azimuth = np.ones(self.r.size)*nan
+        self.z = np.ones(self.r.size)*np.nan
+        self.azimuth = np.ones(self.r.size)*np.nan
 
         
         self.vr = np.zeros((self.time.size, self.r.size))
         self.vtheta = np.zeros((self.time.size, self.r.size))
-        self.vz = np.ones((self.time.size, self.r.size))*nan
+        self.vz = np.ones((self.time.size, self.r.size))*np.nan
 
         #Set up some temporary arrays to store the velocities
         ch1_v = np.zeros((self.time.size, self.r.size))
@@ -587,38 +590,38 @@ class Velocity():
         #  - r_2^2 \sin^2 A \sin^2 B}}{\sin^2 A \sin ^2 B + \cos^2 A}
 
         #Define some trigonometric quantities that I need
-        sinA1 = sin(degstorads(ch1.A))
-        cosA1 = cos(degstorads(ch1.A))
-        sinB1 = sin(degstorads(ch1.B))
-        cosB1 = cos(degstorads(ch1.B))
-        sinA2 = sin(degstorads(ch2.A))
-        cosA2 = cos(degstorads(ch2.A))
-        sinB2 = sin(degstorads(ch2.B))
-        cosB2 = cos(degstorads(ch2.B))
+        sinA1 = math.sin(degstorads(ch1.A))
+        cosA1 = math.cos(degstorads(ch1.A))
+        sinB1 = math.sin(degstorads(ch1.B))
+        cosB1 = math.cos(degstorads(ch1.B))
+        sinA2 = math.sin(degstorads(ch2.A))
+        cosA2 = math.cos(degstorads(ch2.A))
+        sinB2 = math.sin(degstorads(ch2.B))
+        cosB2 = math.cos(degstorads(ch2.B))
 
-        alpha1 = arctan(sinA1*sinB1/cosA1)
-        alpha2 = arctan(sinA2*sinB2/cosA2)
+        alpha1 = math.atan(sinA1*sinB1/cosA1)
+        alpha2 = math.atan(sinA2*sinB2/cosA2)
 
         T = np.zeros([2,2])
 
         for i in range(0, self.r.size):
             r = self.r[i]
             #Set up the transformation matrix
-            d1 = ((r2*cosA1 - sqrt(r**2*(sinA1**2*sinB1**2 + cosA1**2) -
-                                   r2**2*sinA1**2*sinB1**2)) /
+            d1 = ((r2*cosA1 - math.sqrt(r**2*(sinA1**2*sinB1**2 + cosA1**2) -
+                                        r2**2*sinA1**2*sinB1**2)) /
                   (sinA1**2*sinB1**2 + cosA1**2))
-            d2 = ((r2*cosA2 - sqrt(r**2*(sinA2**2*sinB2**2 + cosA2**2) -
-                                   r2**2*sinA2**2*sinB2**2)) /
+            d2 = ((r2*cosA2 - math.sqrt(r**2*(sinA2**2*sinB2**2 + cosA2**2) -
+                                        r2**2*sinA2**2*sinB2**2)) /
                   (sinA2**2*sinB2**2 + cosA2**2))
-            theta1 = arcsin(d1*sinA1*sinB1/r)
-            theta2 = arcsin(d2*sinA2*sinB2/r)
+            theta1 = math.asin(d1*sinA1*sinB1/r)
+            theta2 = math.asin(d2*sinA2*sinB2/r)
             xi1 = alpha1 + theta1
             xi2 = alpha2 + theta2
 
-            T[0,0] = -sqrt(1 - sinA1**2*cosB1**2)*cos(xi1)
-            T[0,1] = sqrt(1 - sinA1**2*cosB1**2)*sin(xi1)
-            T[1,0] = -sqrt(1 - sinA2**2*cosB2**2)*cos(xi2)
-            T[1,1] = sqrt(1 - sinA2**2*cosB2**2)*sin(xi2)
+            T[0,0] = -math.sqrt(1 - sinA1**2*cosB1**2)*math.cos(xi1)
+            T[0,1] = math.sqrt(1 - sinA1**2*cosB1**2)*math.sin(xi1)
+            T[1,0] = -math.sqrt(1 - sinA2**2*cosB2**2)*math.cos(xi2)
+            T[1,1] = math.sqrt(1 - sinA2**2*cosB2**2)*math.sin(xi2)
 
             #Now invert the matrix so we can apply it to the measured
             #velocities
@@ -691,14 +694,14 @@ class Velocity():
         for i in range(0, len(tempch1.depth)):
             f = UnivariateSpline((ch1.time -
                                   self.m*ch1.azimuth[i]*
-                                  self.period/(2*pi)),
+                                  self.period/(2*math.pi)),
                                  ch1.velocity[:, i],
                                  k=3, s=0)
             tempch1.velocity[:,i] = f(tempch1.time)
 
             f = UnivariateSpline((ch1.time -
                                   self.m*ch1.azimuth[i]*
-                                  self.period/(2*pi)),
+                                  self.period/(2*math.pi)),
                                  ch1.unwrapped_velocity[:, i],
                                  k=3, s=0)
             tempch1.unwrapped_velocity[:,i] = f(tempch1.time)
@@ -707,14 +710,14 @@ class Velocity():
         for i in range(0, len(tempch2.depth)):
             f = UnivariateSpline((ch2.time -
                                   self.m*ch2.azimuth[i]*
-                                  self.period/(2*pi)),
+                                  self.period/(2*math.pi)),
                                  ch2.velocity[:, i],
                                  k=3, s=0)
             tempch2.velocity[:,i] = f(tempch2.time)
 
             f = UnivariateSpline((ch2.time -
                                   self.m*ch2.azimuth[i]*
-                                  self.period/(2*pi)),
+                                  self.period/(2*math.pi)),
                                  ch2.unwrapped_velocity[:, i],
                                  k=3, s=0)
             tempch2.unwrapped_velocity[:,i] = f(tempch2.time)
@@ -744,7 +747,7 @@ class Velocity():
     def list_progenitors(self):
         '''List information about the channels that were combined to
         create a Velocity object.'''
-        num_progenitors = size(self.progenitors)
+        num_progenitors = len(self.progenitors)
         print "Derived from %d progenitor(s)" % num_progenitors
         for i in range(0, num_progenitors):
             progenitor = self.progenitors[i]
@@ -801,10 +804,10 @@ def del_shot(shot_num):
 
 def wrap_phase(angle):
     '''Make phase fit in the range -pi to pi.'''
-    while (angle > pi):
-        angle = angle - 2.0*pi
+    while (angle > math.pi):
+        angle = angle - 2.0*math.pi
 
-    while (angle < -pi):
-        angle = angle + 2.0*pi
+    while (angle < -math.pi):
+        angle = angle + 2.0*math.pi
 
     return angle
