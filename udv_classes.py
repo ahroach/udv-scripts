@@ -5,6 +5,10 @@ import shot_params as sp
 import shot_db_ops as sdo
 from numpy import *
 
+'''Provides Shot, Channel, and Velocity objects to be used in processing
+UDV data. Also provides get_shot() (and the associated add_shot()) and
+del_shot() functions for managing a list of already-processed shots.'''
+
 r1 = 7.06
 r2 = 20.30
 rpmtorads = lambda x: x*2.0*pi/60.0
@@ -39,6 +43,19 @@ class Shot:
         '''Adds all available channels to the Shot object'''
         for channel in self.channels_used:
             add_channel(channel)
+
+    def get_channel(self, channel_num):
+        '''Returns a ChannelData object corresponding to channel_num. Should
+        be equivalent to Shot.channels[channel_num], with the only difference
+        being that this routine will add the channel data if it has not
+        already been added to the shot.'''
+        #Check to see if we've added this channel data before, and, if so,
+        #return it
+        for key in self.channels.keys():
+            if self.channels[key].channel == channel_num:
+                return self.channels[key]
+        #Otherwise add the channel and return that.
+        return self.add_channel(channel_num)
     
     def add_channel(self, channel_num):
         '''Adds and returns a ChannelData object corresponding to channel_num
@@ -53,18 +70,32 @@ class Shot:
         self.channels[channel_num] = ChannelData(self, channel_num)
         return self.channels[channel_num]
     
-    def get_channel(self, channel_num):
-        '''Returns a ChannelData object corresponding to channel_num. Should
-        be equivalent to Shot.channels[channel_num], with the only difference
-        being that this routine will add the channel data if it has not
-        already been added to the shot.'''
-        #Check to see if we've added this channel data before, and, if so,
+    def get_velocity(self, channel_nums, m=0, period=0):
+        '''Returns a Velocity object produced using the specified
+        channel_nums for this Shot.'''
+        channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
+
+        #Check to see if we've processed this velocity data before, and, if so,
         #return it
-        for key in self.channels.keys():
-            if self.channels[key].channel == channel_num:
-                return self.channels[key]
-        #Otherwise add the channel and return that.
-        return self.add_channel(channel_num)
+
+        for velocity in self.velocities:
+            #First make a list of the channel numbers from all of the
+            #progenitor ChannelData objects for this Velocity object
+            progenitor_list = list()
+            for progenitor in velocity.progenitors:
+                progenitor_list.append(progenitor.channel)
+
+            #Now check to see if these channels match the channel_nums, and
+            #that m also matches. If m!=0, also check to make sure that
+            #the period times match.
+            progenitor_list.sort()
+            if ((progenitor_list == channel_nums) and
+                (velocity.m == m) and
+                ((m==0) or (velocity.period == period))):
+                return velocity
+
+        #Otherwise add this new velocity set and return that.
+        return self.add_velocity(channel_nums, m=m, period=period)
 
     def add_velocity(self, channel_nums, m=0, period=0):
         '''Adds and returns a Velocity object produced using channel_nums
@@ -82,19 +113,18 @@ class Shot:
         self.velocities.append(Velocity(self, channel_nums, m, period))
         return self.velocities[-1]
     
-    def get_velocity(self, channel_nums, m=0, period=0):
-        '''Returns a Velocity object produced using the specified
-        channel_nums for this Shot.'''
+    def del_velocity(self, channel_nums, m=0, period=0):
+        '''Removes a Velocity object from a shot matching the specified
+        parameters.'''
         channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
 
-        #Check to see if we've processed this velocity data before, and, if so,
-        #return it
+        #Try to find this velocity.
 
-        for idx in range(0, self.velocities.__len__()):
+        for velocity in self.velocities:
             #First make a list of the channel numbers from all of the
             #progenitor ChannelData objects for this Velocity object
             progenitor_list = list()
-            for progenitor in self.velocities[idx].progenitors:
+            for progenitor in velocity.progenitors:
                 progenitor_list.append(progenitor.channel)
 
             #Now check to see if these channels match the channel_nums, and
@@ -102,12 +132,9 @@ class Shot:
             #the period times match.
             progenitor_list.sort()
             if ((progenitor_list == channel_nums) and
-                (self.velocities[idx].m == m) and
-                ((m==0) or (self.velocities[idx].period == period))):
-                return self.velocities[idx]
-
-        #Otherwise add this new velocity set and return that.
-        return self.add_velocity(channel_nums, m=m, period=period)
+                (velocity.m == m) and
+                ((m==0) or (velocity.period == period))):
+                self.velocities.remove(velocity)
 
     def sanitize_channel_nums_for_velocities(self, channel_nums):
         '''Makes sure we have the channel_nums as a sorted list, even if
