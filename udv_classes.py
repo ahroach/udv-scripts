@@ -77,6 +77,25 @@ class Shot:
         #And create it, adding the object to the channels dictionary
         self.channels[channel_num] = ChannelData(self, channel_num)
         return self.channels[channel_num]
+
+    def del_channel(self, channel_num):
+        '''Delete a channel and associated velocity objects.
+
+        Note that this is a rather destructive action, since it wipes
+        out all velocity objects that used that channel, so it should
+        be used with caution.'''
+        velocities_to_be_removed = []
+        #First check all of the velocity objects to see if this channel
+        #is used in its progenitors. If so, get rid of it.
+        for velocity in self.velocities:
+            for progenitor in velocity.progenitors:
+                if (progenitor.channel == channel_num):
+                    velocities_to_be_removed.append(velocity)
+        for velocity in velocities_to_be_removed:
+            self.velocities.remove(velocity)
+        
+        #Now that we've done that, get rid of the channel
+        self.channels.pop(channel_num)
     
     def get_velocity(self, channel_nums, m=0, period=0):
         '''Returns a Velocity object produced using the specified
