@@ -1,13 +1,15 @@
+'''Provides Shot, Channel, and Velocity objects for processing UDV data.
+
+Also provides get_shot() (and the associated add_shot()) and
+del_shot() functions for managing a list of already-processed
+shots.''' 
+
 import read_ultrasound_new as rudv
 from scipy.interpolate import UnivariateSpline
 from copy import deepcopy
 import shot_params as sp
 import shot_db_ops as sdo
 import numpy as np
-
-'''Provides Shot, Channel, and Velocity objects to be used in processing
-UDV data. Also provides get_shot() (and the associated add_shot()) and
-del_shot() functions for managing a list of already-processed shots.'''
 
 r1 = 7.06
 r2 = 20.30
@@ -16,8 +18,11 @@ degstorads = lambda x: x*pi/180.0
 
 class Shot:
     def __init__(self, shot_num):
-        '''Creates a new Shot object, looks up and adds shot parameters
-        to the object, and runs add_channel_data() for all channels'''
+        '''Creates a new Shot object.
+        
+        Looks up and adds shot parameters to the object from the shot
+        database. Also creates a CouetteProfile object with the ideal
+        Couette profile for this set of parameters'''
         if(not(sp.shot_params.has_key(shot_num))):
             print "Error: Shot %d not in database." % shot_num
             return False
@@ -45,7 +50,9 @@ class Shot:
             add_channel(channel)
 
     def get_channel(self, channel_num):
-        '''Returns a ChannelData object corresponding to channel_num. Should
+        '''Returns ChannelData object for specified channel number for this Shot.
+
+        Returns a ChannelData object corresponding to channel_num. Should
         be equivalent to Shot.channels[channel_num], with the only difference
         being that this routine will add the channel data if it has not
         already been added to the shot.'''
@@ -169,10 +176,11 @@ class Shot:
     
 class ChannelData:
     def __init__(self, shot, channel_num):
-        '''Initialize a ChannelData object. Note that shot is a Shot object,
-        which must be created before. Ideally, this function is only run
-        from Shot.add_channel_data(), and was most likely already run
-        from Shot.__init__().'''
+        '''Initialize a ChannelData object.
+
+        Note that shot is a Shot object, which must be created
+        before. Ideally, this function is only run from
+        Shot.add_channel_data().'''
 
         if(not(shot.channels_used.__contains__(channel_num))):
             print "Error: Shot %d doesn't use channel %d" % (shot.number,
@@ -295,7 +303,7 @@ class ChannelData:
             self.z[i] = d[i]*sinA*cosB + zoffset
 
     def get_index_near_time(self, time):
-        '''Find the index in the time_array of the element closest to the
+        '''Find index in time_array of the element closest to the
         specified time'''
         return abs(self.time - time).argmin()
 
@@ -315,13 +323,17 @@ class ChannelData:
         return dup_chan
 
 class Velocity():
-    '''A class for processed velocity measurements. These are distinct from
-    the velocities in the Channel class because the velocities here are
-    processed and presented in the v_r, v_theta, and v_z components.
-    __init__() tries to be smart about which generation routine to call based
-    on the number of channels presented.'''
+    '''A class for processed velocity measurements.
+
+    These are distinct from the velocities in the Channel class
+    because the velocities here are processed and presented in the
+    v_r, v_theta, and v_z components.  __init__() tries to be smart
+    about which generation routine to call based on the number of
+    channels presented.'''
     def __init__(self, shot, channel_nums, m=0, period=0):
-        '''Tries to be smart about selecting generation methods, based
+        '''Creates a Velocity object
+        
+        Tries to be smart about selecting generation methods, based
         on the number of channels required and whether or not a non-zero
         m has been specified.'''
         self.shot = shot
@@ -367,10 +379,12 @@ class Velocity():
             return None
 
     def gen_velocity_one_transducer(self, channel):
-        '''Generate velocity from a single transducer. If it is purely radial
-        or purely vertical, a purely radial or vertical velocity is created.
-        Otherwise, the velocity is assumed to be in the azimuthal direction,
-        and the appropriate angle corrections are applied to the velocity.'''
+        '''Generate velocity from a single transducer.
+
+        If it is purely radial or purely vertical, a purely radial or
+        vertical velocity is created.  Otherwise, the velocity is
+        assumed to be in the azimuthal direction, and the appropriate
+        angle corrections are applied to the velocity.'''
         
         self.time = channel.time.copy()
         self.r = channel.r.copy()
@@ -429,13 +443,16 @@ class Velocity():
         self.vz = self.vz[:,::-1]
 
     def gen_velocity_one_transducer_nonaxi(self, channel):
-        '''Find the velocity fields using one transducer, assuming a
-        nonaxisymmetric velocity distribution, with m and period provided
-        in the call to __init__() (and probably to the call to
-        Shot.get_velocity(). Assumes that we are only dealing with azimuthal
-        velocities for now. Note that this method essentially corrects
-        for the azimuthal offset along a measurement chord, making each
-        measurement appear to be made at \theta=0.'''
+        '''Generate nonaxisymmetric velocity from a single transducer
+
+        Find the velocity fields using one transducer, assuming a
+        nonaxisymmetric velocity distribution, with m and period
+        provided in the call to __init__() (and probably to the call
+        to Shot.get_velocity(). Assumes that we are only dealing with
+        azimuthal velocities for now. Note that this method
+        essentially corrects for the azimuthal offset along a
+        measurement chord, making each measurement appear to be made
+        at \theta=0.'''
         #Create a copy of the original channel object. We're going to make
         #changes to the data in this thing to pass to
         #gen_velocity_one_transducers(), but we of course don't want to
@@ -501,8 +518,10 @@ class Velocity():
         del(tempchannel)
 
     def gen_velocity_two_transducers(self, ch1, ch2):
-        '''Generate velocity from two transducers. Currently assumes we are
-           just getting contributions from v_r and v_theta'''
+        '''Generate velocity from two transducers.
+
+        Currently assumes we are just getting contributions from v_r
+        and v_theta'''
                 
         #Find the index of the deepest point (smallest radius)
         ch1_last_idx = ch1.r.argmin()
@@ -618,10 +637,12 @@ class Velocity():
                                     rpmtorads(self.shot.OCspeed)*r)
 
     def gen_velocity_two_transducers_nonaxi(self, ch1, ch2):
-        '''Find the velocity fields using two transducers, assuming a
-        nonaxisymmetric velocity distribution, with m and period provided
-        in the call to __init__() (and probably to the call to
-        Shot.get_velocity(). Decomposes only into v_r and v_theta.'''
+        '''Generate nonaxisymmetric velocity using two transducers
+
+        Find the velocity fields using two transducers, assuming a
+        nonaxisymmetric velocity distribution, with m and period
+        provided in the call to __init__() (and probably to the call
+        to Shot.get_velocity(). Decomposes only into v_r and v_theta.'''
         #Create copies of the original channel objects. We're going to make
         #changes to the data in these things to pass to
         #gen_velocity_two_transducers(), but we of course don't want to
@@ -711,13 +732,13 @@ class Velocity():
         del(tempch2)
 
     def get_index_near_time(self, time):
-        '''Find the index in the time_array of the element closest to the
+        '''Find index in the time_array of element closest to the 
         specified time'''
         return abs(self.time - time).argmin()
                   
     def get_index_near_radius(self, radius):
-        '''Find the index in the radius array of the element with r
-        closest to the specified radius'''
+        '''Find index in radius array of the element closest to the
+        specified radius'''
         return abs(self.r - radius).argmin()
     
     def list_progenitors(self):
