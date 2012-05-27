@@ -55,7 +55,7 @@ def plot_d_vs_r(A=20.3, B=90, offset=0, r2=rout, dmin=0.0, dmax=rout):
 
 
 def plot_theta_vs_d(A=20.3, B=90, offset=0, r2=rout,
-                    dmin=0.0, dmax=rout):
+                    dmin=0.0, dmax=rout, degs=0):
     d = linspace(dmin,dmax,num=100)
     theta = zeros(d.size)
     
@@ -67,8 +67,13 @@ def plot_theta_vs_d(A=20.3, B=90, offset=0, r2=rout,
         depth = d[i] - offset
         r = sqrt((depth*sinA*sinB)**2 + (r2 - depth*cosA)**2)
         theta[i] = math.asin(depth*sinA*sinB/r)
+
+    if(degs):
+        conversionfactor = 180.0/pi
+    else:
+        conversionfactor = 1.0
     
-    plot(d,theta)
+    plot(d, theta*conversionfactor)
 
     dclosest = r2*cosA/(sinA**2*sinB**2 + cosA**2)
     axvline(dclosest, ls='--', lw=1, color='k')
@@ -77,7 +82,7 @@ def plot_theta_vs_d(A=20.3, B=90, offset=0, r2=rout,
     ylabel("theta [rad]")
 
 
-def plot_theta_vs_r(A=20.3, B=90, r2=rout):
+def plot_theta_vs_r(A=20.3, B=90, r2=rout, degs=0):
     
     sinA = sin(pi*A/180.)
     sinB = sin(pi*B/180.)
@@ -92,12 +97,54 @@ def plot_theta_vs_r(A=20.3, B=90, r2=rout):
                              r2**2*sinA**2*sinB**2)) /
              (sinA**2*sinB**2 + cosA**2))
         theta[i] = arcsin(d*sinA*sinB/r[i])
+
+    if(degs):
+        conversionfactor = 180.0/pi
+    else:
+        conversionfactor = 1.0
     
-    plot(r,theta)
+    plot(r, theta*conversionfactor)
     xlabel("r [cm]")
     ylabel("theta [rad]")
 
+def plot_r_and_theta_vs_d(A=20.3, B=90, offset=0, r2=rout,
+                          dmin=0.0, dmax=rout):
+    d = linspace(dmin,dmax,num=200)
+    r = zeros(d.size)
+    theta = zeros(d.size)    
 
+    sinA = sin(pi*A/180.)
+    sinB = sin(pi*B/180.)
+    cosA = cos(pi*A/180.)
+    
+    for i in range(0, d.size):
+        depth = d[i] - offset
+        r[i] = sqrt((depth*sinA*sinB)**2 + (r2 - depth*cosA)**2)
+        theta[i] = math.asin(depth*sinA*sinB/r[i])
+
+    fig = figure()
+    ax1 = fig.add_subplot(111)
+    ax1.plot(d,r, 'b-', label=r"$r$")
+    ax1.set_xlabel("Measurement depth [cm]")
+    ax1.set_ylabel("Radius [cm]", color='b')    
+    ax1.set_xlim(dmin, dmax)
+    for ticklabel in ax1.get_yticklabels():
+        ticklabel.set_color('b')
+
+    ax2 = ax1.twinx()
+    ax2.plot(d, theta*180.0/pi, 'g-', label=r"$\theta$")
+    ax2.set_ylabel("Azimuth [degs]", color='g', rotation=270)
+    ax2.set_xticks(arange(dmin, dmax+2, 2))
+    ax2.set_xlim(dmin, dmax)
+    for ticklabel in ax2.get_yticklabels():
+        ticklabel.set_color('g')
+
+
+    dclosest = r2*cosA/(sinA**2*sinB**2 + cosA**2)
+    ax1.axvline(dclosest, ls='--', lw=1, color='k')
+
+
+    
 def plot_velocity_contribs_r(A=20.3, B=90, r2=rout):
     sinA = sin(A*pi/180.)
     sinB = sin(B*pi/180.)
@@ -155,9 +202,11 @@ def plot_velocity_contribs_d(A=20.3, B=90, offset=0, r2=rout,
         vtcoeff[i] = sqrt(1-sinA**2*cosB**2)*sin(xi)
         vzcoeff[i] = sinA*cosB
 
-    plot(d,vrcoeff, label=r"$v_r$ coefficient")
-    plot(d,vtcoeff, label=r"$v_\theta$ coefficient")
-    plot(d,vzcoeff, label=r"$v_z$ coefficient")
+    plot(d,vrcoeff, label=r"$a$")
+    plot(d,vtcoeff, label=r"$b$")
+    plot(d,vzcoeff, label=r"$c$")
+
+    title(r"$V_{UDV} = aV_r + bV_{\theta} + cV_z$")
 
     dclosest = r2*cosA/(sinA**2*sinB**2 + cosA**2)
     axvline(dclosest, ls='--', lw=1, color='k')
