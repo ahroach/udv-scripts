@@ -11,11 +11,35 @@ import shot_params as sp
 import shot_db_ops as sdo
 import numpy as np
 import math
+import os
 
+#Define some handy variables and functions
 r1 = 7.06
 r2 = 20.30
 rpmtorads = lambda x: x*2.0*math.pi/60.0
 degstorads = lambda x: x*math.pi/180.0
+
+data_path=''
+def set_data_path(new_path):
+    """Set the path where the UDV data is located to the string new_path.
+    If new_path is empty, the path will be the current working directory."""
+
+    #Make sure we have data_path in the module scope.
+    global data_path
+
+    if(new_path == ''):
+        new_path = os.getcwd()
+    
+    #If the path is not empty (which would translate to just using the current
+    #directory), and the path does not end in a /, add one.
+    if(not(new_path == '') and not(new_path[-1] == '/')):
+        new_path = new_path + '/'
+    
+    data_path = new_path
+
+#Initialize data_path to the current working directory.
+set_data_path('')
+
 
 class Shot:
     def __init__(self, shot_num):
@@ -29,7 +53,7 @@ class Shot:
             return False
         
         self.number = shot_num
-        self.filename = str(shot_num) + '.BDD'
+        self.filename = data_path + str(shot_num) + '.BDD'
         self.shot_length = sp.shot_params[shot_num]['shot_length']
         self.ICspeed = sp.shot_params[shot_num]['ICspeed']
         self.IRspeed = sp.shot_params[shot_num]['IRspeed']
