@@ -5883,3 +5883,15 @@ shot_params[1303] = {'shot_num': 1303, 'shot_length': 115,
                      'Bs': [-90, 90, 90, 90],
                      'offsets': [1.19, 0.72, 0.41, 0.53],
                      'ports': [5, 6, 7, 3]}
+
+
+shot_params[1304] = {'shot_num': 1304, 'shot_length': 190,
+                     'ICspeed': 53, 'IRspeed': 53,
+                     'ORspeed': 53, 'OCspeed': 53,
+                     'current': 400, 'field_delay': 125, 't_field': 60,
+                     'udv_delay': 105,
+                     'channels': [1, 2, 3, 4, 5],
+                     'As': [20.3, 20.3, 20.3, 20.3, 20.3],
+                     'Bs': [90, -90, -90, 90, 90],
+                     'offsets': [1.19, 0.42, 0.15, 0.24, 0.52],
+                     'ports': [6, 7, 8, 5, 10]}
