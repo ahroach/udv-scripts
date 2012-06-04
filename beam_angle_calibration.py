@@ -161,7 +161,7 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
 
     fig = figure()
     ax = fig.add_subplot(111)
-    cp = ax.contourf(A1s, A2s, errors)
+    cp = ax.contourf(A1s, A2s, errors, 30)
     fig.colorbar(cp)
     
 
