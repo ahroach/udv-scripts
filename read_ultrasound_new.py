@@ -64,10 +64,8 @@ def read_ultrasound(filename, channel, verbose=1):
     #If the multiplexer is enabled
     if Mpx_Mode & 2 > 0:
         multiplexer_mode = 1
-        First_Ch = int(Mpx_Mode / 65536) #First channel in the sequence
-        if (verbose):
-            print "First Channel: " + str(First_Ch)
-        jt = 1 << (First_Ch + 3)
+        #Set this pointer to bit 4, the start of the channel-selection bits
+        jt = 1 << (1 + 3)
         for i in range(1, 10):
             jt = jt << 1
             if jt == 16384:
