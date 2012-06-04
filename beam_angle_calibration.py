@@ -86,6 +86,78 @@ def global_optimize_transducer_angle(shot1, shot2, channelnum1, channelnum2,
     udvh.plot_two_component_avg_velocities(vel1, start_idx, end_idx)
     udvh.plot_two_component_avg_velocities(vel2, start_idx, end_idx)
 
+
+def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
+                                 start_time, end_time, anglediff=2.0,
+                                 numpoints=30):
+    #Get copies of the real channels
+    sh1ch1 = deepcopy(shot1.get_channel(channelnum1))
+    sh1ch2 = deepcopy(shot1.get_channel(channelnum2))
+    sh2ch1 = deepcopy(shot2.get_channel(channelnum1))
+    sh2ch2 = deepcopy(shot2.get_channel(channelnum2))
+
+    #Now get some dummy combined velocity things.
+    vel1 = deepcopy(shot1.get_velocity((channelnum1, channelnum2)))
+    vel2 = deepcopy(shot2.get_velocity((channelnum1, channelnum2)))
+    
+    start_idx = vel1.get_index_near_time(start_time)
+    end_idx = vel1.get_index_near_time(end_time)
+
+    def err_func(A1, A2):
+        print "Running with A1 = %0.8g, A2 = %0.8g" % (As[0], As[1])
+        #First modify the As in the relevant dummy channels.
+        sh1ch1.A = A1
+        sh2ch1.A = A1
+        sh1ch2.A = A2
+        sh2ch2.A = A2
+        
+        #Need to update the radius vectors, too
+        sh1ch1.calculate_radius()
+        sh1ch2.calculate_radius()
+        sh2ch1.calculate_radius()
+        sh2ch2.calculate_radius()
+        
+        #Now reprocess the dummy velocities.
+        vel1.gen_velocity_two_transducers(sh1ch1, sh1ch2)
+        vel2.gen_velocity_two_transducers(sh2ch1, sh2ch2)
+        
+        #Find how far to go from the outside to get to the inner and outer
+        #points of interest
+        indx_in = vel1.r.size - vel1.get_index_near_radius(12.0)
+        indx_out = vel1.r.size - vel2.get_index_near_radius(20.0)
+        nindx = indx_in-indx_out
+        
+        #And calculate the error vector. We multiply the vr difference by
+        #10 assuming the vr ~ 0.10*vtheta
+        error = zeros(2*nindx)
+        for i in range(0, nindx):
+            error[i] = (vel1.vtheta[start_idx:end_idx, -(i+indx_out)].mean() +
+                        vel2.vtheta[start_idx:end_idx, -(i+indx_out)].mean())
+        for i in range(nindx, 2*nindx):
+            n = i-nindx
+            error[i] = 10*(vel1.vr[start_idx:end_idx, -(n+indx_out)].mean() -
+                            vel2.vr[start_idx:end_idx, -(n+indx_out)].mean())
+        
+        #Find the L1 norm
+        errorsum = abs(a).sum()
+
+        #And return the L1 norm divided by the number of indices
+        return errorsum/nindx
+
+    A1s = linspace(sh1ch1.A - anglediff, sh1ch1.A + anglediff, numpoints)
+    A2s = linspace(sh1ch2.A - anglediff, sh1ch2.A + anglediff, numpoints)
+
+    errors = zeros([A2s.size, A1s.size])
+    for i in range(0, A1s.size):
+        for j in range(0, A2s.size):
+            errfunc[j, i] = err_func(A1s[i], A2s[j])
+
+    fig = figure()
+    fig.contourf(A1s, A2s, errors)
+    fig.colorbar()
+    
+
+
 def local_optimize_transducer_angle(shot1, shot2, channelnum1, channelnum2,
                                     start_time, end_time):
     '''Implements a method to calculate the pair of transducer angles that
