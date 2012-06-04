@@ -90,6 +90,9 @@ def global_optimize_transducer_angle(shot1, shot2, channelnum1, channelnum2,
 def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
                                  start_time, end_time, anglediff=2.0,
                                  numpoints=30):
+    """Do a brute force calibration of the transducer angles. Calculate a
+    number of positions around the suspected angle for each transducer, and
+    plot an error function for all of those points"""
     #Get copies of the real channels
     sh1ch1 = deepcopy(shot1.get_channel(channelnum1))
     sh1ch2 = deepcopy(shot1.get_channel(channelnum2))
@@ -104,7 +107,6 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
     end_idx = vel1.get_index_near_time(end_time)
 
     def err_func(A1, A2):
-        print "Running with A1 = %0.8g, A2 = %0.8g" % (As[0], As[1])
         #First modify the As in the relevant dummy channels.
         sh1ch1.A = A1
         sh2ch1.A = A1
@@ -139,7 +141,7 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
                             vel2.vr[start_idx:end_idx, -(n+indx_out)].mean())
         
         #Find the L1 norm
-        errorsum = abs(a).sum()
+        errorsum = abs(error).sum()
 
         #And return the L1 norm divided by the number of indices
         return errorsum/nindx
@@ -148,13 +150,19 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
     A2s = linspace(sh1ch2.A - anglediff, sh1ch2.A + anglediff, numpoints)
 
     errors = zeros([A2s.size, A1s.size])
+    totalpts = errors.size
+    print "Entering loop...."
     for i in range(0, A1s.size):
         for j in range(0, A2s.size):
-            errfunc[j, i] = err_func(A1s[i], A2s[j])
+            errors[j, i] = err_func(A1s[i], A2s[j])
+            sys.stdout.write('\x1b[1A\x1b[2K\x1b[J')
+            print "%d of %d positions analyzed" % (i*A2s.size + j + 1,
+                                                   totalpts)
 
     fig = figure()
-    fig.contourf(A1s, A2s, errors)
-    fig.colorbar()
+    ax = fig.add_subplot(111)
+    cp = ax.contourf(A1s, A2s, errors)
+    fig.colorbar(cp)
     
 
 
