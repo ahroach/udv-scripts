@@ -123,28 +123,26 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
         vel1.gen_velocity_two_transducers(sh1ch1, sh1ch2)
         vel2.gen_velocity_two_transducers(sh2ch1, sh2ch2)
         
-        #Find how far to go from the outside to get to the inner and outer
-        #points of interest
-        indx_in = vel1.r.size - vel1.get_index_near_radius(12.0)
-        indx_out = vel1.r.size - vel2.get_index_near_radius(20.0)
-        nindx = indx_in-indx_out
+        #Find indices of radius bounds
+        indx_rmin = vel1.get_index_near_radius(12.0)
+        indx_rmax = vel1.get_index_near_radius(20.0)
+        nindx = indx_rmax - indx_rmin
         
-        #And calculate the error vector. We multiply the vr difference by
-        #10 assuming the vr ~ 0.10*vtheta
-        error = zeros(2*nindx)
-        for i in range(0, nindx):
-            error[i] = (vel1.vtheta[start_idx:end_idx, -(i+indx_out)].mean() +
-                        vel2.vtheta[start_idx:end_idx, -(i+indx_out)].mean())
-        for i in range(nindx, 2*nindx):
-            n = i-nindx
-            error[i] = 10*(vel1.vr[start_idx:end_idx, -(n+indx_out)].mean() -
-                            vel2.vr[start_idx:end_idx, -(n+indx_out)].mean())
-        
-        #Find the L1 norm
-        errorsum = abs(error).sum()
+        #And calculate the L1 norm for the differences between the
+        #forward and backwards shots, divided by the total number of
+        #radial samples. We multiply the vr difference by 10 assuming
+        #that vr ~ 0.10*vtheta so that we give ~equal weights to 
+        #both components.
+        vt_err = abs(mean(vel1.vtheta[start_idx:end_idx, indx_rmin:indx_rmax],
+                          axis=0) +
+                     mean(vel2.vtheta[start_idx:end_idx, indx_rmin:indx_rmax],
+                          axis=0)).sum()/nindx
+        vr_err = 10.*abs(mean(vel1.vr[start_idx:end_idx, indx_rmin:indx_rmax],
+                              axis=0) -
+                         mean(vel2.vr[start_idx:end_idx, indx_rmin:indx_rmax],
+                              axis=0)).sum()/nindx
 
-        #And return the L1 norm divided by the number of indices
-        return errorsum/nindx
+        return vt_err + vr_err
 
     A1s = linspace(sh1ch1.A - anglediff, sh1ch1.A + anglediff, numpoints)
     A2s = linspace(sh1ch2.A - anglediff, sh1ch2.A + anglediff, numpoints)
@@ -163,7 +161,51 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
     ax = fig.add_subplot(111)
     cp = ax.contourf(A1s, A2s, errors, 30)
     fig.colorbar(cp)
+    ax.set_xlabel("A for Channel %d" % channelnum1)
+    ax.set_ylabel("A for Channel %d" % channelnum2)
+
+
+def plot_calibrated_result(shot1, shot2, channelnum1, channelnum2,
+                           start_time, end_time, A1, A2):
+    #Get copies of the real channels
+    sh1ch1 = deepcopy(shot1.get_channel(channelnum1))
+    sh1ch2 = deepcopy(shot1.get_channel(channelnum2))
+    sh2ch1 = deepcopy(shot2.get_channel(channelnum1))
+    sh2ch2 = deepcopy(shot2.get_channel(channelnum2))
+
+    #Now get some dummy combined velocity things.
+    vel1 = deepcopy(shot1.get_velocity((channelnum1, channelnum2)))
+    vel2 = deepcopy(shot2.get_velocity((channelnum1, channelnum2)))
     
+    start_idx = vel1.get_index_near_time(start_time)
+    end_idx = vel1.get_index_near_time(end_time)
+
+    #First modify the As in the relevant dummy channels.
+    sh1ch1.A = A1
+    sh2ch1.A = A1
+    sh1ch2.A = A2
+    sh2ch2.A = A2
+    
+    #Need to update the radius vectors, too
+    sh1ch1.calculate_radius()
+    sh1ch2.calculate_radius()
+    sh2ch1.calculate_radius()
+    sh2ch2.calculate_radius()
+    
+    #Now reprocess the dummy velocities.
+    vel1.gen_velocity_two_transducers(sh1ch1, sh1ch2)
+    vel2.gen_velocity_two_transducers(sh2ch1, sh2ch2)
+    
+    #Now plot these.
+    fig = figure()
+    ax1=subplot(2,1,1)
+    ax1.plot(vel1.r, mean(vel1.vtheta[start_idx:end_idx,:], axis=0), 'b')
+    ax1.plot(vel2.r, -mean(vel2.vtheta[start_idx:end_idx,:], axis=0), 'g')
+
+    ax2=subplot(2,1,2)
+    ax2.plot(vel1.r, mean(vel1.vr[start_idx:end_idx,:], axis=0), 'b')
+    ax2.plot(vel2.r, mean(vel2.vr[start_idx:end_idx,:], axis=0), 'g')
+
 
 
 def local_optimize_transducer_angle(shot1, shot2, channelnum1, channelnum2,
