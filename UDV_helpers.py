@@ -412,7 +412,8 @@ def plot_two_component_avg_velocities(velocity, start_num, end_num,
         print "Invalid start or end time indices."
         return False
     
-    rlim = velocity.get_index_near_radius(rlim)
+    rlimin = velocity.get_index_near_radius(rlim)
+    rlimout = velocity.get_index_near_radius(r2)
 
     subplot(2,1,1)
     ylabel(r"$v_\theta$ [cm/sec]")
@@ -420,8 +421,9 @@ def plot_two_component_avg_velocities(velocity, start_num, end_num,
         labelstring= "Shot %d: %d to %d" % (velocity.shot.number,
                                             start_num,
                                             end_num)
-    plot(velocity.r[rlim:],
-         scale*mean(velocity.vtheta[start_num:end_num, rlim:], axis=0),
+    plot(velocity.r[rlimin:rlimout],
+         scale*mean(velocity.vtheta[start_num:end_num,
+                                    rlimin:rlimout], axis=0),
          label=labelstring)     
     axvline(x=r1, color='black')
     axvline(x=r2, color='black')
@@ -433,8 +435,9 @@ def plot_two_component_avg_velocities(velocity, start_num, end_num,
     subplot(2,1,2)
     xlabel("r [cm]")
     ylabel(r"$v_r$ [cm/sec]")
-    plot(velocity.r[rlim:],
-         scale*mean(velocity.vr[start_num:end_num, rlim:], axis=0))
+    plot(velocity.r[rlimin:rlimout],
+         scale*mean(velocity.vr[start_num:end_num,
+                                rlimin:rlimout], axis=0))
     axhline(y=0, color='black')
     axvline(x=r1, color='black')
     axvline(x=r2, color='black')
