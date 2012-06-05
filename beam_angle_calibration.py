@@ -25,8 +25,8 @@ def global_optimize_transducer_angle(shot1, shot2, channelnum1, channelnum2,
 
     #Find how far to go from the outside to get to the inner and outer
     #points of interest
-    indx_in = vel1.r.size - vel1.get_index_near_radius(12.0)
-    indx_out = vel1.r.size - vel2.get_index_near_radius(20.0)
+    indx_in = vel1.r.size - vel1.get_index_near_radius(11.0)
+    indx_out = vel1.r.size - vel2.get_index_near_radius(19.0)
     nindx = indx_in-indx_out
 
     def err_func(As):
@@ -126,8 +126,8 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
         vel2.gen_velocity_two_transducers(sh2ch1, sh2ch2)
         
         #Find indices of radius bounds
-        indx_rmin = vel1.get_index_near_radius(12.0)
-        indx_rmax = vel1.get_index_near_radius(20.0)
+        indx_rmin = vel1.get_index_near_radius(11.0)
+        indx_rmax = vel1.get_index_near_radius(19.0)
         nindx = indx_rmax - indx_rmin
         
         #And calculate the L1 norm for the differences between the
