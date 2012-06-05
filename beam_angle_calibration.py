@@ -91,7 +91,8 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
                                  start_time, end_time, anglediff=2.0,
                                  A1s=linspace(18,23,30),
                                  A2s=linspace(18,23,30), 
-                                 progressive_draw=0):
+                                 progressive_draw=0,
+                                 norm=1):
     """Do a brute force calibration of the transducer angles. Calculate a
     number of positions around the suspected angle for each transducer, and
     plot an error function for all of those points"""
@@ -130,21 +131,27 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
         indx_rmax = vel1.get_index_near_radius(19.0)
         nindx = indx_rmax - indx_rmin
         
-        #And calculate the L1 norm for the differences between the
+        #And calculate the norm for the differences between the
         #forward and backwards shots, divided by the total number of
-        #radial samples. We multiply the vr difference by 10 assuming
-        #that vr ~ 0.10*vtheta so that we give ~equal weights to 
-        #both components.
-        vt_err = abs(mean(vel1.vtheta[start_idx:end_idx, indx_rmin:indx_rmax],
-                          axis=0) +
-                     mean(vel2.vtheta[start_idx:end_idx, indx_rmin:indx_rmax],
-                          axis=0)).sum()/nindx
-        vr_err = 10.*abs(mean(vel1.vr[start_idx:end_idx, indx_rmin:indx_rmax],
+        #radial samples. The degree of the norm is specified by the
+        #'norm' parameter (1=L1, 2=L2, 3=L3, etc.). We multiply the vr
+        #difference by 10 assuming that vr ~ 0.10*vtheta so that we
+        #give ~equal weights to both components.
+
+        vt_diff = abs(mean(vel1.vtheta[start_idx:end_idx, indx_rmin:indx_rmax],
+                           axis=0) +
+                      mean(vel2.vtheta[start_idx:end_idx, indx_rmin:indx_rmax],
+                           axis=0))
+        
+        vr_diff = 10*abs(mean(vel1.vr[start_idx:end_idx, indx_rmin:indx_rmax],
                               axis=0) -
                          mean(vel2.vr[start_idx:end_idx, indx_rmin:indx_rmax],
-                              axis=0)).sum()/nindx
-
-        return vt_err + vr_err
+                              axis=0))
+        
+        total_err = ((vr_diff**norm).sum() +
+                     (vt_diff**norm).sum())**(1.0/norm)/(nindx)
+        
+        return total_err
 
     errors = ones([A2s.size, A1s.size])*nan
     fig = figure()
