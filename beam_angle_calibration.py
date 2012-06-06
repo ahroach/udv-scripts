@@ -179,6 +179,8 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
     fig.colorbar(cp)
     ax.set_xlabel("A for Channel %d" % channelnum1)
     ax.set_ylabel("A for Channel %d" % channelnum2)
+    return A1s, A2s, errors
+
 
 def plot_calibrated_result(shot1, shot2, channelnum1, channelnum2,
                            start_time, end_time, A1, A2):
