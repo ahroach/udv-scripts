@@ -875,6 +875,12 @@ class ShotList():
             if (shot.number == shot_num):
                 self.shots.remove(shot)
 
+
+def update_shot_params():
+    """Update the shot_params database after changes to the database."""
+    reload(sp)
+
+
 def wrap_phase(angle):
     """Make phase fit in the range -pi to pi."""
     while (angle > math.pi):
