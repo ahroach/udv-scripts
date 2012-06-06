@@ -779,6 +779,95 @@ def plot_vr_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
     colorbar()
 
 
+def project_velocity_timeseries_on_rt_plane(velocity, component,
+                                            mid_time,
+                                            numpoints=400,
+                                            rin=r1, rout=r2,
+                                            subtract_m0 = 0,
+                                            plot_rotation=0):
+    '''Projects a timeseries onto the r-\theta plane.
+
+    Measurements should be at the same azimuthal location for most
+    accurate results. The m and period for the nonaxisymmetric modes
+    are brought along in the Velocity object. You just have to specify
+    the mid-point time for the desired projection. If subtract_m0 is
+    set, the axisymmetric contribution is subtracted off. The
+    plot_rotation angle specifies the number of radians to rotate the
+    plot of the mode. Returns an x vector, a y vector, and the
+    velocity array'''
+
+    x = linspace(-r2, r2, num=numpoints)
+    y = linspace(-r2, r2, num=numpoints)
+    v = zeros([x.size, y.size])
+
+    if(component == 'vr'):
+        v_component = velocity.vr
+    elif(component == 'vtheta'):
+        v_component = velocity.vtheta
+    elif(component == 'vz'):
+        v_component = velocity.vz
+    else:
+        print "Unrecognized component. Must be 'vr', 'vtheta', or 'vz'."
+        return False
+    
+
+    #The phase decreases with time, for a function going as
+    #exp(k\cdot x - \omega t)
+    phase = -2.0*pi*velocity.time/velocity.period
+
+    #Define this function, so we can find the nearest phase measurement
+    #that we have for each desired phase.
+    #We know that this was created with a linear fit, so it should be easy.
+    b = phase[0]
+    m = (phase[-1] - b)/(phase.size-1)
+    minv = 1.0/m
+    def get_index_near_phase(desired_phase):
+        return rint((desired_phase-b)*minv)
+
+    #If we want to subtract off the axisymmetric component, take the 
+    #average of velocities over the full range of the phases that will
+    #be plotted, to be subtracted later.
+    if(subtract_m0):
+        mean = zeros(velocity.r.size)
+        phase_min = -pi*velocity.m - mid_time*2.0*pi/velocity.period
+        phase_max = pi*velocity.m - mid_time*2.0*pi/velocity.period
+        phase_min_idx = get_index_near_phase(phase_min)
+        phase_max_idx = get_index_near_phase(phase_max)
+        for i in range(0, mean.size):
+            #I flip the indices here because phase becomes more negative
+            #with time.
+            mean[i] = v_component[phase_max_idx:phase_min_idx, i].mean()
+    
+    #Note what appear to be flipped indices in vr and vt below. This
+    #is so the call to contour(x, y, v) displays properly.
+    for i in range(0, x.size):
+        for j in range(0, y.size):
+            r = sqrt(x[i]**2 + y[j]**2)
+            if ((r < rin) or (r > rout)):
+                v[j][i] = nan
+            else:
+                #Find the azimuth of a point in the plot. Take into account
+                #the desired overall plot rotation. Subtracting here leads
+                #to a clockwise plot rotation.
+                azimuth = wrap_phase(math.atan2(y[j], x[i]) - plot_rotation)
+                desired_phase = (velocity.m*azimuth -
+                                 mid_time*2*pi/velocity.period)
+
+                #Just do a nearest-neighbor thing in radius and phase,
+                #since these are fairly fine-grained measurements in
+                #these dimensions now.
+                ridx = velocity.get_index_near_radius(r)
+                phaseidx = get_index_near_phase(desired_phase)
+                v[j][i] = v_component[phaseidx, ridx]
+
+                #And subtract off the axisymmetric component at that radius,
+                #if desired.
+                if(subtract_m0):
+                    v[j][i] -= mean[ridx]
+    
+    return x, y, v
+
+
 def save_vtheta_mode_animation(velocity, filename, start_time=nan,
                                end_time=nan, rin=r1,
                                rout=r2, fps=24, speed=1.0,
@@ -864,93 +953,6 @@ def save_vtheta_mode_animation(velocity, filename, start_time=nan,
     subprocess.check_call(assemblecmd)
     for framefilename in framefilenames:
         os.remove(framefilenames[framefilename])
-
-
-def project_velocity_timeseries_on_rt_plane(velocity, component,
-                                            mid_time,
-                                            numpoints=400,
-                                            rin=r1, rout=r2,
-                                            subtract_m0 = 0,
-                                            plot_rotation=0):
-    '''Projects a timeseries onto the r-\theta plane. Measurements
-    should be at the same azimuthal location for most accurate
-    results. The m and period for the nonaxisymmetric modes are
-    brought along in the Velocity object. You just have to specify the
-    mid-point time for the desired projection. If subtract_m0 is set,
-    the axisymmetric contribution is subtracted off. The plot_rotation
-    angle specifies the number of radians to rotate the plot of the
-    mode. Returns an x vector, a y vector, and the velocity array'''
-
-    x = linspace(-r2, r2, num=numpoints)
-    y = linspace(-r2, r2, num=numpoints)
-    v = zeros([x.size, y.size])
-
-    if(component == 'vr'):
-        v_component = velocity.vr
-    elif(component == 'vtheta'):
-        v_component = velocity.vtheta
-    elif(component == 'vz'):
-        v_component = velocity.vz
-    else:
-        print "Unrecognized component. Must be 'vr', 'vtheta', or 'vz'."
-        return False
-    
-
-    #The phase decreases with time, for a function going as
-    #exp(k\cdot x - \omega t)
-    phase = -2.0*pi*velocity.time/velocity.period
-
-    #Define this function, so we can find the nearest phase measurement
-    #that we have for each desired phase.
-    #We know that this was created with a linear fit, so it should be easy.
-    b = phase[0]
-    m = (phase[-1] - b)/(phase.size-1)
-    minv = 1.0/m
-    def get_index_near_phase(desired_phase):
-        return rint((desired_phase-b)*minv)
-
-    #If we want to subtract off the axisymmetric component, take the 
-    #average of velocities over the full range of the phases that will
-    #be plotted, to be subtracted later.
-    if(subtract_m0):
-        mean = zeros(velocity.r.size)
-        phase_min = -pi*velocity.m - mid_time*2.0*pi/velocity.period
-        phase_max = pi*velocity.m - mid_time*2.0*pi/velocity.period
-        phase_min_idx = get_index_near_phase(phase_min)
-        phase_max_idx = get_index_near_phase(phase_max)
-        for i in range(0, mean.size):
-            #I flip the indices here because phase becomes more negative
-            #with time.
-            mean[i] = v_component[phase_max_idx:phase_min_idx, i].mean()
-    
-    #Note what appear to be flipped indices in vr and vt below. This
-    #is so the call to contour(x, y, v) displays properly.
-    for i in range(0, x.size):
-        for j in range(0, y.size):
-            r = sqrt(x[i]**2 + y[j]**2)
-            if ((r < rin) or (r > rout)):
-                v[j][i] = nan
-            else:
-                #Find the azimuth of a point in the plot. Take into account
-                #the desired overall plot rotation. Subtracting here leads
-                #to a clockwise plot rotation.
-                azimuth = wrap_phase(math.atan2(y[j], x[i]) - plot_rotation)
-                desired_phase = (velocity.m*azimuth -
-                                 mid_time*2*pi/velocity.period)
-
-                #Just do a nearest-neighbor thing in radius and phase,
-                #since these are fairly fine-grained measurements in
-                #these dimensions now.
-                ridx = velocity.get_index_near_radius(r)
-                phaseidx = get_index_near_phase(desired_phase)
-                v[j][i] = v_component[phaseidx, ridx]
-
-                #And subtract off the axisymmetric component at that radius,
-                #if desired.
-                if(subtract_m0):
-                    v[j][i] -= mean[ridx]
-    
-    return x, y, v
 
 
 def play_channel_velocity_animation(channel, speed=1.0,
