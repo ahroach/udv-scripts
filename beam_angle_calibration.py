@@ -13,8 +13,8 @@ def global_optimize_transducer_angle(shot1, shot2, channelnum1, channelnum2,
     sh2ch2 = deepcopy(shot2.get_channel(channelnum2))
 
     #Now get some dummy combined velocity things.
-    vel1 = deepcopy(shot1.get_velocity((channelnum1, channelnum2)))
-    vel2 = deepcopy(shot2.get_velocity((channelnum1, channelnum2)))
+    vel1 = deepcopy(shot1.get_velocity(channelnum1, channelnum2))
+    vel2 = deepcopy(shot2.get_velocity(channelnum1, channelnum2))
     
     start_idx = vel1.get_index_near_time(start_time)
     end_idx = vel1.get_index_near_time(end_time)
@@ -103,8 +103,8 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
     sh2ch2 = deepcopy(shot2.get_channel(channelnum2))
 
     #Now get some dummy combined velocity things.
-    vel1 = deepcopy(shot1.get_velocity((channelnum1, channelnum2)))
-    vel2 = deepcopy(shot2.get_velocity((channelnum1, channelnum2)))
+    vel1 = deepcopy(shot1.get_velocity(channelnum1, channelnum2))
+    vel2 = deepcopy(shot2.get_velocity(channelnum1, channelnum2))
     
     start_idx = vel1.get_index_near_time(start_time)
     end_idx = vel1.get_index_near_time(end_time)
@@ -191,8 +191,8 @@ def plot_calibrated_result(shot1, shot2, channelnum1, channelnum2,
     sh2ch2 = deepcopy(shot2.get_channel(channelnum2))
 
     #Now get some dummy combined velocity things.
-    vel1 = deepcopy(shot1.get_velocity((channelnum1, channelnum2)))
-    vel2 = deepcopy(shot2.get_velocity((channelnum1, channelnum2)))
+    vel1 = deepcopy(shot1.get_velocity(channelnum1, channelnum2))
+    vel2 = deepcopy(shot2.get_velocity(channelnum1, channelnum2))
     
     start_idx = vel1.get_index_near_time(start_time)
     end_idx = vel1.get_index_near_time(end_time)
