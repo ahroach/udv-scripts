@@ -91,7 +91,7 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
                                  start_time, end_time, anglediff=2.0,
                                  A1s=linspace(18,23,30),
                                  A2s=linspace(18,23,30), 
-                                 progressive_draw=0,
+                                 plot_output=1,
                                  norm=1):
     """Do a brute force calibration of the transducer angles. Calculate a
     number of positions around the suspected angle for each transducer, and
@@ -154,14 +154,15 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
         return total_err
 
     errors = ones([A2s.size, A1s.size])*nan
-    fig = figure()
+    if(plot_output):
+        fig = figure()
 
     totalpts = errors.size
     print "Entering loop...."
     for i in range(0, A1s.size):
         for j in range(0, A2s.size):
             errors[j, i] = err_func(A1s[i], A2s[j])
-            if(progressive_draw):
+            if(plot_output):
                 fig.clear()
                 ax = fig.add_subplot(111)
                 cp = ax.contourf(A1s, A2s, errors, 50)
@@ -173,12 +174,13 @@ def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
             print "%d of %d positions analyzed" % (i*A2s.size + j + 1,
                                                    totalpts)
 
-    fig.clear()
-    ax = fig.add_subplot(111)
-    cp = ax.contourf(A1s, A2s, errors, 30)
-    fig.colorbar(cp)
-    ax.set_xlabel("A for Channel %d" % channelnum1)
-    ax.set_ylabel("A for Channel %d" % channelnum2)
+    if(plot_output):
+        fig.clear()
+        ax = fig.add_subplot(111)
+        cp = ax.contourf(A1s, A2s, errors, 30)
+        fig.colorbar(cp)
+        ax.set_xlabel("A for Channel %d" % channelnum1)
+        ax.set_ylabel("A for Channel %d" % channelnum2)
     return (A1s, A2s, errors)
 
 
