@@ -139,13 +139,25 @@ class Shot:
         for velocity in velocities_to_be_removed:
             self.velocities.remove(velocity)
     
-    def get_velocity(self, channel_nums, m=0, period=0):
-        '''Returns a Velocity object produced using the specified
-        channel_nums for this Shot.'''
-        channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
+    def get_velocity(self, *args, **kwargs):
+        """Returns a Velocity object produced using the channel
+        numbers specified in *args for this Shot. Optional 'm' and
+        'period' arguments in **kwargs can be specified to do
+        nonaxisymmetric velocity reconstructions. If the desired
+        velocity object already exists, it is returned and
+        add_velocity() is not called."""
 
-        #Check to see if we've processed this velocity data before, and, if so,
-        #return it
+        #Grab the channel numbers, and get the list of channel nums
+        channel_nums = self.sanitize_channel_nums_for_velocities(args)
+
+        #Grab the channel numbers, and get the list of channel nums
+        channel_nums = self.sanitize_channel_nums_for_velocities(args)
+
+        #Grab the optional arguments
+        m = kwargs.pop('m', 0)
+        period = kwargs.pop('period', 0)
+        for k in kwargs.keys():
+            print "Unrecognized argument to get_velocity(): %s" % k
 
         for velocity in self.velocities:
             #Now check to see if the progenitor channels the channel_nums, and
@@ -158,18 +170,30 @@ class Shot:
                 return velocity
 
         #Otherwise add this new velocity set and return that.
-        return self.add_velocity(channel_nums, m=m, period=period)
+        return self.add_velocity(*channel_nums, m=m, period=period)
 
-    def add_velocity(self, channel_nums, m=0, period=0):
-        '''Adds and returns a Velocity object produced using channel_nums
-        for this Shot.'''
-        channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
-        
+    def add_velocity(self, *args, **kwargs):
+        """Adds and returns a Velocity object produced using the
+        channel numbers specified in *args for this Shot. Optional 'm'
+        and 'period' arguments in **kwargs can be specified to do
+        nonaxisymmetric velocity reconstructions."""
+
+        #Grab the channel numbers, and get the list of channel nums
+        channel_nums = self.sanitize_channel_nums_for_velocities(args)
+
+        #Grab the optional arguments
+        m = kwargs.pop('m', 0)
+        period = kwargs.pop('period', 0)
+        for k in kwargs.keys():
+            print "Unrecognized argument to add_velocity(): %s" % k
+
+        #Now generate the velocity object
         try:
-            velocity = Velocity(self, channel_nums, m, period)
+            velocity = Velocity(self, channel_nums, m=m, period=period)
         except:
             raise
 
+        #And append it to the velocities list for this Shot
         self.velocities.append(velocity)
         return self.velocities[-1]
     
@@ -197,16 +221,25 @@ class Shot:
                 self.velocities.remove(velocity)
 
     def sanitize_channel_nums_for_velocities(self, channel_nums):
-        '''Makes sure we have the channel_nums as a sorted list, even if
-        we get weird things on input'''
-        if(type(channel_nums) is int):
-            channel = channel_nums
-            channel_nums = list()
-            channel_nums.append(channel)
-        elif(not(type(channel_nums) is list)):
-            channels = channel_nums
+        """Makes sure we have the channel_nums as a sorted list, even if
+        we get weird things on input"""
+
+        #If we received a tuple, list, dict, or array on input to
+        #get_velocity or add_velocity, that object will be in the
+        #first position of the arguments list. So grab that argument,
+        #and make a list out of it.
+
+        t = type(channel_nums[0])
+        if (t == dict) or (t==list) or (t==tuple) or (t==np.ndarray):
+            channels = channel_nums[0]
             channel_nums = list(channels)
-        
+        else:
+            #Otherwise, the channel numbers were listed separately. So
+            #make the whole thing a list.
+            channel_nums = list(channel_nums)
+
+        #Now sort them, so the channel numbers are in order when comparing
+        #to other Velocity objects.
         channel_nums.sort()
         return channel_nums
 
@@ -387,11 +420,14 @@ class Velocity():
     about which generation routine to call based on the number of
     channels presented.'''
     def __init__(self, shot, channel_nums, m=0, period=0):
-        '''Creates a Velocity object
-        
-        Tries to be smart about selecting generation methods, based
-        on the number of channels required and whether or not a non-zero
-        m has been specified.'''
+        """Creates a Velocity object
+
+        Creates a new Velocity object based on the channel numbers
+        specified in the list channel_nums. Tries to be smart about
+        selecting generation methods, based on the number of channels
+        required and whether or not a non-zero m has been
+        specified."""
+
         self.shot = shot
         self.progenitors = []
 
@@ -399,6 +435,13 @@ class Velocity():
         if (len(channel_nums) < 1) or (len(channel_nums) > 3):
             raise ValueError("Can't generate velocity from %d measurements" % len(channel_nums))
 
+
+        #Make sure period is cast right, and make sure it is in
+        #reasonable bounds.
+        period = float(period)
+        if (m != 0) and (period <= 0):
+            raise ValueError("In call to Velocity.__init__(), period must be > 0 if m!=0")
+        
         #Put all of the channel objects in the progenitors list.
         for channel_num in channel_nums:
             try:
@@ -538,8 +581,8 @@ class Velocity():
         #Also, choose a dt such that m*period/dt = 200. We're upsampling
         #here so that when we go to plot this on the r-theta plane,
         #we have an easier time of it.
-        dt = self.m*self.period/200
-        time_buffer = self.m*self.period/2
+        dt = self.m*self.period/200.0
+        time_buffer = self.m*self.period/2.0
         tempchannel.time = np.arange(tempchannel.time[0] + time_buffer,
                                      tempchannel.time[-1] - time_buffer, dt)
 
@@ -731,9 +774,9 @@ class Velocity():
         #here so that when we go to plot this on the r-theta plane,
         #we have an easier time of it.
         
-        #@3 2ill use a common time base for both channels
-        dt = self.m*self.period/200
-        time_buffer = self.m*self.period/2
+        #Use a common time base for both channels
+        dt = self.m*self.period/200.0
+        time_buffer = self.m*self.period/2.0
         tempch1.time = np.arange(tempch1.time[0] + time_buffer,
                                  tempch1.time[-1] - time_buffer, dt)
         tempch2.time = tempch1.time.copy()
