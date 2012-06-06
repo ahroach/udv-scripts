@@ -158,24 +158,21 @@ class Shot:
         for velocity in velocities_to_be_removed:
             self.velocities.remove(velocity)
     
-    def get_velocity(self, *args, **kwargs):
+    def get_velocity(self, *channels, **nonaxiargs):        
         """Returns a Velocity object produced using the channel
-        numbers specified in *args for this Shot. Optional 'm' and
-        'period' arguments in **kwargs can be specified to do
+        numbers specified in *channels for this Shot. Optional 'm' and
+        'period' arguments in **nonaxiargs can be specified to do
         nonaxisymmetric velocity reconstructions. If the desired
         velocity object already exists, it is returned and
         add_velocity() is not called."""
 
         #Grab the channel numbers, and get the list of channel nums
-        channel_nums = self.sanitize_channel_nums_for_velocities(args)
-
-        #Grab the channel numbers, and get the list of channel nums
-        channel_nums = self.sanitize_channel_nums_for_velocities(args)
+        channel_nums = self.sanitize_channel_nums_for_velocities(channels)
 
         #Grab the optional arguments
-        m = kwargs.pop('m', 0)
-        period = kwargs.pop('period', 0)
-        for k in kwargs.keys():
+        m = nonaxiargs.pop('m', 0)
+        period = nonaxiargs.pop('period', 0)
+        for k in nonaxiargs.keys():
             print "Unrecognized argument to get_velocity(): %s" % k
 
         for velocity in self.velocities:
@@ -191,19 +188,19 @@ class Shot:
         #Otherwise add this new velocity set and return that.
         return self.add_velocity(*channel_nums, m=m, period=period)
 
-    def add_velocity(self, *args, **kwargs):
+    def add_velocity(self, *channels, **nonaxiargs):
         """Adds and returns a Velocity object produced using the
-        channel numbers specified in *args for this Shot. Optional 'm'
-        and 'period' arguments in **kwargs can be specified to do
-        nonaxisymmetric velocity reconstructions."""
+        channel numbers specified in *channels for this Shot. Optional
+        'm' and 'period' arguments in **nonaxiargs can be specified to
+        do nonaxisymmetric velocity reconstructions."""
 
         #Grab the channel numbers, and get the list of channel nums
-        channel_nums = self.sanitize_channel_nums_for_velocities(args)
+        channel_nums = self.sanitize_channel_nums_for_velocities(channels)
 
         #Grab the optional arguments
-        m = kwargs.pop('m', 0)
-        period = kwargs.pop('period', 0)
-        for k in kwargs.keys():
+        m = nonaxiargs.pop('m', 0)
+        period = nonaxiargs.pop('period', 0)
+        for k in nonaxiargs.keys():
             print "Unrecognized argument to add_velocity(): %s" % k
 
         #Now generate the velocity object
@@ -216,11 +213,22 @@ class Shot:
         self.velocities.append(velocity)
         return self.velocities[-1]
     
-    def del_velocity(self, channel_nums, m=0, period=0):
-        '''Removes a Velocity object from a shot matching the specified
-        parameters.'''
-        channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
+    def del_velocity(self, *channels, **nonaxiargs):
+        """Removes a Velocity object from a shot matching the specified
+        parameters.
 
+        Functional call is in the same format as to add_velocity() and
+        get_velocity() methods."""
+        
+        #Grab the channel numbers, and get the list of channel nums
+        channel_nums = self.sanitize_channel_nums_for_velocities(channels)
+        
+        #Grab the optional arguments
+        m = nonaxiargs.pop('m', 0)
+        period = nonaxiargs.pop('period', 0)
+        for k in nonaxiargs.keys():
+            print "Unrecognized argument to del_velocity(): %s" % k
+        
         #Try to find this velocity.
 
         for velocity in self.velocities:
@@ -238,7 +246,7 @@ class Shot:
                 (velocity.m == m) and
                 ((m==0) or (velocity.period == period))):
                 self.velocities.remove(velocity)
-
+    
     def sanitize_channel_nums_for_velocities(self, channel_nums):
         """Makes sure we have the channel_nums as a sorted list, even if
         we get weird things on input"""
