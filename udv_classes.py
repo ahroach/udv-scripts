@@ -48,12 +48,15 @@ class Shot:
         Looks up and adds shot parameters to the object from the shot
         database. Also creates a CouetteProfile object with the ideal
         Couette profile for this set of parameters'''
+
         if(not(sp.shot_params.has_key(shot_num))):
-            print "Error: Shot %d not in database." % shot_num
-            return False
+            raise ValueError('Shot %d not in database.' % shot_num)
         
         self.number = shot_num
         self.filename = data_path + str(shot_num) + '.BDD'
+        if(not(os.path.exists(self.filename))):
+            raise ValueError('Data file %s does not exist.' % self.filename)
+        
         self.shot_length = sp.shot_params[shot_num]['shot_length']
         self.ICspeed = sp.shot_params[shot_num]['ICspeed']
         self.IRspeed = sp.shot_params[shot_num]['IRspeed']
@@ -92,14 +95,13 @@ class Shot:
     def add_channel(self, channel_num):
         '''Adds and returns a ChannelData object corresponding to channel_num
         for this Shot.'''
-        #Make sure this channel exists
-        if(not(self.channels_used.__contains__(channel_num))):
-            print "Error: Shot %d doesn't use channel %d." % (self.number,
-                                                              channel_num)
-            return False
+        
+        try:
+            channel = ChannelData(self, channel_num)
+        except:
+            raise
 
-        #And create it, adding the object to the channels dictionary
-        self.channels[channel_num] = ChannelData(self, channel_num)
+        self.channels[channel_num] = channel
         return self.channels[channel_num]
 
     def del_channel(self, channel_num):
@@ -163,14 +165,12 @@ class Shot:
         for this Shot.'''
         channel_nums = self.sanitize_channel_nums_for_velocities(channel_nums)
         
-        #Make sure we actually have all of these channels.
-        for channel_num in channel_nums:
-            if(not(self.channels_used.__contains__(channel_num))):
-                print "Error: Shot %d doesn't use channel %d." % (self.number,
-                                                                  channel_num)
-                return False
-        
-        self.velocities.append(Velocity(self, channel_nums, m, period))
+        try:
+            velocity = Velocity(self, channel_nums, m, period)
+        except:
+            raise
+
+        self.velocities.append(velocity)
         return self.velocities[-1]
     
     def del_velocity(self, channel_nums, m=0, period=0):
@@ -236,14 +236,16 @@ class ChannelData:
         Shot.add_channel_data().'''
 
         if(not(shot.channels_used.__contains__(channel_num))):
-            print "Error: Shot %d doesn't use channel %d" % (shot.number,
-                                                             channel_num)
-            return False
+            raise ValueError("Shot %d does not use channel %d" % (shot.number,
+                                                                  channel_num))
 
         #Get a pointer back to our parent Shot.
         self.shot = shot
         
         #Read in the data from the UDV file
+        if(not(os.path.exists(shot.filename))):
+            raise ValueError('Data file %s does not exist.' % self.filename)
+
         data = rudv.read_ultrasound(shot.filename, channel_num,
                                     verbose=0)
 
@@ -375,6 +377,7 @@ class ChannelData:
         dup_chan = ChannelData(self.shot, self.channel)
         return dup_chan
 
+
 class Velocity():
     '''A class for processed velocity measurements.
 
@@ -391,12 +394,21 @@ class Velocity():
         m has been specified.'''
         self.shot = shot
         self.progenitors = []
-    
-        if len(channel_nums) == 0:
-            print "Error: 0 channels presented to Velocity.__init__()."
-            return None
-        elif len(channel_nums) == 1:
-            self.progenitors.append(self.shot.get_channel(channel_nums[0]))
+
+        #Make sure we've been given a reasonable number of channels.
+        if (len(channel_nums) < 1) or (len(channel_nums) > 3):
+            raise ValueError("Can't generate velocity from %d measurements" % len(channel_nums))
+
+        #Put all of the channel objects in the progenitors list.
+        for channel_num in channel_nums:
+            try:
+                channel = self.shot.get_channel(channel_num)
+            except:
+                raise
+            self.progenitors.append(channel)
+
+        #Now call the correct generation method for each situation.
+        if len(channel_nums) == 1:
             if (m==0):
                 self.m = 0
                 self.period = 0
@@ -406,8 +418,6 @@ class Velocity():
                 self.period = period
                 self.gen_velocity_one_transducer_nonaxi(self.progenitors[0])
         elif len(channel_nums) == 2:
-            self.progenitors.append(self.shot.get_channel(channel_nums[0]))
-            self.progenitors.append(self.shot.get_channel(channel_nums[1]))
             if (m==0):
                 self.m = 0
                 self.period = 0
@@ -419,17 +429,14 @@ class Velocity():
                 self.gen_velocity_two_transducers_nonaxi(self.progenitors[0],
                                                          self.progenitors[1])
         elif len(channel_nums) == 3:
-            self.progenitors.append(self.shot.get_channel(channel_nums[0]))
-            self.progenitors.append(self.shot.get_channel(channel_nums[1]))
-            self.progenitors.append(self.shot.get_channel(channel_nums[2]))
             self.m = 0
             self.period = 0
             self.gen_velocity_three_transducers(self.progenitors[0],
                                                 self.progenitors[1],
                                                 self.progenitors[2])
         else:
-            print "Error: Can't generate velocity from %d measurements" % size(channel_nums)
-            return None
+            raise ValueError("Can't generate velocity from %d measurements" % len(channel_nums))
+
 
     def gen_velocity_one_transducer(self, channel):
         '''Generate velocity from a single transducer.
@@ -863,10 +870,15 @@ class ShotList():
         
         #Try to create this shot, checking to make sure that Shot.__init__
         #doesn't return False.
-        shot = Shot(shot_num)
-        if(shot):
-            self.shots.append(shot)
-            return shot
+        try:
+            shot=Shot(shot_num)
+        except ValueError as e:
+            print "Error adding shot to list."
+            print e.message
+            return None
+        
+        self.shots.append(shot)
+        return shot
     
     def del_shot(self, shot_num):
         """Deletes Shot object from the list for the specified shot number."""
