@@ -1,8 +1,18 @@
-'''Provides Shot, Channel, and Velocity objects for processing UDV data.
+"""Provides Shot, ChannelData, Velocity, and ShotList objects for UDV data.
 
-Also provides get_shot() (and the associated add_shot()) and
-del_shot() functions for managing a list of already-processed
-shots.''' 
+A typical workflow might look like:
+    import udv_classes
+    udv_classes.set_data_path("/u/aroach/ultrasound_data")
+    get_shot = udv_classes.ShotList().get_shot #Initialize a new ShotList
+
+Then to get Shot, Channel, or Velocity objects:
+    shot = get_shot(948)
+    channel = get_shot(948).get_channel(2)
+    velocity = get_shot(948).get_velocity(1,2)
+
+Or to get a velocity object assuming a nonaxisymmetric mode structure:
+    velocity = get_shot(948).get_velocity(1, 2, m=1, period=1.2)
+"""
 
 import read_ultrasound_new as rudv
 from scipy.interpolate import UnivariateSpline
@@ -42,12 +52,21 @@ set_data_path('')
 
 
 class Shot:
+    """A class for data from an individual shot.
+    
+    A shot is initialized with a shot number. Parameters for that shot
+    number are read from shot_params.py. Raw data from an individual
+    channel can be accessed in a ChannelData object returned from the
+    get_channel() method. Data processed into individual velocity
+    components can be accessed in a Velocity object returned from the
+    get_velocity() method."""
+    
     def __init__(self, shot_num):
-        '''Creates a new Shot object.
+        """Creates a new Shot object.
         
         Looks up and adds shot parameters to the object from the shot
         database. Also creates a CouetteProfile object with the ideal
-        Couette profile for this set of parameters'''
+        Couette profile for this set of parameters"""
 
         if(not(sp.shot_params.has_key(shot_num))):
             raise ValueError('Shot %d not in database.' % shot_num)
@@ -261,6 +280,15 @@ class Shot:
         
     
 class ChannelData:
+    """A class for raw data from an individual channel.
+    
+    On __init__, parameters are found from the parent Shot and from
+    shot_params.py for the desired channel. The raw data from the
+    channel is then read in using
+    read_ultrasound_new.read_ultrasound().  Transformations from the
+    measurement depth to the measurement location in cylindrical
+    coordinates are also done."""
+    
     def __init__(self, shot, channel_num):
         '''Initialize a ChannelData object.
 
@@ -412,13 +440,13 @@ class ChannelData:
 
 
 class Velocity():
-    '''A class for processed velocity measurements.
+    """A class for processed velocity measurements.
 
     These are distinct from the velocities in the Channel class
     because the velocities here are processed and presented in the
     v_r, v_theta, and v_z components.  __init__() tries to be smart
     about which generation routine to call based on the number of
-    channels presented.'''
+    channels presented."""
     def __init__(self, shot, channel_nums, m=0, period=0):
         """Creates a Velocity object
 
@@ -880,6 +908,9 @@ class Velocity():
             return False
 
 class CouetteProfile():
+    """A simple class used to calculate and store the ideal Couette profile
+    for the parameters in a Shot object."""
+    
     def __init__(self, shot):
         self.shot = shot
         self.r = np.linspace(r1, r2, 200)
@@ -894,6 +925,12 @@ class CouetteProfile():
 
 
 class ShotList():
+    """A class for managing groups of Shots.
+
+    Maintains a list of processed Shots. Normally, only the get_shot()
+    method should be required to access this list. But shots can also be
+    removed with the del_shot() method."""
+    
     def __init__(self):
         self.shots = []
 

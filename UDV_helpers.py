@@ -7,9 +7,10 @@ best way to get a Shot object, and the get_channel() or get_velocity()
 methods of the Shot object should be used to get the appropriate
 Channel or Velocity object. As an example, we might run
 
-import udv_classes
-get_shot = udv_classes.ShotList().get_shot
-plot_avg_vtheta_profile(get_shot(852).get_velocity((1,2)), 100, 150)
+   import udv_classes
+   udv_classes.set_data_path("/u/aroach/ultrasound_data")
+   get_shot = udv_classes.ShotList().get_shot
+AAAAAA   plot_avg_vtheta_profile(get_shot(852).get_velocity(1,2), 100, 150)
 
 to plot the average vtheta obtained from combining channels 1 and 2
 from shot 852."""
