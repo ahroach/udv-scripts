@@ -103,6 +103,30 @@ def plot_avg_vtheta_profile(velocity, start_num, end_num):
     plot(velocity.shot.idealcouette.r, velocity.shot.idealcouette.vtheta)
 
 
+def plot_raw_data_all_channels(shot, start_time, end_time,
+                               offset=0, scale=1.0):
+    for ch_num in shot.channels_used:
+        ch = shot.get_channel(ch_num)
+        start_idx = ch.get_index_near_time(start_time)
+        end_idx = ch.get_index_near_time(end_time)
+        if (sin(ch.B) > 0):
+            labelstring = "Ch.%d" % ch_num
+        else:
+            labelstring = "-Ch.%d" % ch_num
+        
+        if(offset):
+            plot(ch.depth-ch.offset,
+                 (scale*sin(ch.B) *
+                  mean(ch.unwrapped_velocity[start_idx:end_idx,:], axis=0)),
+                 label=labelstring)
+        else:
+            plot(ch.depth-ch.offset,
+                 (scale*sin(ch.B) *
+                  mean(ch.unwrapped_velocity[start_idx:end_idx,:], axis=0)),
+                 label=labelstring)
+        legend(loc='upper left')
+                 
+
 def plot_channel_velocity_contour(channel, unwrapped=0, n=30):
     '''Makes a contour plot of the raw velocity as a function of depth for a
     channel'''
