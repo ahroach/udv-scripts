@@ -88,7 +88,7 @@ def global_optimize_transducer_angle(shot1, shot2, channelnum1, channelnum2,
 
 
 def brute_force_transducer_angle(shot1, shot2, channelnum1, channelnum2,
-                                 start_time, end_time, anglediff=2.0,
+                                 start_time, end_time,
                                  A1s=linspace(18,23,30),
                                  A2s=linspace(18,23,30), 
                                  plot_output=1,
