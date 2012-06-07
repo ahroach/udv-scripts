@@ -371,3 +371,124 @@ def local_optimize_transducer_angle(shot1, shot2, channelnum1, channelnum2,
     plot(r, A1s)
     plot(r, A2s)
                                            
+
+
+def local_optimize_transducer_angle_2(shot1, shot2, channelnum1, channelnum2,
+                                      start_time, end_time):
+    '''Implements a method to calculate the pair of transducer angles that
+    produce two velocity measurements from a set of forward/backward shots.
+    A pair of angles is calculated for reach radius of the measurements.
+    If all goes well, the calculated angles will be roughly constant
+    as a function of radius. Note that we have assumed that cos(B)=0 to make
+    the math easier (i.e. the beams are in the r-\theta plane.) Under
+    pathological conditions (such as with a small A angle), there may be no
+    set of transducer angles which produce a given pair of measurements.'''
+
+    #Note that this is only valid for cos(B) = 0!
+    #We don't have to copy these channels as we do for the global method,
+    #since we don't need to modify anything.
+    
+    sh1ch1 = shot1.get_channel(channelnum1)
+    sh1ch2 = shot1.get_channel(channelnum2)
+    sh2ch1 = shot2.get_channel(channelnum1)
+    sh2ch2 = shot2.get_channel(channelnum2)
+    
+    #Reimplement the logic from the gen_velocity_two_transducers to get
+    #a common radius vector.
+    
+    #Find the index of the deepest point (smallest radius)
+    sh1ch1_last_idx = sh1ch1.r.argmin()
+    sh1ch2_last_idx = sh1ch2.r.argmin()
+    sh2ch1_last_idx = sh2ch1.r.argmin()
+    sh2ch2_last_idx = sh2ch2.r.argmin()
+    
+    #Find out which channel has the least radial penetration, and use
+    #that as the definitive r coordinate.
+    r = sh1ch1.r[0:sh1ch1_last_idx][::-1]
+    if (sh1ch2.r.min() > r.min()):
+        r = sh1ch2.r[0:sh1ch2_last_idx][::-1]
+    if (sh2ch1.r.min() > r.min()):
+        r = sh2ch1.r[0:sh2ch1_last_idx][::-1]
+    if (sh2ch2.r.min() > r.min()):
+        r = sh2ch2.r[0:sh2ch2_last_idx][::-1]
+    
+    #Now resample each of the velocities onto the new radial grid.
+    US = scipy.interpolate.UnivariateSpline
+    
+    #For shot 1 channel 1
+    start_idx = sh1ch1.get_index_near_time(start_time)
+    end_idx = sh1ch1.get_index_near_time(end_time)
+    
+    f = US(sh1ch1.r[0:sh1ch1_last_idx][::-1],
+           mean(sh1ch1.unwrapped_velocity[start_idx:end_idx,0:sh1ch1_last_idx],
+                axis=0)[::-1],
+           k=3, s=0)
+    v11 = f(r)
+    
+    #For shot 1 channel 2
+    start_idx = sh1ch2.get_index_near_time(start_time)
+    end_idx = sh1ch2.get_index_near_time(end_time)
+    
+    f = US(sh1ch2.r[0:sh1ch2_last_idx][::-1],
+           mean(sh1ch2.unwrapped_velocity[start_idx:end_idx,0:sh1ch2_last_idx],
+                axis=0)[::-1],
+           k=3, s=0)
+    v12 = f(r)
+    
+    
+    #For shot 2 channel 1
+    start_idx = sh2ch1.get_index_near_time(start_time)
+    end_idx = sh2ch1.get_index_near_time(end_time)
+    
+    f = US(sh2ch1.r[0:sh2ch1_last_idx][::-1],
+           mean(sh2ch1.unwrapped_velocity[start_idx:end_idx,0:sh2ch1_last_idx],
+                axis=0)[::-1],
+           k=3, s=0)
+    v21 = f(r)
+    
+    
+    #For shot 2 channel 2
+    start_idx = sh2ch2.get_index_near_time(start_time)
+    end_idx = sh2ch2.get_index_near_time(end_time)
+
+    f = US(sh2ch2.r[0:sh2ch2_last_idx][::-1],
+           mean(sh2ch2.unwrapped_velocity[start_idx:end_idx,0:sh2ch2_last_idx],
+                axis=0)[::-1],
+           k=3, s=0)
+    v22 = f(r)
+
+    A1s = linspace(18.3, 22.3, 30)
+    A2err = zeros([A1s.size, r.size])
+    A2s = zeros([A1s.size, r.size])
+
+    for i in range(0, r.size):
+        for j in range(0, A1s.size):
+            vr = (v11[i] + v21[i])/(-2.0*cos(A1s[j]*pi/180.))
+            vt = (v11[i] - v21[i])/(2.0*sin(A1s[j]*pi/180.))
+            A2vr = arccos((v12[i] + v22[i])/(-2.0*vr))
+            A2vt = arcsin((v12[i] - v22[i])/(2.0*vt))
+            #Need the negative branch.
+            #if (A2vr > 0):
+            #    A2vr = -A2vr
+            #A2err[j,i] = unwrap_phase(abs(A2vr-A2vt))*180./pi
+            A2err[j, i] = v11[i] + v21[i]
+            A2s[j,i] = A2vt*180./pi
+    
+    print A2s
+    figure()
+    contourf(r, A1s, A2err)
+    title("Error")
+    colorbar()
+
+    figure()
+    cl= linspace(-22.3, -18.3, 30)
+    contourf(r, A1s, A2s, levels=cl)
+    title("A2")
+    colorbar()
+                                           
+def unwrap_phase(angle):
+    while(angle > pi):
+        angle = angle-pi
+    while(angle < -pi):
+        angle = angle+pi
+    return angle
