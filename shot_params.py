@@ -6089,7 +6089,7 @@ shot_params[1321] = {'shot_num': 1321, 'shot_length': 180,
                      'ports': [6, 7, 8, 5, 10]}
 
 
-shot_params[1322] = {'shot_num': 1322, 'shot_length': 160, 'trouble'flag': 1,
+shot_params[1322] = {'shot_num': 1322, 'shot_length': 160, 'trouble_flag': 1,
                      'ICspeed': 1200, 'IRspeed': 660,
                      'ORspeed': 159, 'OCspeed': 159,
                      'current': 1200, 'field_delay': 125, 't_field': 30,
