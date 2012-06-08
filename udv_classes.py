@@ -435,6 +435,11 @@ class ChannelData:
         specified time'''
         return abs(self.time - time).argmin()
 
+    def get_index_near_radius(self, radius):
+        '''Find index in radius array of the element closest to the
+        specified radius'''
+        return abs(self.r - radius).argmin()
+
     def list_params(self):
         '''Lists information about the channel'''
         print "Shot: %d, Channel: %d, Port: %d" % (self.shot.number,
