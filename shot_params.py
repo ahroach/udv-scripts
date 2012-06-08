@@ -6063,3 +6063,39 @@ shot_params[1318] = {'shot_num': 1318, 'shot_length': 300,
                      'Bs': [90, -90, -90, 90, 90],
                      'offsets': [1.23, 1.13, 0.15, 0.41, 0.6],
                      'ports': [6, 7, 8, 5, 10]}
+
+
+shot_params[1319] = {'shot_num': 1319, 'shot_length': 190,
+                     'ICspeed': 1200, 'IRspeed': 660,
+                     'ORspeed': 159, 'OCspeed': 159,
+                     'current': 400, 'field_delay': 125, 't_field': 60,
+                     'udv_delay': 105,
+                     'channels': [1, 2, 3, 4, 5],
+                     'As': [20.3, 20.5, 20.0, 20.2, 20.3],
+                     'Bs': [90, -90, -90, 90, 90],
+                     'offsets': [1.23, 1.13, 0.15, 0.41, 0.6],
+                     'ports': [6, 7, 8, 5, 10]}
+
+
+shot_params[1321] = {'shot_num': 1321, 'shot_length': 180,
+                     'ICspeed': 1200, 'IRspeed': 660,
+                     'ORspeed': 159, 'OCspeed': 159,
+                     'current': 800, 'field_delay': 125, 't_field': 50,
+                     'udv_delay': 105,
+                     'channels': [1, 2, 3, 4, 5],
+                     'As': [20.3, 20.5, 20.0, 20.2, 20.3],
+                     'Bs': [90, -90, -90, 90, 90],
+                     'offsets': [1.23, 1.13, 0.15, 0.41, 0.6],
+                     'ports': [6, 7, 8, 5, 10]}
+
+
+shot_params[1322] = {'shot_num': 1322, 'shot_length': 160, 'trouble'flag': 1,
+                     'ICspeed': 1200, 'IRspeed': 660,
+                     'ORspeed': 159, 'OCspeed': 159,
+                     'current': 1200, 'field_delay': 125, 't_field': 30,
+                     'udv_delay': 105,
+                     'channels': [1, 2, 3, 4, 5],
+                     'As': [20.3, 20.5, 20.0, 20.2, 20.3],
+                     'Bs': [90, -90, -90, 90, 90],
+                     'offsets': [1.23, 1.13, 0.15, 0.41, 0.6],
+                     'ports': [6, 7, 8, 5, 10]}
