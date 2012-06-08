@@ -278,16 +278,16 @@ class Shot:
     def list_params(self):
         '''Lists information about the shot'''
         print "Shot number: %d" % self.number
-        print "Component speeds: {%d, %d, %d, %d RPM}" % (self.ICspeed,
+        print "Component speeds: {%g, %g, %g, %g RPM}" % (self.ICspeed,
                                                           self.IRspeed,
                                                           self.ORspeed,
                                                           self.OCspeed)
-        print "Shot length: %ds, UDV Delay: %ds" % (self.shot_length,
+        print "Shot length: %gs, UDV Delay: %gs" % (self.shot_length,
                                                     self.udv_delay)
-        print "Field delay: %ds, Field length: %ds" % (self.field_delay,
+        print "Field delay: %gs, Field length: %gs" % (self.field_delay,
                                                        self.field_length)
         field = self.current*2.8669
-        print "%dA applied current -> %dG" % (self.current,
+        print "%gA applied current -> %gG" % (self.current,
                                               field)
         
     
@@ -443,7 +443,7 @@ class ChannelData:
         print "A = %g, B = %g, offset = %gmm" % (self.A,
                                                  self.B,
                                                  self.offset)
-        print "UDV delay: %ds, Data-taking time: %gs" % (self.shot.udv_delay,
+        print "UDV delay: %gs, Data-taking time: %gs" % (self.shot.udv_delay,
                                                          self.time[-1])
 
     def duplicate(self):
