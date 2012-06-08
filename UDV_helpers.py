@@ -159,9 +159,9 @@ def plot_two_component_velocity_contours(velocity, start_time, end_time, n=30):
     colorbar()
 
     
-def plot_timeseries(channel, idx, labelstring='', withpts=0):
-    '''Plot timeseries of the velocity at a particular point, specified by
-    idx, of a channel.'''
+def plot_timeseries(channel, radius, labelstring='', withpts=0):
+    """Plot timeseries of the velocity measured by a channel at one radius"""
+    idx = channel.get_index_near_radius(radius)
     if(len(labelstring) == 0):
         labelstring="Shot %d, Ch. %d:\nd=%.3gcm, r=%.3gcm"%(channel.shot.number,
                                                             channel.channel,
