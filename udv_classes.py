@@ -440,6 +440,56 @@ class ChannelData:
         specified radius'''
         return abs(self.r - radius).argmin()
 
+    def mean_t(self, t_start, t_end):
+        """Find the mean over the specified time interval
+
+        Returns a dictionary containing r, azimuth, z, depth,
+        velocity, unwrapped_velocity, echo, and energy, where the
+        value at each radius is the mean value over the specified time
+        interval."""
+
+        start_idx = self.get_index_near_time(t_start)
+        end_idx = self.get_index_near_time(t_end)
+        
+        r = self.r.copy()
+        azimuth = self.azimuth.copy()
+        z = self.z.copy()
+        depth = self.depth.copy()
+        velocity = np.mean(self.velocity[start_idx:end_idx, :], axis=0)
+        unwrapped_velocity = np.mean(self.unwrapped_velocity[start_idx:end_idx, :], axis=0)
+        echo = np.mean(self.echo[start_idx:end_idx, :], axis=0)
+        energy = np.mean(self.energy[start_idx:end_idx, :], axis=0)
+        
+        return {'r': r, 'azimuth': azimuth, 'z': z, 'depth': depth,
+                'velocity': velocity,
+                'unwrapped_velocity': unwrapped_velocity, 'echo': echo,
+                'energy': energy}
+
+    def median_t(self, t_start, t_end):
+        """Find the median over the specified time interval
+
+        Returns a dictionary containing r, azimuth, z, depth,
+        velocity, unwrapped_velocity, echo, and energy, where the
+        value at each radius is the median value over the specified
+        time interval."""
+
+        start_idx = self.get_index_near_time(t_start)
+        end_idx = self.get_index_near_time(t_end)
+        
+        r = self.r.copy()
+        azimuth = self.azimuth.copy()
+        z = self.z.copy()
+        depth = self.depth.copy()
+        velocity = np.median(self.velocity[start_idx:end_idx, :], axis=0)
+        unwrapped_velocity = np.median(self.unwrapped_velocity[start_idx:end_idx, :], axis=0)
+        echo = np.median(self.echo[start_idx:end_idx, :], axis=0)
+        energy = np.median(self.energy[start_idx:end_idx, :], axis=0)
+        
+        return {'r': r, 'azimuth': azimuth, 'z': z, 'depth': depth,
+                'velocity': velocity,
+                'unwrapped_velocity': unwrapped_velocity, 'echo': echo,
+                'energy': energy}
+
     def list_params(self):
         '''Lists information about the channel'''
         print "Shot: %d, Channel: %d, Port: %d" % (self.shot.number,
@@ -891,6 +941,46 @@ class Velocity():
         '''Find index in radius array of the element closest to the
         specified radius'''
         return abs(self.r - radius).argmin()
+
+    def mean_t(self, t_start, t_end):
+        """Find the mean velocities over the specified time interval
+
+        Returns a dictionary containing r, z, azimuth, vr, vtheta, and
+        vz, where the value of the velocity at each radius is the mean
+        value over the specified time interval."""
+
+        start_idx = self.get_index_near_time(t_start)
+        end_idx = self.get_index_near_time(t_end)
+        
+        r = self.r.copy()
+        azimuth = self.azimuth.copy()
+        z = self.z.copy()
+        vr = np.mean(self.vr[start_idx:end_idx, :], axis=0)
+        vtheta = np.mean(self.vtheta[start_idx:end_idx, :], axis=0)
+        vz = np.mean(self.vz[start_idx:end_idx, :], axis=0)
+        
+        return {'r': r, 'azimuth': azimuth, 'z': z, 'vr': vr,
+                'vtheta': vtheta, 'vz': vz}
+
+    def median_t(self, t_start, t_end):
+        """Find the median velocities over the specified time interval
+
+        Returns a dictionary containing r, z, azimuth, vr, vtheta, and
+        vz, where the value of the velocity at each radius is the
+        median value over the specified time interval."""
+
+        start_idx = self.get_index_near_time(t_start)
+        end_idx = self.get_index_near_time(t_end)
+        
+        r = self.r.copy()
+        azimuth = self.azimuth.copy()
+        z = self.z.copy()
+        vr = np.median(self.vr[start_idx:end_idx, :], axis=0)
+        vtheta = np.median(self.vtheta[start_idx:end_idx, :], axis=0)
+        vz = np.median(self.vz[start_idx:end_idx, :], axis=0)
+        
+        return {'r': r, 'azimuth': azimuth, 'z': z, 'vr': vr,
+                'vtheta': vtheta, 'vz': vz}
     
     def list_progenitor_params(self):
         '''List information about the channels that were combined to
