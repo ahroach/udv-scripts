@@ -169,9 +169,11 @@ def plot_velocity_contribs_r(A=20.3, B=90, r2=rout):
         vtcoeff[i] = sqrt(1-sinA**2*cosB**2)*sin(xi)
         vzcoeff[i] = sinA*cosB
 
-    plot(r,vrcoeff, label=r"$v_r$ coefficient")
-    plot(r,vtcoeff, label=r"$v_\theta$ coefficient")
-    plot(r,vzcoeff, label=r"$v_z$ coefficient")
+    plot(r,vrcoeff, label=r"$u_r$")
+    plot(r,vtcoeff, label=r"$u_\theta$")
+    plot(r,vzcoeff, label=r"$u_z$")
+
+    title(r"$v_{udv} = \vec{v} \cdot \hat{u} = u_r v_r + u_{\theta} v_{\theta} + u_z v_z$")
 
     xlabel("r [cm]")
     legend(loc='best')
@@ -202,11 +204,11 @@ def plot_velocity_contribs_d(A=20.3, B=90, offset=0, r2=rout,
         vtcoeff[i] = sqrt(1-sinA**2*cosB**2)*sin(xi)
         vzcoeff[i] = sinA*cosB
 
-    plot(d,vrcoeff, label=r"$a$")
-    plot(d,vtcoeff, label=r"$b$")
-    plot(d,vzcoeff, label=r"$c$")
+    plot(d,vrcoeff, label=r"$u_r$")
+    plot(d,vtcoeff, label=r"$u_{\theta}$")
+    plot(d,vzcoeff, label=r"$u_z$")
 
-    title(r"$V_{UDV} = aV_r + bV_{\theta} + cV_z$")
+    title(r"$v_{udv} = \vec{v} \cdot \hat{u} = u_r v_r + u_{\theta} v_{\theta} + u_z v_z$")
 
     dclosest = r2*cosA/(sinA**2*sinB**2 + cosA**2)
     axvline(dclosest, ls='--', lw=1, color='k')
