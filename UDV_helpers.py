@@ -979,6 +979,109 @@ def save_vtheta_mode_animation(velocity, filename, start_time=nan,
         os.remove(framefilenames[framefilename])
 
 
+def save_velocity_mode_animation(velocity, filename, start_time=nan,
+                                 end_time=nan, rin=r1,
+                                 rout=r2, fps=24, speed=1.0,
+                                 minvelocityvt=nan, maxvelocityvt=nan,
+                                 minvelocityvr=nan, maxvelocityvr=nan,
+                                 numpoints=400, nlevels=50,
+                                 rotate_with_mode=0):
+    '''Create an animation of the azimuthal and radial velocity modes.'''
+    tmpfilebase = "/tmp/__tmp%s%s" % (string.ascii_letters[randint(0,51)],
+                                      string.ascii_letters[randint(0,51)])
+    
+    #Make sure that the start and end times are outside of the range
+    #that would lead to extrapolation, and hence unexpected results.
+    
+    min_time = velocity.time[0] + velocity.m*velocity.period/2.0
+    max_time = velocity.time[-1] - velocity.m*velocity.period/2.0
+    
+    if((isnan(start_time)) or (start_time < min_time)
+       or (start_time > max_time)):
+        start_time = min_time
+    
+    if((isnan(end_time)) or (end_time < min_time)
+       or (end_time > max_time)):
+        end_time = max_time
+    
+    #Calculate the time step from frame to frame, and set up an array
+    #of every time that we want to display.
+    dt = 1.0*speed/fps
+    
+    times = arange(start_time, end_time, dt)
+    
+    #If we want to rotate with the mode, set up an array of the rotation
+    #angle corresponding to each time.
+    if(rotate_with_mode):
+        rot_angles = -(times*2.0*pi*velocity.m/velocity.period % (2*pi))
+    else:
+        rot_angles = zeros(times.size)
+    
+    
+    #Now set everything up for the plots
+    fig = figure(figsize=(12, 6), dpi=80)
+    subplots_adjust(left=0.0, right=1.0, bottom=0.0, top=1.0)
+    ax1 = fig.add_subplot(1,2,1, autoscale_on=False, xlim=(-rout,rout),
+                          ylim=(-rout, rout))
+    ax2 = fig.add_subplot(1,2,2, autoscale_on=False, xlim=(-rout,rout),
+                          ylim=(-rout, rout))
+    ax1.set_aspect('equal')
+    ax2.set_aspect('equal')
+    
+    levelsvt=linspace(minvelocityvt, maxvelocityvt, nlevels)
+    levelsvr=linspace(minvelocityvr, maxvelocityvr, nlevels)
+    
+    #Now do the transformations of all of the velocity fields, and stick
+    #them in a list
+    print "Beginning to process frames"
+    framefilenames = {}
+    for i in range(0,times.size):
+        x1, y1, vt = \
+        project_velocity_timeseries_on_rt_plane(velocity, 'vtheta',
+                                                times[i], numpoints=numpoints,
+                                                rin=rin, rout=rout,
+                                                subtract_m0=1,
+                                                plot_rotation = rot_angles[i])
+        x2, y2, vr = \
+        project_velocity_timeseries_on_rt_plane(velocity, 'vr',
+                                                times[i], numpoints=numpoints,
+                                                rin=rin, rout=rout,
+                                                subtract_m0=1,
+                                                plot_rotation = rot_angles[i])
+
+        #Draw the contour plot
+        small=0.001
+        vt.clip(minvelocityvt, maxvelocityvt)        
+        vr.clip(minvelocityvr, maxvelocityvr)
+        ax1.contourf(x1, y1, vt, levelsvt, extend='both')
+        ax2.contourf(x2, y2, vr, levelsvr, extend='both')
+        
+        #Set the time text
+        ax1.text(0.05, 0.95, "t=%0.4gs" % times[i], transform=ax1.transAxes)
+        
+        #Set the label text
+        ax1.text(0.95, 0.05, r"$v_\theta$", transform=ax1.transAxes)
+        ax2.text(0.95, 0.05, r"$v_r$", transform=ax1.transAxes)
+
+        #Save the png file
+        framefilenames[i] = "%s%0.4d.png" % (tmpfilebase, i)
+        savefig(framefilenames[i])
+        
+        #And clear for the next round
+        ax1.cla()
+        ax2.cla()
+        sys.stdout.write('\x1b[1A\x1b[2K\x1b[J')
+        print "%d of %d frames assembled" % (i+1, times.size)
+    
+    close(fig)
+    assemblecmd = ['avconv', '-y', '-r', str(fps), '-b', '1800k', '-i',
+                   '%s%%04d.png' % tmpfilebase, filename]
+    
+    subprocess.check_call(assemblecmd)
+    for framefilename in framefilenames:
+        os.remove(framefilenames[framefilename])
+
+
 def play_channel_velocity_animation(channel, speed=1.0,
                                     saveoutput=0, savefilename=''):
     '''Plays an animation of the raw data from the specified Channel object.
