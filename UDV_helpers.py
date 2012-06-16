@@ -177,14 +177,14 @@ def plot_timeseries(channel, radius, labelstring='', withpts=0):
     ylabel("Velocity [cm/sec]")
 
 
-def plot_two_component_velocity_timeseries(velocity, radius):
+def plot_two_component_velocity_timeseries(velocity, radius, ls='.-'):
     '''Plot timeseries of a velocity object at a specified radius'''
     idx = velocity.get_index_near_radius(radius)
 
     titlestring = "Shot %d, r=%.3gcm" % (velocity.shot.number,
                                          velocity.r[idx])
-    plot(velocity.time, velocity.vr[:,idx], '.-', label=r"$v_r$")
-    plot(velocity.time, velocity.vtheta[:,idx], '.-', label=r"$v_\theta$")
+    plot(velocity.time, velocity.vr[:,idx], ls, label=r"$v_r$")
+    plot(velocity.time, velocity.vtheta[:,idx], ls, label=r"$v_\theta$")
     xlabel("Time [sec]")
     ylabel("Velocity [cm/sec]")
     title(titlestring)
@@ -769,13 +769,13 @@ def save_avg_profile(velocity, start_num, end_num, savefilename, scale=1,
 
 def plot_vtheta_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
                             minvelocity=nan, maxvelocity=nan,
-                            nlevels=50):
+                            nlevels=50, subtract_m0=1):
     '''Simply plot the structure of a nonaxisymmetric vtheta mode,
     without the axisymmetric background.'''
     x, y, v = project_velocity_timeseries_on_rt_plane(velocity, 'vtheta',
                                                       mid_time, numpoints=400,
                                                       rin=rin, rout=rout,
-                                                      subtract_m0=1,
+                                                      subtract_m0=subtract_m0,
                                                       plot_rotation=0)
     
     contourf(x, y, v.clip(minvelocity, maxvelocity), nlevels)
@@ -787,13 +787,13 @@ def plot_vtheta_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
 
 def plot_vr_on_rt_plane(velocity, mid_time, rin=r1, rout=r2,
                         minvelocity=nan, maxvelocity=nan,
-                        nlevels=50):
+                        nlevels=50, subtract_m0=1):
     '''Simply plot the structure of a nonaxisymmetric vr mode,
     without the axisymmetric background.'''
     x, y, v = project_velocity_timeseries_on_rt_plane(velocity, 'vr',
                                                       mid_time, numpoints=400,
                                                       rin=rin, rout=rout,
-                                                      subtract_m0=1,
+                                                      subtract_m0=subtract_m0,
                                                       plot_rotation=0)
     
     contourf(x, y, v.clip(minvelocity, maxvelocity), nlevels)
