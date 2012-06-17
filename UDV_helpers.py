@@ -1061,7 +1061,7 @@ def save_velocity_mode_animation(velocity, filename, start_time=nan,
         
         #Set the label text
         ax1.text(0.95, 0.05, r"$v_\theta$", transform=ax1.transAxes)
-        ax2.text(0.95, 0.05, r"$v_r$", transform=ax1.transAxes)
+        ax2.text(0.95, 0.05, r"$v_r$", transform=ax2.transAxes)
 
         #Save the png file
         framefilenames[i] = "%s%0.4d.png" % (tmpfilebase, i)
