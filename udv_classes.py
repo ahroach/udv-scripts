@@ -371,8 +371,11 @@ class ChannelData:
             #from the face of the transducer to the current radius. Iterate
             #along, adding one when we jump 2\pi, and subtracting one when
             #we go back the other way.
+            #We don't start counting until after a radius of 19.5cm, to avoid
+            #problems with noise near the outer cylinder.
             wraps = np.zeros(self.spatial_points)
-            for i in range(10, self.spatial_points):
+            first_idx = self.get_index_near_radius(19.5)
+            for i in range(first_idx, self.spatial_points):
                 if (self.velocity[j, i] -
                     self.velocity[j, i-1]) < -threshold*maxvelocity:
                     wraps[i] = wraps[i-1] + 1
