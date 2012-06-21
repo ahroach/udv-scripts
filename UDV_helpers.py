@@ -925,7 +925,7 @@ def save_vtheta_mode_animation(velocity, filename, start_time=nan,
     #If we want to rotate with the mode, set up an array of the rotation
     #angle corresponding to each time.
     if(rotate_with_mode):
-        rot_angles = -(times*2.0*pi*velocity.m/velocity.period % (2*pi))
+        rot_angles = -(2.0*pi*times/(velocity.m*velocity.period) % (2*pi))
     else:
         rot_angles = zeros(times.size)
     
@@ -1013,7 +1013,7 @@ def save_velocity_mode_animation(velocity, filename, start_time=nan,
     #If we want to rotate with the mode, set up an array of the rotation
     #angle corresponding to each time.
     if(rotate_with_mode):
-        rot_angles = -(times*2.0*pi*velocity.m/velocity.period % (2*pi))
+        rot_angles = -(2.0*pi*times/(velocity.m*velocity.period) % (2*pi))
     else:
         rot_angles = zeros(times.size)
     
