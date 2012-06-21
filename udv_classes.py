@@ -352,10 +352,10 @@ class ChannelData:
 
         #Now run some routines to unwrap the aliased velocity, and to find
         #the location of each measurement.        
-        self.unwrap_velocity()
         self.calculate_radius()
         self.calculate_azimuth()
         self.calculate_height()
+        self.unwrap_velocity()
 
     def unwrap_velocity(self, threshold=1.5):
         '''Adds the unwrapped velocity to the channel information using
