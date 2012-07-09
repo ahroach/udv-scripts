@@ -67,8 +67,8 @@ def plot_channel_velocity(channel, start_num, end_num, unwrapped=0,
     which case those are time points to average between. Unwrapped velocity
     is plotted instead of raw velocity if unwrapped != 0'''
     if(time != 0):
-        start_num = channel.find_index_after_time(start_num)
-        end_num = channel.find_index_after_time(end_num)
+        start_num = channel.get_index_near_time(start_num)
+        end_num = channel.get_index_near_time(end_num)
 
     if (unwrapped == 0):
         profile = mean(channel.velocity[start_num:end_num,:], axis=0)
