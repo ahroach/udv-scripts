@@ -1519,7 +1519,7 @@ def get_data():
     return su_data
 
 rho = 6.36 #Density of GaInSn in gm/cm^3
-eta = 2.43e3 #Magnetic diffusivity in cm^2/sec
+eta = 2.57e3 #Magnetic diffusivity in cm^2/sec
 
 def plot_amplitudes(elsasser = 1, logscale=0, rpm=0, elsasser_y_axis=0,
                     showtitle=1):

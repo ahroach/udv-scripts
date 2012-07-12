@@ -373,7 +373,7 @@ def get_data():
     return mrized_data
 
 rho = 6.36 #Density of GaInSn in gm/cm^3
-eta = 2.43e3 #Magnetic diffusivity in cm^2/sec
+eta = 2.57e3 #Magnetic diffusivity in cm^2/sec
 
 def plot_amplitudes():
     mrized_data = get_data()
