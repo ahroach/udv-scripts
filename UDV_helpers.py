@@ -853,8 +853,8 @@ def project_velocity_timeseries_on_rt_plane(velocity, component,
     #be plotted, to be subtracted later.
     if(subtract_m0):
         mean = zeros(velocity.r.size)
-        phase_min = -pi*velocity.m - mid_time*2.0*pi/velocity.period
-        phase_max = pi*velocity.m - mid_time*2.0*pi/velocity.period
+        phase_min = -pi*abs(velocity.m) - mid_time*2.0*pi/velocity.period
+        phase_max = pi*abs(velocity.m) - mid_time*2.0*pi/velocity.period
         phase_min_idx = get_index_near_phase(phase_min)
         phase_max_idx = get_index_near_phase(phase_max)
         for i in range(0, mean.size):

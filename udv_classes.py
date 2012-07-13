@@ -873,8 +873,8 @@ class Velocity():
         #we have an easier time of it.
         
         #Use a common time base for both channels
-        dt = self.m*self.period/200.0
-        time_buffer = self.m*self.period/2.0
+        dt = abs(self.m)*self.period/200.0
+        time_buffer = abs(self.m)*self.period/2.0
         tempch1.time = np.arange(tempch1.time[0] + time_buffer,
                                  tempch1.time[-1] - time_buffer, dt)
         tempch2.time = tempch1.time.copy()
