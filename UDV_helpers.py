@@ -486,57 +486,37 @@ def find_avg_velocity_at_r(velocity, start, end, radius, time=0):
     return vr.mean(), vr.std(), vt.mean(), vt.std()
 
 
-def find_shear(filename, start_time, end_time, omega1, omega2, rlimin, rlimout, channel=2):
-    r_data = rudv.read_ultrasound(filename, 1)
-    t_data = rudv.read_ultrasound(filename, channel)
+def plot_twopoint_avg_shear(velocity, start_time, end_time, rlimin, rlimout):
+    """Find and plot the shear defined by two radial points"""
 
-    start_num = find_profile_after_time(filename, channel, start_time)
-    end_num = find_profile_after_time(filename, channel, end_time)
-
-    num_profiles = end_num - start_num
-
-    print("Number of profiles used: " + str(num_profiles))
-
-    r, vr, vt = reconstruct_avg_velocities_novr(r_data, t_data, start_num,
-                                                end_num, omega2)
-    omega = zeros(vt.shape)
-    for i in range(0, omega.size):
-        omega[i] = vt[i]/r[i]
-    v1 = 2*pi*omega1*r1/60.0
-    v2 = 2*pi*omega2*r2/60.0
-    a = (v1*r1 - v2*r2)/(r1**2-r2**2)
-    b = (v1*r1 - a*r1**2)
-    couette = zeros(r.shape)
-    for i in range(0, couette.size):
-        couette[i] = a + b/(r[i]*r[i])
-    rcouette = r
-
-
+    omega = (velocity.mean_t(start_time, end_time)['vtheta'] /
+             velocity.r)
 
     #Convert rlimits to element number
-    rlimin = find_element_r(r, rlimin)
-    rlimout = find_element_r(r, rlimout)
-
-    print("rlimin " + str(rlimin) + "rlimout" + str(rlimout))
-
-    avg_shear = (omega[rlimout] - omega[rlimin])/(r[rlimout] - r[rlimin])
-    offset = omega[rlimout]-avg_shear*r[rlimout]
+    rlimin_idx = velocity.get_index_near_radius(rlimin)
+    rlimout_idx = velocity.get_index_near_radius(rlimout)
     
-    shear_fit_line = zeros(r.shape)
-    for i in range(0, shear_fit_line.size):
-        shear_fit_line[i] = avg_shear*r[i] + offset
+    avg_shear = ((omega[rlimout_idx] - omega[rlimin_idx]) / 
+                 (velocity.r[rlimout_idx] - velocity.r[rlimin_idx]))
+    offset = omega[rlimout_idx] - avg_shear*velocity.r[rlimout_idx]
+    
+    shear_fit_line = avg_shear*velocity.r + offset
 
     xlabel("r [cm]")
     ylabel(r"$\Omega$ [rad/sec]")
-    datalabelstring=filename + ": "+str(start_num)+"-"+str(end_num)
-    plot(r, omega, label=datalabelstring)
+    plot(velocity.r, omega, label="Shot %g: %i-%is" % (velocity.shot.number,
+                                                       start_time,
+                                                       end_time))
     axvline(x=r1, color='black')
     axvline(x=r2, color='black')
-    plot(rcouette, couette, 'k-', label="Ideal Couette profile")
+    plot(velocity.shot.idealcouette.r,
+         velocity.shot.idealcouette.vtheta/velocity.shot.idealcouette.r,
+         'k-', label="Ideal Couette profile")
     fitlabelstring="Shear: " + str(avg_shear) + " rad/cm*sec"
-    plot(r, shear_fit_line, label=fitlabelstring)
+    plot(velocity.r, shear_fit_line,
+         label="Shear: %g; offset: %g" % (avg_shear, offset))
     grid(b=1)
-    legend()
+    legend(loc='best')
 
 
 def filter_outliers(x, stddevs):
