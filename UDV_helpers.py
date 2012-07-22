@@ -653,30 +653,28 @@ def eval_shear_layer(r_data, t_data, profile_num, omega1, omega2, channel=2,
     return a, avg_ampl
 
 
-def eval_shear_layer_2(r_data, t_data, profile_num, omega1, omega2, channel=2,
+def eval_shear_layer_2(velocity, profile_num,
                        time=0, rmin=10, rmax=18, display=0, knots=8):
 
     if(time == 1):
-        profile_num = find_profile_after_time(filename, channel,
-                                              profile_num)
+        profile_num = velocity.get_index_near_time(profile_num)
 
-    r, vr, vt = reconstruct_avg_velocities_novr(r_data, t_data, profile_num,
-                                                profile_num, omega2)
-    omega = vt/r
+
+    omega = velocity.vtheta[profile_num,:]/velocity.r
     
     if(display==1):
-        plot(r, omega)
-
+        plot(velocity.r, omega)
     
-    avg_ampl_in = omega[find_element_r(r,9):find_element_r(r,11)].mean()
-    avg_ampl_out = omega[find_element_r(r,18):find_element_r(r,20)].mean()
+    avg_ampl_in = omega[velocity.get_index_near_radius(9):
+                        velocity.get_index_near_radius(11)].mean()
+    avg_ampl_out = omega[velocity.get_index_near_radius(18):
+                         velocity.get_index_near_radius(20)].mean()
     avg_ampl = avg_ampl_in-avg_ampl_out
 
     #Trim the arrays so we're only looking in the vicinity of the shear layer.
-    rmin_elm = find_element_r(r, rmin)
-    rmax_elm = find_element_r(r, rmax)
-    r = r[rmin_elm:rmax_elm]
-    vr = vr[rmin_elm:rmax_elm]
+    rmin_elm = velocity.get_index_near_radius(rmin)
+    rmax_elm = velocity.get_index_near_radius(rmax)
+    r = velocity.r[rmin_elm:rmax_elm]
     omega = omega[rmin_elm:rmax_elm]
 
     #Fit spline with explicit knots
@@ -687,8 +685,8 @@ def eval_shear_layer_2(r_data, t_data, profile_num, omega1, omega2, channel=2,
 
 
     if(display == 1):
-        labelstring = "Fit with" + str(knots) + "knots"
-        plot(r, scipy.interpolate.splev(r, fit), label=labelstring)
+        plot(r, scipy.interpolate.splev(r, fit),
+             label="Fit with %i knots" % knots)
         plot(r, scipy.interpolate.splev(r, fit, der=1), label="1st der")
         plot(r, scipy.interpolate.splev(r, fit, der=2), label="2nd der")
              
