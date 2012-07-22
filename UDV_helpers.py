@@ -531,19 +531,16 @@ def filter_outliers(x, stddevs):
     return x_masked
 
 
-def show_shear_layer_evolution(filename, omega1, omega2, channel=2, rmin=10,
-                               rmax=18, filteroutliers=0):
-    r_data = rudv.read_ultrasound(filename, 1)
-    t_data = rudv.read_ultrasound(filename, channel)
-    time = t_data['time']
-    layer_width = zeros(time.size)
-    layer_amplitude = zeros(time.size)
-    layer_location = zeros(time.size)
-    layer_avg = zeros(time.size)
+def show_shear_layer_evolution(velocity, rmin=10, rmax=18,
+                               filteroutliers=0):
+    layer_width = zeros(velocity.time.size)
+    layer_amplitude = zeros(velocity.time.size)
+    layer_location = zeros(velocity.time.size)
+    layer_avg = zeros(velocity.time.size)
 
-    for i in range(0, time.size):
-        a, avg_amp = eval_shear_layer(r_data, t_data, i, omega1, omega2,
-                                      channel, time=0, rmin=rmin, rmax=rmax)
+    for i in range(0, velocity.time.size):
+        a, avg_amp = eval_shear_layer(velocity, i, time=0,
+                                      rmin=rmin, rmax=rmax)
         layer_amplitude[i] = avg_amp
         layer_width[i] = a[1]
         if(layer_width[i] > r2-r1):
@@ -551,8 +548,6 @@ def show_shear_layer_evolution(filename, omega1, omega2, channel=2, rmin=10,
         layer_location[i] = a[2]
         layer_avg[i] = a[3]
         
-        if(i%10 == 0):
-            print i
 
     if(filteroutliers):
         layer_amplitude_masked = filter_outliers(layer_amplitude, 3)
@@ -563,41 +558,41 @@ def show_shear_layer_evolution(filename, omega1, omega2, channel=2, rmin=10,
         
         figure()
         subplot(2,2,1)
-        plot(time[layer_width_masked.mask],
+        plot(velocity.time[layer_width_masked.mask],
              layer_width[layer_width_masked.mask])
         ylabel("Layer width [cm]")
         xlabel("Time [sec]")
         subplot(2,2,2)
-        plot(time[layer_amplitude_masked.mask],
+        plot(velocity.time[layer_amplitude_masked.mask],
              layer_amplitude[layer_amplitude_masked.mask])
         ylabel("Layer amplitude [rad/sec]")
         xlabel("Time [sec]")
         subplot(2,2,3)
-        plot(time[layer_location_masked.mask],
+        plot(velocity.time[layer_location_masked.mask],
              layer_location[layer_location_masked.mask])
         ylabel("Radial layer location [cm]")
         xlabel("Time [sec]")
         subplot(2,2,4)
-        plot(time[layer_shear_masked.mask],
+        plot(velocity.time[layer_shear_masked.mask],
              layer_shear_masked.data[layer_shear_masked.mask])
         ylabel("Shear parameter [1/cm*sec]")
         xlabel("Time [sec]")
     else:
         figure()
         subplot(2,2,1)
-        plot(time, layer_width)
+        plot(velocity.time, layer_width)
         ylabel("Layer width [cm]")
         xlabel("Time [sec]")
         subplot(2,2,2)
-        plot(time, layer_amplitude)
+        plot(velocity.time, layer_amplitude)
         ylabel("Layer amplitude [rad/sec]")
         xlabel("Time [sec]")
         subplot(2,2,3)
-        plot(time, layer_location)
+        plot(velocity.time, layer_location)
         ylabel("Radial layer location [cm]")
         xlabel("Time [sec]")
         subplot(2,2,4)
-        plot(time, layer_amplitude/layer_width)
+        plot(velocity.time, layer_amplitude/layer_width)
         ylabel("Shear parameter [1/cm*sec]")
         xlabel("Time [sec]")
 
