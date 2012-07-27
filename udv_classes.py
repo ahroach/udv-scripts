@@ -727,7 +727,7 @@ class Velocity():
         #We're done with the fake channel, so get rid of it.
         del(tempchannel)
 
-    def gen_velocity_two_transducers(self, ch1, ch2):
+    def gen_velocity_two_transducers(self, ch1, ch2, radialknots=30):
         '''Generate velocity from two transducers.
 
         Currently assumes we are just getting contributions from v_r
@@ -771,16 +771,24 @@ class Velocity():
         #be stored from smaller radii to larger.
         for i in range (0, self.time.size):
             if(use_ch1_r):
+                knots = np.linspace(ch2.r[ch2_last_idx-1], ch2.r[1],
+                                    num=int((ch2.r[1] -
+                                             ch2.r[ch2_last_idx-1]) /
+                                            radialknots))
                 ch1_v[i,:] = ch1.unwrapped_velocity[i,0:ch1_last_idx][::-1]
-                f = UnivariateSpline(ch2.r[0:ch2_last_idx][::-1],
-                                     ch2.unwrapped_velocity[i,0:ch2_last_idx][::-1],
-                                     k=3, s=0)
+                f = LSQUnivariateSpline(ch2.r[0:ch2_last_idx][::-1],
+                                        ch2.unwrapped_velocity[i,0:ch2_last_idx][::-1],
+                                        knots, k=3)
                 ch2_v[i,:] = f(self.r)
             else:
+                knots = np.linspace(ch1.r[ch1_last_idx-1], ch1.r[1],
+                                    num=int((ch1.r[1] -
+                                             ch1.r[ch1_last_idx-1]) /
+                                            radialknots))
                 ch2_v[i,:] = ch2.unwrapped_velocity[i,0:ch2_last_idx][::-1]
-                f = UnivariateSpline(ch1.r[0:ch1_last_idx][::-1],
-                                     ch1.unwrapped_velocity[i,0:ch1_last_idx][::-1],
-                                     k=3, s=0)
+                f = LSQUnivariateSpline(ch1.r[0:ch1_last_idx][::-1],
+                                        ch1.unwrapped_velocity[i,0:ch1_last_idx][::-1],
+                                        knots, k=3)
                 ch1_v[i,:] = f(self.r)
 
         #Now define a matrix for doing the transformations.
