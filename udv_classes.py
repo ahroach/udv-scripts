@@ -16,6 +16,7 @@ Or to get a velocity object assuming a nonaxisymmetric mode structure:
 
 import read_ultrasound_new as rudv
 from scipy.interpolate import UnivariateSpline
+from scipy.interpolate import LSQUnivariateSpline
 from copy import deepcopy
 import shot_params as sp
 import shot_db_ops as sdo
@@ -645,7 +646,7 @@ class Velocity():
         self.vtheta = self.vtheta[:,::-1]
         self.vz = self.vz[:,::-1]
 
-    def gen_velocity_one_transducer_nonaxi(self, channel):
+    def gen_velocity_one_transducer_nonaxi(self, channel, knotsperperiod=6):
         '''Generate nonaxisymmetric velocity from a single transducer
 
         Find the velocity fields using one transducer, assuming a
@@ -693,21 +694,27 @@ class Velocity():
                                                    len(tempchannel.depth)])
 
         #Now go through each position of each of these velocity structures,
-        #make a fit, and interpolate onto the new time structure.
-        
+        #make a fit, and interpolate onto the new time structure. We use
+        #explicit knots, with the number set by knotsperperiod, to get
+        #an appropriate amount of smoothing.
+
+
         for i in range(0, len(tempchannel.depth)):
-            f = UnivariateSpline((channel.time -
-                                  self.m*channel.azimuth[i]*
-                                  self.period/(2*math.pi)),
-                                 channel.velocity[:, i],
-                                 k=3, s=0)
+            toffset = self.m*channel.azimuth[i]*self.period/(2*math.pi)
+            knots = np.linspace(channel.time[1] - toffset,
+                                channel.time[-2] - toffset,
+                                num=knotsperperiod*int((channel.time[-2] -
+                                                        channel.time[1]) /
+                                                       self.period))
+            
+            f = LSQUnivariateSpline((channel.time - toffset),
+                                    channel.velocity[:, i],
+                                    knots, k=3)
             tempchannel.velocity[:,i] = f(tempchannel.time)
 
-            f = UnivariateSpline((channel.time -
-                                  self.m*channel.azimuth[i]*
-                                  self.period/(2*math.pi)),
-                                 channel.unwrapped_velocity[:, i],
-                                 k=3, s=0)
+            f = LSQUnivariateSpline((channel.time - toffset),
+                                    channel.unwrapped_velocity[:, i],
+                                    knots, k=3)
             tempchannel.unwrapped_velocity[:,i] = f(tempchannel.time)
         
         
@@ -839,7 +846,7 @@ class Velocity():
                 self.vtheta[j,i] = (self.vtheta[j,i] +
                                     rpmtorads(self.shot.OCspeed)*r)
 
-    def gen_velocity_two_transducers_nonaxi(self, ch1, ch2):
+    def gen_velocity_two_transducers_nonaxi(self, ch1, ch2, knotsperperiod=6):
         '''Generate nonaxisymmetric velocity using two transducers
 
         Find the velocity fields using two transducers, assuming a
@@ -890,37 +897,45 @@ class Velocity():
                                                len(tempch2.depth)])
 
         #Now go through each position of each of these velocity structures,
-        #make a fit, and interpolate onto the new time structure.
+        #make a fit, and interpolate onto the new time structure. We use
+        #explicit knots, with the number set by knotsperperiod, to get
+        #an appropriate amount of smoothing.
 
         for i in range(0, len(tempch1.depth)):
-            f = UnivariateSpline((ch1.time -
-                                  self.m*ch1.azimuth[i]*
-                                  self.period/(2*math.pi)),
-                                 ch1.velocity[:, i],
-                                 k=3, s=0)
+            toffset = self.m*ch1.azimuth[i]*self.period/(2*math.pi)
+            knots = np.linspace(ch1.time[1] - toffset,
+                                ch1.time[-2] - toffset,
+                                num=knotsperperiod*int((ch1.time[-2] -
+                                                        ch1.time[1]) /
+                                                       self.period))
+
+            f = LSQUnivariateSpline((ch1.time - toffset),
+                                    ch1.velocity[:, i],
+                                    knots, k=3)
             tempch1.velocity[:,i] = f(tempch1.time)
 
-            f = UnivariateSpline((ch1.time -
-                                  self.m*ch1.azimuth[i]*
-                                  self.period/(2*math.pi)),
-                                 ch1.unwrapped_velocity[:, i],
-                                 k=3, s=0)
+            f = LSQUnivariateSpline((ch1.time - toffset),
+                                    ch1.unwrapped_velocity[:, i],
+                                    knots, k=3)
             tempch1.unwrapped_velocity[:,i] = f(tempch1.time)
         
         
         for i in range(0, len(tempch2.depth)):
-            f = UnivariateSpline((ch2.time -
-                                  self.m*ch2.azimuth[i]*
-                                  self.period/(2*math.pi)),
-                                 ch2.velocity[:, i],
-                                 k=3, s=0)
+            toffset = self.m*ch2.azimuth[i]*self.period/(2*math.pi)
+            knots = np.linspace(ch2.time[1] - toffset,
+                                ch2.time[-2] - toffset,
+                                num=knotsperperiod*int((ch2.time[-2] -
+                                                        ch2.time[1]) /
+                                                       self.period))
+
+            f = LSQUnivariateSpline((ch2.time - toffset),
+                                    ch2.velocity[:, i],
+                                    knots, k=3)
             tempch2.velocity[:,i] = f(tempch2.time)
 
-            f = UnivariateSpline((ch2.time -
-                                  self.m*ch2.azimuth[i]*
-                                  self.period/(2*math.pi)),
-                                 ch2.unwrapped_velocity[:, i],
-                                 k=3, s=0)
+            f = LSQUnivariateSpline((ch2.time - toffset),
+                                    ch2.unwrapped_velocity[:, i],
+                                    knots, k=3)
             tempch2.unwrapped_velocity[:,i] = f(tempch2.time)
 
         
