@@ -282,16 +282,16 @@ def plot_power_spectrum_channel(channel, idx, start_time,
     subplot(2,1,1)
     semilogy(freq, power)
     xlabel("Freq [Hz]")
-    ylabel("Power Spectrum")
+    ylabel("Power")
     legend()
     xlim(xmin=0.0)
     grid(b=1)
     
     subplot(2,1,2)
     plot(channel.time[start_num:end_num],
-         channel.velocity[start_num:end_num, idx])
-    xlabel("Time [sec]")
-    ylabel("Velocity [cm/sec]")
+         channel.velocity[start_num:end_num, idx], '.-')
+    xlabel("Time [s]")
+    ylabel("Velocity [cm/s]")
     
     pinband = get_power_in_band(channel.time[start_num:end_num],
                                 filter_velocity(channel.velocity[start_num:end_num, idx],
