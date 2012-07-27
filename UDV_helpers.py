@@ -198,10 +198,13 @@ def plot_wave_amplitude_profile(velocity, component, start_time, end_time,
     is twice the amplitude.'''
     if(component == 'vr'):
         data = velocity.vr.copy()
+        labelstring = r"$|\tilde{v_r}|$"
     elif(component == 'vtheta'):
         data = velocity.vtheta.copy()
+        labelstring = r"$|\tilde{v_\theta}|$"
     elif(component == 'vz'):
         data = velocity.vz.copy()
+        labelstring = r"$|\tilde{v_z}|$"
     else:
         print "Error: Allowable components are 'vr', 'vtheta', or 'vz'."
         return False
@@ -219,8 +222,9 @@ def plot_wave_amplitude_profile(velocity, component, start_time, end_time,
                                   freqband_max = freqband_max)
         amplitude[i] = sqrt(power)
 
-    plot(velocity.r, amplitude)
-
+    plot(velocity.r, amplitude, label=labelstring)
+    xlabel(r"$r$ [cm]")
+    ylabel("Velocity [cm/s]")
 
 def plot_power_spectrum_velocity(velocity, component, radius, start_time,
                                  end_time, freqband_min = 0, freqband_max = 0,
