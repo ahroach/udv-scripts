@@ -406,23 +406,24 @@ def plot_spectrogram(channel, idx, start_time=0, end_time=1000, timechunk=3):
     object at the location specified by the index idx.'''
     start = channel.get_index_near_time(start_time)
     end = channel.get_index_near_time(end_time)
+    fig = figure()
 
-    subplot(2,1,1)
-    plot(channel.time[start:end], channel.velocity[start:end, idx])
-    ylabel("Velocity [cm/sec]")
+    ax1 = fig.add_subplot(2,1,1)
+    ax2 = fig.add_subplot(2,1,2, sharex=ax1)
+    ax1.plot(channel.time[start:end], channel.velocity[start:end, idx], '.-')
+    ax1.set_ylabel("Velocity [cm/s]")
     titlestring = "Shot %d, Ch. %d: r=%.3gcm" % (channel.shot.number,
                                                  channel.channel,
                                                  channel.r[idx])
-    title(titlestring)
+    ax1.set_title(titlestring)
 
-    subplot(2,1,2)
     fs = 1.0/(channel.time[2]-channel.time[1])
-    nfft = rint(fs*timechunk)
+    nfft = int(fs*timechunk)
     noverlap=nfft-1
-    Pxx, freqs, bins, im = specgram(channel.velocity[start:end, idx],
-                                    NFFT=nfft, Fs=fs, noverlap=noverlap)
-    xlabel("Time [sec]")
-    ylabel("Frequency [Hz]")
+    Pxx, freqs, bins, im = ax2.specgram(channel.velocity[start:end, idx],
+                                        NFFT=nfft, Fs=fs, noverlap=noverlap)
+    ax2.set_xlabel("Time [s]")
+    ax2.set_ylabel("Frequency [Hz]")
     
 
 def plot_two_component_avg_velocities(velocity, start_num, end_num,
