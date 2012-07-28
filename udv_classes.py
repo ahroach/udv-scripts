@@ -771,7 +771,7 @@ class Velocity():
         #be stored from smaller radii to larger.
         for i in range (0, self.time.size):
             if(use_ch1_r):
-                knots = np.linspace(ch2.r[ch2_last_idx-1], ch2.r[1],
+                knots = np.linspace(ch2.r[ch2_last_idx-2], ch2.r[1],
                                     num=radialknots)
                 ch1_v[i,:] = ch1.unwrapped_velocity[i,0:ch1_last_idx][::-1]
                 f = LSQUnivariateSpline(ch2.r[0:ch2_last_idx][::-1],
@@ -779,7 +779,7 @@ class Velocity():
                                         knots, k=3)
                 ch2_v[i,:] = f(self.r)
             else:
-                knots = np.linspace(ch1.r[ch1_last_idx-1], ch1.r[1],
+                knots = np.linspace(ch1.r[ch1_last_idx-2], ch1.r[1],
                                     num=radialknots)
                 ch2_v[i,:] = ch2.unwrapped_velocity[i,0:ch2_last_idx][::-1]
                 f = LSQUnivariateSpline(ch1.r[0:ch1_last_idx][::-1],
