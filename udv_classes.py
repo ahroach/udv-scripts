@@ -135,7 +135,8 @@ class Shot:
         self.del_velocities_derived_from_channel(channel_num)
         
         #Now that we've done that, get rid of the channel
-        self.channels.pop(channel_num)
+        if(self.channels.has_key(channel_num)):
+            self.channels.pop(channel_num)
     
     def del_velocities_derived_from_channel(self, channel_num):
         """Delete velocity objects associated with a channel
