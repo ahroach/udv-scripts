@@ -51,11 +51,23 @@ def wrap_phase(angle):
 def filter_velocity(data, filter_threshold):
     '''Provides a simple filter for outliers in a velocity vector'''
 
-    for i in range(5, data.size):
-        if abs(data[i] - 0.2*(data[i-1] + data[i-2] + 
-                              data[i-3] + data[i-4] + 
-                              data[i-5])) > filter_threshold:
-            data[i] = data[i-1]
+    for i in range(5, data.size-5):
+        #Get the mean from the previous 5 measurements, excluding nans
+        meandata = ma.masked_array(data[i-5:i], isnan(data[i-5:i])).mean()
+        if isnan(meandata):
+            #Uhoh. It looks like everything ahead of us was a nan.
+            #I guess all we can do is look ahead and hope for the best.
+            meandata = ma.masked_array(data[i+1:i+6],
+                                       isnan(data[i+1:i+6])).mean()
+        if (abs(data[i] - meandata) > filter_threshold):
+            #If the point looks bad, make it a nan.
+            data[i] = nan
+
+    #Don't want to leave nans in the data, so replace them with the
+    #mean around that measurement.
+    for i in range(2, data.size-2):
+        if isnan(data[i]):
+            data[i]=ma.masked_array(data[i-2:i+3],isnan(data[i-2:i+3])).mean()
 
     return data
 
