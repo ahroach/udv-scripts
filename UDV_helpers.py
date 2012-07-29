@@ -22,6 +22,7 @@ import scipy
 import scipy.interpolate
 from scipy.interpolate import UnivariateSpline
 import scipy.optimize
+import scipy.signal
 import subprocess
 import os
 import shutil
@@ -415,7 +416,45 @@ def fit_frequency_channel(channel, idx, start_time, end_time,
     plot(fitted_time, fitted_amplitude, label="Fitted")
     xlabel("Time [sec]")
     ylabel("Velocity [cm/sec]")
+
+
+def get_autocorrelation(ch, r, t_start, t_end):
+    ridx = ch.get_index_near_radius(r)
+    startidx = ch.get_index_near_time(t_start)
+    endidx = ch.get_index_near_time(t_end)
+
+    ac = scipy.signal.correlate(ch.unwrapped_velocity[startidx:endidx,
+                                                      ridx],
+                                ch.unwrapped_velocity[startidx:endidx,
+                                                      ridx])
+    dt = linspace(-(ch.time[endidx-1]-ch.time[startidx]),
+                  (ch.time[endidx-1] - ch.time[startidx]),
+                  num=(2*ch.unwrapped_velocity[startidx:endidx,
+                                               ridx].size - 1))
+    return dt, ac
+
+
+def get_crosscorrelation(ch1, ch2, r, t_start, t_end):
+    ridx1 = ch1.get_index_near_radius(r)
+    ridx2 = ch2.get_index_near_radius(r)
+    startidx = ch1.get_index_near_time(t_start)
+    endidx = ch1.get_index_near_time(t_end)
+
+    cc = scipy.signal.correlate(ch1.unwrapped_velocity[startidx:endidx,
+                                                       ridx1],
+                                ch2.unwrapped_velocity[startidx:endidx,
+                                                       ridx2])
+    dt = linspace(-(ch1.time[endidx-1]-ch1.time[startidx]),
+                  (ch1.time[endidx-1] - ch1.time[startidx]),
+                  num=(2*ch1.unwrapped_velocity[startidx:endidx,
+                                               ridx1].size - 1))
+
+    #We must account for the offset due to the slightly different time bases
+    #for the two channels.
+    dt = dt - (ch2.time[endidx-1] - ch1.time[endidx-1])
     
+    return dt, cc
+
 
 def plot_spectrogram(channel, idx, start_time=0, end_time=1000, timechunk=3):
     '''Plots a spectrogram of the velocity measured on the specified channel
