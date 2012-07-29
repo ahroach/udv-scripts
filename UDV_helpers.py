@@ -456,6 +456,13 @@ def get_crosscorrelation(ch1, ch2, r, t_start, t_end):
     return dt, cc
 
 
+def plot_correlations(shot, r, t_start, t_end, ch1=2, ch2=3):
+    plot(*get_autocorrelation(shot.get_channel(ch1), r, t_start, t_end),
+         ls='-', marker='.')
+    plot(*get_crosscorrelation(shot.get_channel(ch2), shot.get_channel(ch1),
+         r, t_start, t_end), ls='-', marker='.')
+
+
 def plot_spectrogram(channel, idx, start_time=0, end_time=1000, timechunk=3):
     '''Plots a spectrogram of the velocity measured on the specified channel
     object at the location specified by the index idx.'''
