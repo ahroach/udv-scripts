@@ -1543,7 +1543,7 @@ def plot_amplitudes(elsasser = 1, logscale=0, rpm=0, elsasser_y_axis=0,
         ax.scatter(xquantity[num_idx], su_data['current'][num_idx]*2.8669, su_data['saturatedpower'][num_idx]*150000/(su_data['speed'][num_idx]*su_data['speed'][num_idx]), label='_nolegend_', facecolor=facecolor)
         #also plot the xs.
         ax.plot(xquantity[nan_idx], su_data['current'][nan_idx]*2.8669, 'x', color='black', label='_nolegend_')
-        ylabel("B [Gauss]")
+        ylabel("B [gauss]")
             
     if(logscale==1):
         ax.set_xscale('log')
@@ -1580,7 +1580,7 @@ def plot_amplitudes_shear(elsasser = 1):
     nan_idx = isnan(su_data['saturatedpower'])
     plot(-su_data['saturatedshear'][nan_idx], su_data['current'][nan_idx]*2.8669, 'x', color='black', label='_nolegend_')
     xlabel("Saturated shear, 12-16cm [rad/cm*sec]")
-    ylabel("B [Gauss]")
+    ylabel("B [gauss]")
     title("$P_{fundamental}/(IC\, \mathrm{speed})^2$")
     #Now plot line for Elsasser number constant
     #Defined as v_A^2/(eta*Omega)
