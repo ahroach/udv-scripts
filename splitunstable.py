@@ -1522,7 +1522,7 @@ rho = 6.36 #Density of GaInSn in gm/cm^3
 eta = 2.57e3 #Magnetic diffusivity in cm^2/sec
 
 def plot_amplitudes(elsasser = 1, logscale=0, rpm=0, elsasser_y_axis=0,
-                    showtitle=1):
+                    showtitle=1, facecolor="#708070"):
     su_data = get_data()
     if(rpm==0):
         xquantity = su_data['speed']*2*pi/60
@@ -1535,12 +1535,12 @@ def plot_amplitudes(elsasser = 1, logscale=0, rpm=0, elsasser_y_axis=0,
     elsasser_num = 4.0413e-4*su_data['current']*su_data['current']/su_data['speed']
     
     if(elsasser_y_axis):
-        ax.scatter(xquantity[num_idx], elsasser_num[num_idx], su_data['saturatedpower'][num_idx]*150000/(su_data['speed'][num_idx]*su_data['speed'][num_idx]), label='_nolegend_')
+        ax.scatter(xquantity[num_idx], elsasser_num[num_idx], su_data['saturatedpower'][num_idx]*150000/(su_data['speed'][num_idx]*su_data['speed'][num_idx]), label='_nolegend_', facecolor=facecolor)
         #also plot the xs.
         ax.plot(xquantity[nan_idx], elsasser_num[nan_idx], 'x', color='black', label='_nolegend_')
         ylabel(r'$\Lambda$')
     else:
-        ax.scatter(xquantity[num_idx], su_data['current'][num_idx]*2.8669, su_data['saturatedpower'][num_idx]*150000/(su_data['speed'][num_idx]*su_data['speed'][num_idx]), label='_nolegend_')
+        ax.scatter(xquantity[num_idx], su_data['current'][num_idx]*2.8669, su_data['saturatedpower'][num_idx]*150000/(su_data['speed'][num_idx]*su_data['speed'][num_idx]), label='_nolegend_', facecolor=facecolor)
         #also plot the xs.
         ax.plot(xquantity[nan_idx], su_data['current'][nan_idx]*2.8669, 'x', color='black', label='_nolegend_')
         ylabel("B [Gauss]")
