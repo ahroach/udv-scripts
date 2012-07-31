@@ -632,8 +632,8 @@ def filter_outliers(x, stddevs):
     return x_masked
 
 
-def show_shear_layer_evolution(velocity, rmin=10, rmax=18,
-                               filteroutliers=0):
+def show_shear_layer_evolution(velocity, rmin=9, rmax=19,
+                               filteroutliers=0, tavg_start=0, tavg_end=0):
     layer_width = zeros(velocity.time.size)
     layer_amplitude = zeros(velocity.time.size)
     layer_location = zeros(velocity.time.size)
@@ -648,6 +648,17 @@ def show_shear_layer_evolution(velocity, rmin=10, rmax=18,
             layer_width[i] = r2-r1        
         layer_location[i] = a[2]
         layer_avg[i] = a[3]
+
+    if (tavg_start != 0) and (tavg_end != 0):
+        start_idx = velocity.get_index_near_time(tavg_start)
+        end_idx = velocity.get_index_near_time(tavg_end)
+        pvalues = (tavg_start, tavg_end,
+                   layer_amplitude[start_idx:end_idx].mean(),
+                   layer_width[start_idx:end_idx].mean(),
+                   layer_location[start_idx:end_idx].mean())
+        print "Between %g and %gs: amplitude = %g, width=%g, location=%g" % pvalues
+            
+
         
 
     if(filteroutliers):
@@ -699,7 +710,7 @@ def show_shear_layer_evolution(velocity, rmin=10, rmax=18,
 
 
 def eval_shear_layer(velocity, profile_num,
-                     time=0, rmin=10, rmax=18, display=0):
+                     time=0, rmin=9, rmax=19, display=0):
 
     if(time == 1):
         profile_num = velocity.get_index_near_time(profile_num)
@@ -729,8 +740,8 @@ def eval_shear_layer(velocity, profile_num,
 
     err = lambda a, r, omega: (model_func(a, r) - omega)
 
-    a0 = [velocity.shot.ICspeed*2*pi/60, 2.0, 14.0,
-          (velocity.shot.ICspeed-velocity.shot.OCspeed)*2*pi/60]
+    a0 = [velocity.shot.ICspeed*2*pi/60, 4.0, 13.0,
+          0.5*(velocity.shot.ICspeed-velocity.shot.OCspeed)*2*pi/60]
     a, success = scipy.optimize.leastsq(err, a0, 
                                         args=(velocity.r[rmin_idx:rmax_idx],
                                               omega[rmin_idx:rmax_idx]), 
