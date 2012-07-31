@@ -239,6 +239,44 @@ def plot_wave_amplitude_profile(velocity, component, start_time, end_time,
     xlabel(r"$r$ [cm]")
     ylabel("Velocity [cm/s]")
 
+
+def plot_wave_amplitude_profile_vert(velocity, component, start_time, end_time,
+                                     freqband_min = 0, freqband_max = 0,
+                                     filter_threshold=1000):
+    '''Plots the amplitude of velocity fluctuations in a given frequency
+    band as a function of radius. Note that the peak-to-peak velocity
+    is twice the amplitude.'''
+    if(component == 'vr'):
+        data = velocity.vr.copy()
+        labelstring = r"$|\tilde{v_r}|$"
+    elif(component == 'vtheta'):
+        data = velocity.vtheta.copy()
+        labelstring = r"$|\tilde{v_\theta}|$"
+    elif(component == 'vz'):
+        data = velocity.vz.copy()
+        labelstring = r"$|\tilde{v_z}|$"
+    else:
+        print "Error: Allowable components are 'vr', 'vtheta', or 'vz'."
+        return False
+    
+
+    start_num = velocity.get_index_near_time(start_time)
+    end_num = velocity.get_index_near_time(end_time)
+    
+    amplitude = zeros(velocity.z.size)
+    for i in range(0, amplitude.size):
+        power = get_power_in_band(velocity.time[start_num:end_num],
+                                  filter_velocity(data[start_num:end_num, i],
+                                                  filter_threshold),
+                                  freqband_min = freqband_min,
+                                  freqband_max = freqband_max)
+        amplitude[i] = sqrt(power)
+
+    plot(velocity.z, amplitude, label=labelstring)
+    xlabel(r"$z$ [cm]")
+    ylabel("Velocity [cm/s]")
+
+
 def plot_power_spectrum_velocity(velocity, component, radius, start_time,
                                  end_time, freqband_min = 0, freqband_max = 0,
                                  filter_threshold=1000):
