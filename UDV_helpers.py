@@ -633,7 +633,8 @@ def filter_outliers(x, stddevs):
 
 
 def show_shear_layer_evolution(velocity, rmin=9, rmax=19,
-                               filteroutliers=0, tavg_start=0, tavg_end=0):
+                               filteroutliers=0, tavg_start=0, tavg_end=0,
+                               return_data=0):
     layer_width = zeros(velocity.time.size)
     layer_amplitude = zeros(velocity.time.size)
     layer_location = zeros(velocity.time.size)
@@ -708,6 +709,11 @@ def show_shear_layer_evolution(velocity, rmin=9, rmax=19,
         ylabel("Shear parameter [1/cm*sec]")
         xlabel("Time [sec]")
 
+    if(return_data):
+        return {'time': array(velocity.time),
+                'layer_amplitude': layer_amplitude, 'layer_width': layer_width,
+                'layer_radius': layer_location, 'layer_offset': layer_avg}
+    
 
 def eval_shear_layer(velocity, profile_num,
                      time=0, rmin=9, rmax=19, display=0):
