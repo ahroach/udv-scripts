@@ -124,21 +124,25 @@ def plot_r_and_theta_vs_d(A=20.3, B=90, offset=0, r2=rout,
 
     fig = figure()
     ax1 = fig.add_subplot(111)
-    ax1.plot(d,r, 'b-', label=r"$r$")
+    ax1.plot(d,r, 'k-', label=r"$r$")
     ax1.set_xlabel("Measurement depth [cm]")
-    ax1.set_ylabel("Radius [cm]", color='b')    
+    ax1.set_ylabel(r"$r$ [cm]")    
     ax1.set_xlim(dmin, dmax)
-    for ticklabel in ax1.get_yticklabels():
-        ticklabel.set_color('b')
 
     ax2 = ax1.twinx()
-    ax2.plot(d, theta*180.0/pi, 'g-', label=r"$\theta$")
-    ax2.set_ylabel("Azimuth [degs]", color='g', rotation=270)
+    ax2.plot(d, theta*180.0/pi, 'k-.', label=r"$\theta$")
+    ax2.set_ylabel(r"$\theta$ [degs]", rotation=270)
     ax2.set_xticks(arange(dmin, dmax+2, 2))
     ax2.set_xlim(dmin, dmax)
-    for ticklabel in ax2.get_yticklabels():
-        ticklabel.set_color('g')
 
+    lgndlines = ax1.get_lines() + ax2.get_lines()
+    lgndlabels = []
+    for ln in lgndlines:
+        lgndlabels.append(ln.get_label())
+
+    ax1.legend(lgndlines,
+               lgndlabels,
+               loc='upper center')
 
     dclosest = r2*cosA/(sinA**2*sinB**2 + cosA**2)
     ax1.axvline(dclosest, ls='--', lw=1, color='k')
@@ -204,11 +208,11 @@ def plot_velocity_contribs_d(A=20.3, B=90, offset=0, r2=rout,
         vtcoeff[i] = sqrt(1-sinA**2*cosB**2)*sin(xi)
         vzcoeff[i] = sinA*cosB
 
-    plot(d,vrcoeff, label=r"$u_r$")
-    plot(d,vtcoeff, label=r"$u_{\theta}$")
-    plot(d,vzcoeff, label=r"$u_z$")
+    plot(d,vrcoeff, 'k-', label=r"$u_r$")
+    plot(d,vtcoeff, 'k--', label=r"$u_{\theta}$")
+    plot(d,vzcoeff, 'k-.', label=r"$u_z$")
 
-    title(r"$v_{udv} = \vec{v} \cdot \hat{u} = u_r v_r + u_{\theta} v_{\theta} + u_z v_z$")
+    title(r"$v_{\rm udv} = \vec{v} \cdot \hat{u} = u_r v_r + u_{\theta} v_{\theta} + u_z v_z$")
 
     dclosest = r2*cosA/(sinA**2*sinB**2 + cosA**2)
     axvline(dclosest, ls='--', lw=1, color='k')
