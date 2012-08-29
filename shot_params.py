@@ -6603,3 +6603,27 @@ shot_params[1370] = {'shot_num': 1370, 'shot_length': 160, 'trouble_flag': 1,
                      'Bs': [90, -90, -90, 90, 90],
                      'offsets': [1.23, 1.13, 0.15, 0.41, 0.6],
                      'ports': [6, 7, 8, 5, 10]}
+
+
+shot_params[1371] = {'shot_num': 1371, 'shot_length': 190,
+                     'ICspeed': 1600, 'IRspeed': 880,
+                     'ORspeed': 212, 'OCspeed': 212,
+                     'current': 1200, 'field_delay': 125, 't_field': 60,
+                     'udv_delay': 105,
+                     'channels': [1, 2, 3, 4, 5],
+                     'As': [20.3, 20.5, 20.0, 20.2, 20.3],
+                     'Bs': [90, -90, -90, 90, 90],
+                     'offsets': [1.23, 1.13, 0.15, 0.41, 0.6],
+                     'ports': [6, 7, 8, 5, 10]}
+
+
+shot_params[1372] = {'shot_num': 1372, 'shot_length': 160, 'trouble_flag': 1,
+                     'ICspeed': 2800, 'IRspeed': 1540,
+                     'ORspeed': 371, 'OCspeed': 371,
+                     'current': 1200, 'field_delay': 125, 't_field': 30,
+                     'udv_delay': 105,
+                     'channels': [1, 2, 3, 4, 5],
+                     'As': [20.3, 20.5, 20.0, 20.2, 20.3],
+                     'Bs': [90, -90, -90, 90, 90],
+                     'offsets': [1.23, 1.13, 0.15, 0.41, 0.6],
+                     'ports': [6, 7, 8, 5, 10]}
