@@ -103,6 +103,9 @@ def is_mri_z(shot):
     OR = sp.shot_params[shot]['ORspeed']
     OC = sp.shot_params[shot]['OCspeed']
 
+    if(IR == 0 or OR == 0 or OC == 0):
+        return False
+
     IRrat = float(IC)/float(IR)
     ORrat = float(IC)/float(OR)
     OCrat = float(IC)/float(OC)
@@ -120,6 +123,9 @@ def is_mri_new(shot):
     IR = sp.shot_params[shot]['IRspeed']
     OR = sp.shot_params[shot]['ORspeed']
     OC = sp.shot_params[shot]['OCspeed']
+
+    if(IR == 0 or OR == 0 or OC == 0):
+        return False
 
     IRrat = float(IC)/float(IR)
     ORrat = float(IC)/float(OR)
@@ -139,6 +145,9 @@ def is_mri(shot):
     OR = sp.shot_params[shot]['ORspeed']
     OC = sp.shot_params[shot]['OCspeed']
 
+    if(IR == 0 or OR == 0 or OC == 0):
+        return False
+
     IRrat = float(IC)/float(IR)
     ORrat = float(IC)/float(OR)
     OCrat = float(IC)/float(OC)
@@ -156,6 +165,9 @@ def is_mri_mango(shot):
     IR = sp.shot_params[shot]['IRspeed']
     OR = sp.shot_params[shot]['ORspeed']
     OC = sp.shot_params[shot]['OCspeed']
+
+    if(IR == 0 or OR == 0 or OC == 0):
+        return False
 
     IRrat = float(IC)/float(IR)
     ORrat = float(IC)/float(OR)
