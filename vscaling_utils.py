@@ -328,9 +328,9 @@ class AvgProfile_group():
 
         self.avgprofiles = []
         for measurement in measurements:
-            avgp = AvgPointMeasurement(measurement[0],
-                                       measurement[1], measurement[2],
-                                       daq_turnon_time=self.daq_turnon_time)
+            avgp = AvgProfile(measurement[0],
+                              measurement[1], measurement[2],
+                              daq_turnon_time=self.daq_turnon_time)
             self.avgprofiles.append(avgp)
         
         self.numprofiles = len(self.avgprofiles)
