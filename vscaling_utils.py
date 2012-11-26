@@ -333,7 +333,7 @@ class AvgProfile_group():
                                        daq_turnon_time=self.daq_turnon_time)
             self.avgprofiles.append(avgp)
         
-        numavgprofiles = len(self.avgprofiles)
+        self.numprofiles = len(self.avgprofiles)
 
         #Assume that all of these use the same r vector!
         #This should be safe if they're all from the same
@@ -341,22 +341,22 @@ class AvgProfile_group():
         self.r = self.avgprofiles[0].r
         rlen = len(self.r)
 
-        self.vanorms = numpy.zeros(numavgprofiles)
-        self.vanormstds = numpy.zeros(numavgprofiles)
-        self.vrnorms = numpy.zeros((numavgprofiles, rlen))
-        self.vrnormstds = numpy.zeros((numavgprofiles, rlen))
-        self.vtnorms = numpy.zeros((numavgprofiles, rlen))
-        self.vtnormstds = numpy.zeros((numavgprofiles, rlen))
-        self.vravgs = numpy.zeros((numavgprofiles, rlen))
-        self.vrstds = numpy.zeros((numavgprofiles, rlen))
-        self.vtavgs = numpy.zeros((numavgprofiles, rlen))
-        self.vtstds = numpy.zeros((numavgprofiles, rlen))
-        self.vocavgs = numpy.zeros(numavgprofiles)
-        self.vocstds = numpy.zeros(numavgprofiles)
-        self.vicavgs = numpy.zeros(numavgprofiles)
-        self.vicstds = numpy.zeros(numavgprofiles)
-        self.currentavgs = numpy.zeros(numavgprofiles)
-        self.currentstds = numpy.zeros(numavgprofiles)
+        self.vanorms = numpy.zeros(self.numprofiles)
+        self.vanormstds = numpy.zeros(self.numprofiles)
+        self.vrnorms = numpy.zeros((self.numprofiles, rlen))
+        self.vrnormstds = numpy.zeros((self.numprofiles, rlen))
+        self.vtnorms = numpy.zeros((self.numprofiles, rlen))
+        self.vtnormstds = numpy.zeros((self.numprofiles, rlen))
+        self.vravgs = numpy.zeros((self.numprofiles, rlen))
+        self.vrstds = numpy.zeros((self.numprofiles, rlen))
+        self.vtavgs = numpy.zeros((self.numprofiles, rlen))
+        self.vtstds = numpy.zeros((self.numprofiles, rlen))
+        self.vocavgs = numpy.zeros(self.numprofiles)
+        self.vocstds = numpy.zeros(self.numprofiles)
+        self.vicavgs = numpy.zeros(self.numprofiles)
+        self.vicstds = numpy.zeros(self.numprofiles)
+        self.currentavgs = numpy.zeros(self.numprofiles)
+        self.currentstds = numpy.zeros(self.numprofiles)
 
         for i in range(0, len(self.avgprofiles)):
             self.vanorms[i] = self.avgprofiles[i].vanorm
