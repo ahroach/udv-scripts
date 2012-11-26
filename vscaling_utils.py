@@ -273,7 +273,6 @@ class AvgProfile:
         #Get the velocity measurements
         startidx = self.velocity.get_index_near_time(t_start)
         endidx = self.velocity.get_index_near_time(t_end)
-        ridx = self.velocity.get_index_near_radius(r)
 
         self.vravg = self.velocity.vr[startidx:endidx].mean(axis=0)
         self.vrstd = self.velocity.vr[startidx:endidx].std(axis=0)
