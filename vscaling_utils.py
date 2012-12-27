@@ -79,6 +79,31 @@ class AvgPointMeasurement:
         self.vicavg = self.ICspeedavg*2*numpy.pi*7.06/60
         self.vicstd = self.ICspeedstd*2*numpy.pi*7.06/60
 
+
+        #Average the inner ring speeds over the total length of the
+        #the applied field.
+        
+        self.IRspeedavg = md.time_avg(self.shot.field_delay,
+                                      (self.shot.field_delay +
+                                       self.shot.field_length))['IRspeed']
+
+        self.IRspeedstd = md.time_std(self.shot.field_delay,
+                                      (self.shot.field_delay +
+                                       self.shot.field_length))['IRspeed']
+
+
+        #Average the outer ring speeds over the total length of the
+        #the applied field.
+        
+        self.ORspeedavg = md.time_avg(self.shot.field_delay,
+                                      (self.shot.field_delay +
+                                       self.shot.field_length))['ORspeed']
+
+        self.ORspeedstd = md.time_std(self.shot.field_delay,
+                                      (self.shot.field_delay +
+                                       self.shot.field_length))['ORspeed']
+
+
         #Average the outer cylinder speed over the time of the average
         #UDV measurement.
         #It turns out that the OC encoder sometimes has problems, so
@@ -256,6 +281,31 @@ class AvgProfile:
         self.vicavg = self.ICspeedavg*2*numpy.pi*7.06/60
         self.vicstd = self.ICspeedstd*2*numpy.pi*7.06/60
 
+
+        #Average the inner ring speeds over the total length of the
+        #the applied field.
+        
+        self.IRspeedavg = md.time_avg(self.shot.field_delay,
+                                      (self.shot.field_delay +
+                                       self.shot.field_length))['IRspeed']
+
+        self.IRspeedstd = md.time_std(self.shot.field_delay,
+                                      (self.shot.field_delay +
+                                       self.shot.field_length))['IRspeed']
+
+
+        #Average the outer ring speeds over the total length of the
+        #the applied field.
+        
+        self.ORspeedavg = md.time_avg(self.shot.field_delay,
+                                      (self.shot.field_delay +
+                                       self.shot.field_length))['ORspeed']
+
+        self.ORspeedstd = md.time_std(self.shot.field_delay,
+                                      (self.shot.field_delay +
+                                       self.shot.field_length))['ORspeed']
+
+
         #Average the outer cylinder speed over the time of the average
         #UDV measurement.
         #It turns out that the OC encoder sometimes has problems, so
@@ -374,3 +424,40 @@ class AvgProfile_group():
             self.vicstds[i] = self.avgprofiles[i].vicstd
             self.currentavgs[i] = self.avgprofiles[i].currentavg
             self.currentstds[i] = self.avgprofiles[i].currentstd
+
+    def print_params(self):
+        print "Targets:\n"
+        for profile in self.avgprofiles:
+            print "Shot: %i. Current: %g. " % (profile.shot.number,
+                                               profile.shot.current)
+            print "IC: %g. IR: %g. OR: %g. OC:%g\n" % (profile.shot.ICspeed,
+                                                       profile.shot.IRspeed,
+                                                       profile.shot.ORspeed,
+                                                       profile.shot.OCspeed)
+        
+        print "\nActual:\n"
+        for profile in self.avgprofiles:
+            print "Shot: %i. Current: %g/%g. " % (profile.shot.number,
+                                                  (profile.currentavg/
+                                                   profile.shot.current),
+                                                  (profile.currentstd/
+                                                   profile.shot.current))
+            print "IC: %g/%g. IR: %g/%g. " % ((profile.ICspeedavg/
+                                               profile.shot.ICspeed),
+                                              (profile.ICspeedstd/
+                                               profile.shot.ICspeed),
+                                              (profile.IRspeedavg/
+                                               profile.shot.IRspeed),
+                                              (profile.IRspeedstd/
+                                               profile.shot.IRspeed))
+
+            print "OR: %g/%g. OC: %g/%g.\n" % ((profile.ORspeedavg/
+                                                profile.shot.ORspeed),
+                                               (profile.ORspeedstd/
+                                                profile.shot.ORspeed),
+                                               (profile.OCspeedavg/
+                                                profile.shot.OCspeed),
+                                               (profile.OCspeedstd/
+                                                profile.shot.OCspeed))
+
+                                                                            
