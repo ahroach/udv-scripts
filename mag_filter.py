@@ -84,7 +84,7 @@ def filter_time_signal(shot_dir, channel, t_init=0.0, t_final=1e4,
         #of the *field* (B) rather than B-dot.
         #Don't correct at zero frequency, which leads to
         #NaNs in the reconstructed timeseries
-        F[1:] = F[1:]/(1j*abs(freq[1:]))
+        F[1:] = F[1:]/(1j*freq[1:])
         
     #reconstruct signal
     signal_filt = numpy.fft.ifft(F)
