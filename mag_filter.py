@@ -80,11 +80,11 @@ def filter_time_signal(shot_dir, channel, t_init=0.0, t_final=1e4,
     freq, F = filter_spectrum(shot_dir, channel, t_init, t_final, f_min, f_max)
     #Do frequency correction if required
     if(freq_correct==1):
-        #This is to avoid blowing up at zero frequency, which leads to
+        #Divide by i\omega to convert to a measurement
+        #of the *field* (B) rather than B-dot.
+        #Don't correct at zero frequency, which leads to
         #NaNs in the reconstructed timeseries
-        #plot(freq, F.real)
-        F[1:] = F[1:]/abs(freq[1:])
-        #plot(freq, F.real)
+        F[1:] = F[1:]/(1j*abs(freq[1:]))
         
     #reconstruct signal
     signal_filt = numpy.fft.ifft(F)
